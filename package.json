@@ -1,0 +1,30 @@
+{
+  "name": "tx-decoder",
+  "version": "0.0.1",
+  "description": "Blockchain transaction decoder",
+  "main": "index.js",
+  "repository": "https://github.com/ilyavf/tx-decoder.git",
+  "author": "Ilya Fadeev",
+  "license": "MIT",
+  "scripts": {
+    "test": "npm run lint && npm run mocha",
+    "lint": "standard --fix",
+    "mocha": "nyc mocha -u tdd --timeout 999999 --colors test/ --recursive"
+  },
+  "standard": {
+    "env": [
+      "mocha"
+    ]
+  },
+  "devDependencies": {
+    "assert": "^1.4.1",
+    "mocha": "^3.4.2",
+    "nyc": "^11.0.3",
+    "safe-buffer": "^5.1.1",
+    "standard": "^10.0.2",
+    "varuint-bitcoin": "^1.0.4"
+  },
+  "dependencies": {
+    "ramda": "^0.24.1"
+  }
+}
