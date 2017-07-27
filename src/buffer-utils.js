@@ -8,33 +8,35 @@ const readSlice = offset => buffer => {
 // readUInt32 :: Buffer -> (Res, Buffer)
 function readUInt32 (buffer) {
   typeforce(typeforce.Buffer, buffer)
-  var i = buffer.readUInt32LE(0)
+  const i = buffer.readUInt32LE(0)
   return [i, buffer.slice(4)]
 }
 
 // readUInt32 :: Buffer -> (Res, Buffer)
 function readInt32 (buffer) {
   typeforce(typeforce.Buffer, buffer)
-  var i = buffer.readInt32LE(0)
+  const i = buffer.readInt32LE(0)
   return [i, buffer.slice(4)]
 }
 
 function readUInt64LE (buffer, offset) {
-  var a = buffer.readUInt32LE(offset)
-  var b = buffer.readUInt32LE(offset + 4)
+  typeforce(typeforce.Buffer, buffer)
+  typeforce(typeforce.Number, offset)
+  const a = buffer.readUInt32LE(offset)
+  let b = buffer.readUInt32LE(offset + 4)
   b *= 0x100000000
   // verifuint(b + a, 0x001fffffffffffff)
   return b + a
 }
 
 function readUInt64 (buffer) {
-  var i = readUInt64LE(buffer, 8)
+  const i = readUInt64LE(buffer, 8)
   return [i, buffer.slice(8)]
 }
 
 // readVarInt :: Buffer -> (Res, Buffer)
 function readVarInt (buffer) {
-  var vi = varuint.decode(buffer, 0)
+  const vi = varuint.decode(buffer, 0)
   return [vi, buffer.slice(varuint.decode.bytes)]
 }
 
