@@ -75,28 +75,16 @@ function add (propName, f) {
 console.log(readInt32(buffer))
 
 // readInputs :: Buffer -> (Res, Offset)
-function readInputs (buffer) {
+const readInputs = readFn => buffer => {
   const vins = []
   let [vinLen, bufferLeft] = readVarInt(buffer)
   let vin
   for (let i = 0; i < vinLen; ++i) {
-    [vin, bufferLeft] = readInput(bufferLeft)
+    [vin, bufferLeft] = readFn(bufferLeft)
     vins.push(vin)
   }
   return [vins, bufferLeft]
 }
-function readOutputs (buffer) {
-
-  // var voutLen = readVarInt()
-  // tx.outs.push({
-  //   value: readUInt64(),
-  //   script: readVarSlice()
-  // })
-
-  const vout = []
-  return [vout, buffer]
-}
-
 
 
 // decodeTx :: buffer -> [vin, buffer]
@@ -104,13 +92,13 @@ const decodeTx = buffer =>
 (
   compose([
     add('version', readInt32),
-    add('vin', readInputs),
-    add('vout', readOutputs),
+    add('vin', readInputs(readInput)),
+    add('vout', readInputs(readOutput)),
     add('locktime', readUInt32)
   ])({}, buffer)
 )
 
-// compose :: adds -> (state -> buffer -> [state, buffer])
+// readInput :: Buffer -> [Res, Buffer]
 const readInput = buffer =>
 (
   compose([
@@ -118,6 +106,15 @@ const readInput = buffer =>
     add('index', readUInt32),
     add('script', readVarSlice),
     add('sequence', readUInt32)
+  ])({}, buffer)
+)
+
+// readOutput :: Buffer -> [Res, Buffer]
+const readOutput = buffer =>
+(
+  compose([
+    add('value', readUInt64),
+    add('script', readVarSlice),
   ])({}, buffer)
 )
 
