@@ -13,7 +13,7 @@ const vinLen = varuint.decode(buffer, offset)
 offset += varuint.decode.bytes
 console.log(`vinLen bytes = ${varuint.decode.bytes}`)
 
-const hash = buffer.slice(offset, 32)
+const hash = buffer.slice(offset, offset + 32)
 offset += 32
 
 const index = buffer.readUInt32LE(offset)
@@ -23,32 +23,45 @@ const scriptLen = varuint.decode(buffer, offset)
 offset += varuint.decode.bytes
 console.log(`scriptLen bytes = ${varuint.decode.bytes}`)
 
-const script = buffer.slice(offset, scriptLen)
+const script = buffer.slice(offset, offset + scriptLen)
 offset += scriptLen
 
 const sequence = buffer.readUInt32LE(offset)
 offset += 4
 
-// VOUT-1
+// VOUT
 const voutLen = varuint.decode(buffer, offset)
 offset += varuint.decode.bytes
 
+// VOUT-1
 const valueA = buffer.readUInt32LE(offset)
 const valueB = buffer.readUInt32LE(offset + 4)
-const valueB2 = valueB * 0x100000000
-const value = valueA + valueB2
+const valueBB = valueB * 0x100000000
+const value = valueA + valueBB
 offset += 8
 
 const lockingScriptLen = varuint.decode(buffer, offset)
 offset += varuint.decode.bytes
-console.log(`lockingScriptLen bytes = ${varuint.decode.bytes}`)
 
-console.log(`*** lockingScript ::: offset=${offset}, lockingScriptLen=${lockingScriptLen}, buffer.length=${buffer.length}`)
-const lockingScript = buffer.slice(offset, lockingScriptLen)
+const lockingScript = buffer.slice(offset, offset + lockingScriptLen)
 offset += lockingScriptLen
 
-// script: readVarSlice()
+// VOUT-2
+const valueA2 = buffer.readUInt32LE(offset)
+const valueB2 = buffer.readUInt32LE(offset + 4)
+const valueBB2 = valueB2 * 0x100000000
+const value2 = valueA2 + valueBB2
+offset += 8
 
+const lockingScriptLen2 = varuint.decode(buffer, offset)
+offset += varuint.decode.bytes
+
+const lockingScript2 = buffer.slice(offset, offset + lockingScriptLen2)
+offset += lockingScriptLen2
+
+// Locktime
+const locktime = buffer.readUInt32LE(offset)
+offset += 4
 
 
 console.log(`version = ${version}`)
@@ -61,9 +74,14 @@ console.log(`sequence = ${sequence}`)
 console.log(`voutLen = ${voutLen}`)
 console.log(`valueA = ${valueA}`)
 console.log(`valueB = ${valueB}`)
-console.log(`valueB2 = ${valueB2}`)
+console.log(`valueB2 = ${valueBB}`)
 console.log(`value = ${value}`)
 console.log(`lockingScriptLen = ${lockingScriptLen}`)
-console.log(`lockingScript hex = ${lockingScript.toString('hex')}`)
-console.log(`lockingScript = ${lockingScript}`)
+console.log(`lockingScript = ${lockingScript.toString('hex')}`)
+console.log(`value2 = ${value2}`)
+console.log(`lockingScriptLen2 = ${lockingScriptLen2}`)
+console.log(`lockingScriptLen2 = ${lockingScriptLen2}`)
+console.log(`lockingScript2 = ${lockingScript2.toString('hex')}`)
+console.log(`locktime = ${locktime}`)
+
 console.log(`BUFFER LEFT = ${buffer.slice(offset).toString('hex')}`)
