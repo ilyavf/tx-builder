@@ -1,4 +1,5 @@
 'use strict'
+const Buffer = require('safe-buffer').Buffer
 const assert = require('assert')
 const { readInt32 } = require('../src/buffer-utils')
 const { decodeTx } = require('../src/tx-decoder')
@@ -13,6 +14,12 @@ describe('Decode hex', function () {
     assert.ok(bufferLeft)
   })
 
+  it('should read version', function () {
+    const [ver, bufferLeft] = readInt32(buffer)
+    assert.equal(ver, 1)
+    assert.ok(bufferLeft)
+  })
+
   it('should decode tx', function () {
     let decoded
     try {
@@ -20,6 +27,7 @@ describe('Decode hex', function () {
     } catch (e) {
       console.log(e)
     }
+    console.log(decoded[0].vin)
     assert.ok(decoded)
   })
 })
