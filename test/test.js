@@ -1,6 +1,6 @@
 'use strict'
 const assert = require('assert')
-const { readInt32 } = require('../src/utils')
+const { readInt32 } = require('../src/buffer-utils')
 const { decodeTx } = require('../src/tx-decoder')
 
 describe('Decode hex', function () {

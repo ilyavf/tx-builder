@@ -45,31 +45,11 @@ function readVarSlice (buffer) {
   return [res, buffer.slice(offset + offset2)]
 }
 
-// compose :: adds -> (state -> buffer -> [state, buffer])
-function compose (args) {
-  return function (state, buffer) {
-    typeforce(typeforce.Buffer, buffer)
-    args.reduce(([state, buffer], f) => f(state, buffer), [state, buffer])
-    return [state, buffer]
-  }
-}
-// addProp :: propName -> f -> (state -> buffer -> [state, buffer])
-function addProp (propName, f) {
-  return function (state, buffer) {
-    typeforce(typeforce.Buffer, buffer)
-    const [res, bufferLeft] = f(buffer)
-    state[propName] = res
-    return [state, bufferLeft]
-  }
-}
-
 module.exports = {
   readSlice,
   readUInt32,
   readInt32,
   readUInt64,
   readVarInt,
-  readVarSlice,
-  compose,
-  addProp
+  readVarSlice
 }

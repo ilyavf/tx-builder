@@ -1,13 +1,12 @@
+const { compose, addProp } = require('./compose')
 const {
   readSlice,
   readUInt32,
   readInt32,
   readUInt64,
   readVarInt,
-  readVarSlice,
-  compose,
-  addProp
-} = require('./utils')
+  readVarSlice
+} = require('./buffer-utils')
 
 // readInputs :: Buffer -> (Res, Offset)
 const readInputs = readFn => buffer => {
