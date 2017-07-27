@@ -1,7 +1,7 @@
 {
   "name": "tx-decoder",
   "version": "0.0.1",
-  "description": "Blockchain transaction decoder",
+  "description": "Blockchain transaction decoder in the monadic style",
   "main": "index.js",
   "repository": "https://github.com/ilyavf/tx-decoder.git",
   "author": "Ilya Fadeev",
@@ -24,7 +24,5 @@
     "standard": "^10.0.2",
     "varuint-bitcoin": "^1.0.4"
   },
-  "dependencies": {
-    "ramda": "^0.24.1"
-  }
+  "dependencies": {}
 }
