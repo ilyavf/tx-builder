@@ -2,32 +2,52 @@
 const Buffer = require('safe-buffer').Buffer
 const assert = require('assert')
 const { readInt32 } = require('../src/buffer-utils')
-const { decodeTx } = require('../src/tx-decoder')
+const { decodeTx, readInput } = require('../src/tx-decoder')
+const fixture = require('./fixture')
 
 describe('Decode hex', function () {
-  const txHex = '0100000001545f6161d2be3bdfe7184ee1f72123c3918738da8b97f11e23acdd34059f7a2d010000006b4830450221008c33d765ae16cfa3cc653c5c039d58131fbbdf76266af7a76910fc1ba39de0b8022048ae83fc9b82f62b816641158dd1cfd398d2c56d5f6f812c9fa588947311d8400121033701fc7f242ae2dd63a18753518b6d1425e53496878924b6c0dc08d800af46adffffffff0200e1f505000000001976a91461ca8116d03694952a3ad252d53c695da7d95f6188ac18ddf505000000001976a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac00000000'
+  const txHex = fixture.hex
   const buffer = Buffer.from(txHex, 'hex')
 
-  it('should read version', function () {
-    const [ver, bufferLeft] = readInt32(buffer)
-    assert.equal(ver, 1)
-    assert.ok(bufferLeft)
+  describe('readInt32', function () {
+    it('should read version', function () {
+      const [ver, bufferLeft] = readInt32(buffer)
+      assert.equal(ver, 1)
+      assert.ok(bufferLeft)
+    })
   })
 
-  it('should read version', function () {
-    const [ver, bufferLeft] = readInt32(buffer)
-    assert.equal(ver, 1)
-    assert.ok(bufferLeft)
+  describe('readInput', function () {
+    const offsetVersionAndVinLength = 4 + 1
+    const [input, bufferLeft] = readInput(buffer.slice( offsetVersionAndVinLength ))
+    it('should read hash', function () {
+      assert.equal(input.hash.toString('hex'), fixture.decoded.hash)
+    })
+    it('should read index', function () {
+      assert.equal(input.index, 1)
+    })
+    it('should read script', function () {
+      assert.equal(input.script.toString('hex'), fixture.decoded.script)
+    })
+    it('should read sequence', function () {
+      assert.equal(input.sequence, fixture.decoded.sequence)
+    })
+    it('should leave some buffer', function () {
+      assert.ok(bufferLeft)
+    })
   })
 
-  it('should decode tx', function () {
-    let decoded
-    try {
-      decoded = decodeTx(buffer)
-    } catch (e) {
-      console.log(e)
-    }
-    console.log(decoded[0].vin)
-    assert.ok(decoded)
+  describe('decodeTx', function () {
+    it('should decode tx', function () {
+      let decoded
+      try {
+        decoded = decodeTx(buffer)
+      } catch (e) {
+        console.log(e)
+      }
+      // console.log(decoded)
+      // console.log(decoded[0].vin)
+      assert.ok(decoded)
+    })
   })
 })

@@ -38,9 +38,9 @@ function readVarInt (buffer) {
 
 // readVarSlice :: Buffer -> (Res, Buffer)
 function readVarSlice (buffer) {
-  const [len, offset] = readVarInt(buffer)
-  const [res, offset2] = readSlice(len)(buffer.slice(offset))
-  return [res, buffer.slice(offset + offset2)]
+  const [len, bufferLeft] = readVarInt(buffer)
+  const [res, bufferLeft2] = readSlice(len)(bufferLeft)
+  return [res, bufferLeft2]
 }
 
 module.exports = {
