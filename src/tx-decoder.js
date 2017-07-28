@@ -1,4 +1,3 @@
-const varuint = require('varuint-bitcoin')
 const { compose, addProp } = require('./compose')
 const {
   readSlice,
@@ -14,7 +13,7 @@ const readInputs = readFn => buffer => {
   const vins = []
   let [vinLen, bufferLeft] = readVarInt(buffer)
   console.log('vinLen = ' + vinLen)
-  let vin
+  // let vin
   for (let i = 0; i < vinLen; ++i) {
     const res = readFn(bufferLeft)
     // [vin, bufferLeft] = res

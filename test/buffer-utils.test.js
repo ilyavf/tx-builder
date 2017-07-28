@@ -1,7 +1,6 @@
 const Buffer = require('safe-buffer').Buffer
 const varuint = require('varuint-bitcoin')
 const assert = require('assert')
-const fixture = require('./fixture')
 
 const {
   readSlice,

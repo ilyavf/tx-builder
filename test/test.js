@@ -8,17 +8,9 @@ describe('Decode hex', function () {
   const txHex = fixture.hex
   const buffer = Buffer.from(txHex, 'hex')
 
-  describe('readInt32', function () {
-    it('should read version', function () {
-      const [ver, bufferLeft] = readInt32(buffer)
-      assert.equal(ver, fixture.decoded.version)
-      assert.ok(bufferLeft)
-    })
-  })
-
   describe('readInput', function () {
     const offsetVersionAndVinLength = 4 + 1
-    const [input, bufferLeft] = readInput(buffer.slice( offsetVersionAndVinLength ))
+    const [input, bufferLeft] = readInput(buffer.slice(offsetVersionAndVinLength))
     it('should read hash', function () {
       assert.equal(input.hash.toString('hex'), fixture.decoded.vin[0].hash)
     })
@@ -39,7 +31,7 @@ describe('Decode hex', function () {
 
   describe('readOutput', function () {
     const offsetVout = fixture.offsetVout1
-    const [output, bufferLeft] = readOutput(buffer.slice( offsetVout ))
+    const [output, bufferLeft] = readOutput(buffer.slice(offsetVout))
     it('should read value', function () {
       assert.equal(output.value, fixture.decoded.vout[0].value)
     })

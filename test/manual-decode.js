@@ -65,7 +65,6 @@ offset += lockingScriptLen2
 const locktime = buffer.readUInt32LE(offset)
 offset += 4
 
-
 console.log(`version = ${version}`)
 console.log(`vinLen = ${vinLen}`)
 console.log(`hash = ${hash.toString('hex')}`)
