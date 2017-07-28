@@ -1,6 +1,8 @@
 # tx-decoder
 Blockchain transaction decoder
 
+[![Build Status](https://travis-ci.org/ilyavf/tx-decoder.png?branch=master)](https://travis-ci.org/ilyavf/tx-decoder)
+
 This package contains helpers for decoding a blockchain transaction and implements an example of bitcoin transaction decoder.
 
 It can be useful for blockchain projects forked from BitcoinCore that want to add **custom data to a transaction**.
