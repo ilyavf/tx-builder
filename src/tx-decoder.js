@@ -12,13 +12,9 @@ const {
 const readInputs = readFn => buffer => {
   const vins = []
   let [vinLen, bufferLeft] = readVarInt(buffer)
-  console.log('vinLen = ' + vinLen)
-  // let vin
+  let vin
   for (let i = 0; i < vinLen; ++i) {
-    const res = readFn(bufferLeft)
-    // [vin, bufferLeft] = res
-    const vin = res[0]
-    bufferLeft = res[1]
+    [vin, bufferLeft] = readFn(bufferLeft)
     vins.push(vin)
   }
   return [vins, bufferLeft]

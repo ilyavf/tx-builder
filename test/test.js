@@ -89,9 +89,8 @@ describe('Decode hex', function () {
       } catch (e) {
         console.log(e)
       }
-      // console.log(decoded)
-      // console.log(decoded[0].vin)
-      assert.ok(decoded)
+      assert.equal(decoded[0].vin[0].sequence, fixture.decoded.vin[0].sequence)
+      assert.equal(decoded[0].vout[1].script.toString('hex'), fixture.decoded.vout[1].script)
     })
   })
 })
