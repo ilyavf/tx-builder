@@ -1,6 +1,6 @@
 {
   "name": "tx-decoder",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Composable helpers for decoding blockchain transactions",
   "main": "index.js",
   "repository": "https://github.com/ilyavf/tx-decoder.git",
@@ -22,15 +22,15 @@
       "mocha"
     ]
   },
+  "dependencies": {
+    "typeforce": "^1.11.1",
+    "safe-buffer": "^5.1.1",
+    "varuint-bitcoin": "^1.0.4"
+  },
   "devDependencies": {
     "assert": "^1.4.1",
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
-    "safe-buffer": "^5.1.1",
-    "standard": "^10.0.2",
-    "varuint-bitcoin": "^1.0.4"
-  },
-  "dependencies": {
-    "typeforce": "^1.11.1"
+    "standard": "^10.0.2"
   }
 }
