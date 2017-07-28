@@ -1,7 +1,7 @@
 {
   "name": "tx-decoder",
   "version": "0.0.1",
-  "description": "Blockchain transaction decoder in the monadic style",
+  "description": "Blockchain transaction decoder in a composable style",
   "main": "index.js",
   "repository": "https://github.com/ilyavf/tx-decoder.git",
   "author": "Ilya Fadeev",

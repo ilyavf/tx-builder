@@ -34,6 +34,7 @@ const voutLen = varuint.decode(buffer, offset)
 offset += varuint.decode.bytes
 
 // VOUT-1
+console.log('offset of the VOUT-1', offset)
 const valueA = buffer.readUInt32LE(offset)
 const valueB = buffer.readUInt32LE(offset + 4)
 const valueBB = valueB * 0x100000000
