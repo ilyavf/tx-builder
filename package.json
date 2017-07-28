@@ -1,11 +1,17 @@
 {
   "name": "tx-decoder",
   "version": "0.0.1",
-  "description": "Blockchain transaction decoder in a composable style",
+  "description": "Composable helpers for decoding blockchain transactions",
   "main": "index.js",
   "repository": "https://github.com/ilyavf/tx-decoder.git",
   "author": "Ilya Fadeev",
   "license": "MIT",
+  "keywords": [
+    "bitcoin",
+    "blockchain",
+    "transaction",
+    "decode"
+  ],
   "scripts": {
     "test": "npm run lint && npm run mocha",
     "lint": "standard --fix",
