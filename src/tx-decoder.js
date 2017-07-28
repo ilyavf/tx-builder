@@ -9,14 +9,17 @@ const {
   readVarSlice
 } = require('./buffer-utils')
 
-// readInputs :: Buffer -> (Res, Offset)
+// readInputs :: Buffer -> (Res, Buffer)
 const readInputs = readFn => buffer => {
   const vins = []
   let [vinLen, bufferLeft] = readVarInt(buffer)
   console.log('vinLen = ' + vinLen)
   let vin
   for (let i = 0; i < vinLen; ++i) {
-    [vin, bufferLeft] = readFn(bufferLeft)
+    const res = readFn(bufferLeft)
+    // [vin, bufferLeft] = res
+    const vin = res[0]
+    bufferLeft = res[1]
     vins.push(vin)
   }
   return [vins, bufferLeft]

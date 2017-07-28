@@ -20,7 +20,6 @@ module.exports = {
   offsetVout1: 154
 }
 
-
 // Version:
 // 01000000
 //
