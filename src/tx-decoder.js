@@ -1,3 +1,8 @@
+/**
+ * This `decodeTx` decodes a bitcoin transaction. Its an example of how to use the composable helpers
+ * to make a decoder.
+ */
+
 const { compose, addProp } = require('./compose')
 const {
   readSlice,
@@ -20,7 +25,7 @@ const readInputs = readFn => buffer => {
   return [vins, bufferLeft]
 }
 
-// decodeTx :: buffer -> [vin, buffer]
+// decodeTx :: Buffer -> [Res, Buffer]
 const decodeTx = buffer =>
 (
   compose([

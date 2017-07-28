@@ -1,0 +1,5 @@
+language: node_js
+node_js: 7.3
+addons:
+  firefox: "51.0"
+cache: yarn
