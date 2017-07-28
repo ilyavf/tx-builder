@@ -5,8 +5,7 @@ const compose = args => (state, buffer) => {
   typeforce(typeforce.Array, args)
   typeforce(typeforce.Object, state)
   typeforce(typeforce.Buffer, buffer)
-  args.reduce(([state, buffer], f) => f(state, buffer), [state, buffer])
-  return [state, buffer]
+  return args.reduce(([state, buffer], f) => f(state, buffer), [state, buffer])
 }
 
 // addProp :: propName -> f -> (state -> buffer -> [state, buffer])
