@@ -13,6 +13,8 @@ Compared to `bitcoinjs-lib` which implements decoding in an imperative style whe
 of the outer scope and mutates outer `offset`. Thus its helpers cannot be reused for a different transaction structure.
 
 ## Example:
+
+Here is how bitcoin transaction decoder is implemented (the main export of the package):
 ```javascript
 const Buffer = require("safe-buffer").Buffer
 const { readInt32, readUInt32 } = require("tx-decoder/src/buffer-utils")
@@ -38,7 +40,7 @@ console.log( decodeTx( buffer ) )
 // > [{version: 1, vin: [...], vout: [...]}, <Buffer >]
 ```
 
-Here is how `readInput` can be defined in the same composable manner:
+Here is how `readInput` is defined in the same composable manner:
 ```javascript
 const { readSlice, readVarSlice, readUInt32 } = require("tx-decoder/src/buffer-utils")
 const { compose, addProp } = require("tx-decoder/src/compose")
