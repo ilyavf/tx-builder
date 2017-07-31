@@ -1,12 +1,21 @@
 'use strict'
 const Buffer = require('safe-buffer').Buffer
 const assert = require('assert')
-const { decodeTx, readInput, readOutput, readInputs } = require('../src/tx-decoder')
+const { decodeTx, readHash, readInput, readOutput, readInputs } = require('../src/tx-decoder')
 const fixture = require('./fixture')
 
 describe('Decode hex', function () {
   const txHex = fixture.hex
   const buffer = Buffer.from(txHex, 'hex')
+
+  describe('readHash', function () {
+    const offset = 4 + 1
+    const [hash, bufferLeft] = readHash(buffer.slice(offset))
+    it('should read tx hash from buffer and reverse it', function () {
+      assert.equal(hash, fixture.decoded.vin[0].hash)
+      assert.ok(bufferLeft.length < buffer.length)
+    })
+  })
 
   describe('readInput', function () {
     const offsetVersionAndVinLength = 4 + 1

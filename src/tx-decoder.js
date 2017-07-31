@@ -13,6 +13,16 @@ const {
   readVarSlice
 } = require('./buffer-utils')
 
+/**
+ * Transaction's hash is displayed in a reverse order, we need to un-reverse it.
+ */
+// readHash :: Buffer -> [Hash, Buffer]
+const readHash = buffer => {
+  const [res, bufferLeft] = readSlice(32)(buffer)
+  const hash = Buffer.from(res, 'hex').reverse().toString('hex')
+  return [hash, bufferLeft]
+}
+
 // readInputs :: Buffer -> (Res, Buffer)
 const readInputs = readFn => buffer => {
   const vins = []
@@ -40,7 +50,7 @@ const decodeTx = buffer =>
 const readInput = buffer =>
 (
   compose([
-    addProp('hash', readSlice(32)),           // 32 bytes, Transaction Hash
+    addProp('hash', readHash),                // 32 bytes, Transaction Hash
     addProp('index', readUInt32),             // 4 bytes, Output Index
     addProp('script', readVarSlice),          // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     addProp('sequence', readUInt32)           // 4 bytes, Sequence Number
@@ -58,6 +68,7 @@ const readOutput = buffer =>
 
 module.exports = {
   decodeTx,
+  readHash,
   readInputs,
   readInput,
   readOutput
