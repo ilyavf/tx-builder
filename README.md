@@ -63,11 +63,11 @@ Checkout tests for exact examples of how to use the package helpers.
 
 ## Upcoming
 
-- transaction builder
+- decode script
+- create a transaction builder
 
 ## Release Notes:
 - 0.2.0 Added readHash helper
   - Reverse the hash (tx id) after its read from hex.
 - 0.1.2 Initial version
   - buffer utils, compose helpers, bitcoin tx decode example.
-  
