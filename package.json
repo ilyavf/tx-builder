@@ -1,5 +1,5 @@
 {
-  "name": "tx-decoder",
+  "name": "tx-builder",
   "version": "0.3.0",
   "description": "Composable helpers for building and decoding blockchain transactions",
   "main": "index.js",
