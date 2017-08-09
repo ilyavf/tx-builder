@@ -18,19 +18,25 @@ const {
   prop
 } = require('./compose-build')
 
-var EMPTY_BUFFER = Buffer.allocUnsafe(0)
+const EMPTY_BUFFER = Buffer.allocUnsafe(0)
 
-// buildTx :: Tx -> Buffer -> Buffer
+/**
+ * Main function to build a bitcoin transaction. Creates an instance of Buffer.
+ * @param {Object} tx
+ * @return {Buffer}
+ */
+// buildTx :: Tx -> Buffer
 const buildTx = tx =>
 (
   compose([
     prop('version', bufferInt32),              // 4 bytes
     prop('vin', bufferInputs(bufferInput)),    // 1-9 bytes (VarInt), Input counter; Variable, Inputs
     prop('vout', bufferInputs(bufferOutput)),  // 1-9 bytes (VarInt), Output counter; Variable, Outputs
-    prop('locktime', bufferUInt32)            // 4 bytes
+    prop('locktime', bufferUInt32)             // 4 bytes
   ])(tx, EMPTY_BUFFER)
 )
 
+// bufferInputs :: Fn -> [Object] -> Buffer
 const bufferInputs = bufferFn => vins =>
 (
   Buffer.concat(
@@ -38,6 +44,7 @@ const bufferInputs = bufferFn => vins =>
   )
 )
 
+// bufferInput :: Object -> Buffer
 const bufferInput = vin =>
 (
   compose([
@@ -48,6 +55,7 @@ const bufferInput = vin =>
   ])(vin, EMPTY_BUFFER)
 )
 
+// bufferOutput :: Object -> Buffer
 const bufferOutput = vout =>
 (
   compose([
@@ -56,10 +64,15 @@ const bufferOutput = vout =>
   ])(vout, EMPTY_BUFFER)
 )
 
+/**
+ * Transaction's hash is displayed in a reverse order.
+ */
+// bufferHash :: HexString -> Buffer
 const bufferHash = hash => Buffer.from(hash, 'hex').reverse()
 
 module.exports = {
   buildTx,
+  bufferInputs,
   bufferInput,
   bufferOutput,
   bufferHash
