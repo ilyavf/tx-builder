@@ -3,7 +3,7 @@
  * to make a decoder.
  */
 
-const { compose, addProp } = require('./compose')
+const { compose, addProp } = require('./compose-read')
 const {
   readSlice,
   readUInt32,
@@ -11,7 +11,7 @@ const {
   readUInt64,
   readVarInt,
   readVarSlice
-} = require('./buffer-utils')
+} = require('./buffer-read')
 
 /**
  * Transaction's hash is displayed in a reverse order, we need to un-reverse it.

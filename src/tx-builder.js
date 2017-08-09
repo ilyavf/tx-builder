@@ -6,14 +6,17 @@
 // tx.build().toHex()
 
 const Buffer = require('safe-buffer').Buffer
-const typeforce = require('typeforce')
 const {
   bufferInt32,
   bufferUInt32,
   bufferUInt64,
   bufferVarInt,
   bufferVarSlice
-} = require('./buffer-write')
+} = require('./buffer-build')
+const {
+  compose,
+  prop
+} = require('./compose-build')
 
 var EMPTY_BUFFER = Buffer.allocUnsafe(0)
 
@@ -24,19 +27,9 @@ const buildTx = tx =>
     prop('version', bufferInt32),              // 4 bytes
     prop('vin', bufferInputs(bufferInput)),    // 1-9 bytes (VarInt), Input counter; Variable, Inputs
     prop('vout', bufferInputs(bufferOutput)),  // 1-9 bytes (VarInt), Output counter; Variable, Outputs
-    prop('locktime', bufferUInt32),            // 4 bytes
+    prop('locktime', bufferUInt32)            // 4 bytes
   ])(tx, EMPTY_BUFFER)
 )
-
-// compose :: [Fn] -> Tx -> Buffer -> Buffer
-const compose = args => (tx, buffer) => {
-  typeforce(typeforce.Array, args)
-  typeforce(typeforce.Object, tx)
-  typeforce(typeforce.Buffer, buffer)
-  return args.reduce((buffer, f) => Buffer.concat([buffer, f(tx)]), buffer)
-}
-
-const prop = (propName, fn) => obj => fn(obj[propName])
 
 const bufferInputs = bufferFn => vins =>
 (

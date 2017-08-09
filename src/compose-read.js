@@ -1,6 +1,6 @@
 const typeforce = require('typeforce')
 
-// compose :: addProps -> state -> buffer -> [state, buffer]
+// compose :: [Fn] -> State -> Buffer -> [State, Buffer]
 const compose = args => (state, buffer) => {
   typeforce(typeforce.Array, args)
   typeforce(typeforce.Object, state)
@@ -8,7 +8,7 @@ const compose = args => (state, buffer) => {
   return args.reduce(([state, buffer], f) => f(state, buffer), [state, buffer])
 }
 
-// addProp :: propName -> f -> (state -> buffer -> [state, buffer])
+// addProp :: PropName -> Fn -> (State -> Buffer -> [State, Buffer])
 const addProp = (propName, f) => (state, buffer) => {
   typeforce(typeforce.String, propName)
   typeforce(typeforce.Function, f)

@@ -9,9 +9,9 @@ const {
   readUInt64,
   readVarInt,
   readVarSlice
-} = require('../src/buffer-utils')
+} = require('../src/buffer-read')
 
-describe('buffer-utils', function () {
+describe('buffer-read utils', function () {
   describe('readSlice', function () {
     const buffer = Buffer.from('aabbcc', 'hex')
     const [res, bufferLeft] = readSlice(2)(buffer)

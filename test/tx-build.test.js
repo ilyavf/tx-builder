@@ -5,7 +5,7 @@ const {
   bufferUInt64,
   bufferVarInt,
   bufferVarSlice
-} = require('../src/buffer-write')
+} = require('../src/buffer-build')
 const {
   buildTx,
   bufferInput,
@@ -14,7 +14,7 @@ const {
 } = require('../src/tx-builder')
 const fixture = require('./fixture')
 
-describe('buffer-write', function () {
+describe('buffer-write utils', function () {
   describe('bufferInt32', function () {
     const buffer = bufferInt32(25)
     it('should create a buffer with 32bit integer', function () {
