@@ -16,7 +16,7 @@ of the outer scope and mutates outer `offset`. Thus its helpers cannot be reused
 
 ### Decoding a transaction
 
-Here is how bitcoin transaction decoder is implemented (the main export of the package):
+Here is how Bitcoin transaction decoder is implemented (the main export of the package):
 ```javascript
 const Buffer = require("safe-buffer").Buffer
 const { readInt32, readUInt32 } = require("tx-decoder/src/buffer-read")
@@ -66,14 +66,15 @@ Checkout tests for exact examples of how to use the package helpers.
 
 ### Building a transaction
 
-Here is how bitcoin transaction builder is implemented:
+Here is how Bitcoin transaction builder is implemented
+(see `src/tx-builder.js` for a full example):
 ```javascript
 const Buffer = require("safe-buffer").Buffer
 const { bufferInt32, bufferUInt32 } = require("tx-decoder/src/buffer-utils")
 const { compose, prop } = require("tx-decoder/src/compose-build")
 const { bufferInputs, bufferInput, bufferOutput } = require("tx-decoder/src/tx-builder")
 
-// Create a buffer from a transaction hex:
+// Given a transaction JSON:
 // (see `test/fixture.js` for a full tx example)
 const tx = {
   version: 1,
