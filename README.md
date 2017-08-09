@@ -1,4 +1,4 @@
-# tx-decoder
+# tx-builder
 Composable helpers for building and decoding blockchain transactions
 
 [![Build Status](https://travis-ci.org/ilyavf/tx-builder.png?branch=master)](https://travis-ci.org/ilyavf/tx-builder)
