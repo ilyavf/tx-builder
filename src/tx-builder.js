@@ -6,10 +6,12 @@
 // tx.build().toHex()
 
 const Buffer = require('safe-buffer').Buffer
+const typeforce = require('typeforce')
 const {
   bufferInt32,
   bufferUInt32,
   bufferUInt64,
+  bufferVarInt,
   bufferVarSlice
 } = require('./buffer-write')
 
@@ -34,7 +36,14 @@ const compose = args => (tx, buffer) => {
   return args.reduce((buffer, f) => Buffer.concat([buffer, f(tx)]), buffer)
 }
 
-const bufferInputs = bufferFn => vins => Buffer.concat(vins.map(bufferFn))
+const prop = (propName, fn) => obj => fn(obj[propName])
+
+const bufferInputs = bufferFn => vins =>
+(
+  Buffer.concat(
+    [bufferVarInt(vins.length)].concat(vins.map(bufferFn))
+  )
+)
 
 const bufferInput = vin =>
 (
@@ -54,7 +63,7 @@ const bufferOutput = vout =>
   ])(vout, EMPTY_BUFFER)
 )
 
-const bufferHash = hash => Buffer.from(hash, 'hex')
+const bufferHash = hash => Buffer.from(hash, 'hex').reverse()
 
 module.exports = {
   buildTx,

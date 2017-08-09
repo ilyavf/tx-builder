@@ -7,8 +7,12 @@ const {
   bufferVarSlice
 } = require('../src/buffer-write')
 const {
+  buildTx,
+  bufferInput,
+  bufferOutput,
   bufferHash
 } = require('../src/tx-builder')
+const fixture = require('./fixture')
 
 describe('buffer-write', function () {
   describe('bufferInt32', function () {
@@ -56,7 +60,25 @@ describe('tx-build', function () {
   describe('bufferHash', function () {
     it('should create a buffer with hash', function () {
       const hash = '2d7a9f0534ddac231ef1978bda388791c32321f7e14e18e7df3bbed261615f54'
-      assert.equal(bufferHash(hash).toString('hex'), hash)
+      assert.equal(bufferHash(hash).reverse().toString('hex'), hash)
+    })
+  })
+  describe('bufferInput', function () {
+    it('should build vin', function () {
+      const buffer = bufferInput(fixture.decoded.vin[0])
+      assert.equal(buffer.toString('hex'), fixture.hexItems.vin)
+    })
+  })
+  describe('bufferOutput', function () {
+    it('should build vout-1', function () {
+      const buffer = bufferOutput(fixture.decoded.vout[0])
+      assert.equal(buffer.toString('hex'), fixture.hexItems.vout1)
+    })
+  })
+  describe('buildTx', function () {
+    it('should build the whole transaction', function () {
+      const buffer = buildTx(fixture.decoded)
+      assert.equal(buffer.toString('hex'), fixture.hex)
     })
   })
 })
