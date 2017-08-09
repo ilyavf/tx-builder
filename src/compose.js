@@ -1,6 +1,6 @@
 const typeforce = require('typeforce')
 
-// compose :: addProps -> (state -> buffer -> [state, buffer])
+// compose :: addProps -> state -> buffer -> [state, buffer]
 const compose = args => (state, buffer) => {
   typeforce(typeforce.Array, args)
   typeforce(typeforce.Object, state)
