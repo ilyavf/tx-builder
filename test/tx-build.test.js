@@ -2,6 +2,7 @@ const varuint = require('varuint-bitcoin')
 const assert = require('assert')
 const {
   bufferInt32,
+  bufferUInt64,
   bufferVarInt,
   bufferVarSlice
 } = require('../src/buffer-write')
@@ -20,6 +21,16 @@ describe('buffer-write', function () {
     const buffer = bufferInt32(123)
     it('should create a buffer with unsigned 32bit integer', function () {
       assert.equal(buffer.readUInt32LE(0), 123)
+    })
+  })
+  describe('bufferUInt64', function () {
+    it('should create a buffer with unsigned 64bit integer', function () {
+      const num = 456
+      const buffer = bufferUInt64(num)
+      const a = buffer.readUInt32LE(0)
+      let b = buffer.readUInt32LE(4)
+      b *= 0x100000000
+      assert.equal(a + b, num)
     })
   })
   describe('bufferVarInt', function () {

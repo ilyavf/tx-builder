@@ -13,6 +13,13 @@ const bufferUInt32 = value => {
   return buffer
 }
 
+const bufferUInt64 = value => {
+  const buffer = Buffer.allocUnsafe(8)
+  buffer.writeInt32LE(value & -1)
+  buffer.writeUInt32LE(Math.floor(value / 0x100000000), 4)
+  return buffer
+}
+
 const bufferVarInt = value => varuint.encode(value)
 
 const bufferVarSlice = value => {
@@ -24,6 +31,7 @@ const bufferVarSlice = value => {
 module.exports = {
   bufferInt32,
   bufferUInt32,
+  bufferUInt64,
   bufferVarInt,
   bufferVarSlice
 }

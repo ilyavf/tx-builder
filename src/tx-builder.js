@@ -9,6 +9,7 @@ const Buffer = require('safe-buffer').Buffer
 const {
   bufferInt32,
   bufferUInt32,
+  bufferUInt64,
   bufferVarSlice
 } = require('./buffer-write')
 
@@ -48,8 +49,8 @@ const bufferInput = vin =>
 const bufferOutput = vout =>
 (
   compose([
-    prop('value', readUInt64),               // 8 bytes, Amount in satoshis
-    prop('script', readVarSlice)             // 1-9 bytes (VarInt), Locking-Script Size; Variable, Locking-Script
+    prop('value', bufferUInt64),               // 8 bytes, Amount in satoshis
+    prop('script', bufferVarSlice)             // 1-9 bytes (VarInt), Locking-Script Size; Variable, Locking-Script
   ])(vout, EMPTY_BUFFER)
 )
 
