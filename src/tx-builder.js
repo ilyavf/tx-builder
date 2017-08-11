@@ -6,6 +6,11 @@
 // tx.build().toHex()
 
 const Buffer = require('safe-buffer').Buffer
+const bitcoin = require('bitcoinjs-lib')
+const bcrypto = bitcoin.crypto
+const bscript = bitcoin.script
+const baddress = bitcoin.address
+
 const {
   bufferInt32,
   bufferUInt32,
@@ -15,7 +20,8 @@ const {
 } = require('./buffer-build')
 const {
   compose,
-  prop
+  prop,
+  addProp
 } = require('./compose-build')
 
 const EMPTY_BUFFER = Buffer.allocUnsafe(0)
@@ -50,7 +56,8 @@ const bufferInput = vin =>
   compose([
     prop('hash', bufferHash),                // 32 bytes, Transaction Hash
     prop('index', bufferUInt32),             // 4 bytes, Output Index
-    prop('script', bufferVarSlice),          // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
+    addProp('scriptSig', vinScript),
+    prop('scriptSig', bufferVarSlice),       // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     prop('sequence', bufferUInt32)           // 4 bytes, Sequence Number
   ])(vin, EMPTY_BUFFER)
 )
@@ -60,9 +67,21 @@ const bufferOutput = vout =>
 (
   compose([
     prop('value', bufferUInt64),               // 8 bytes, Amount in satoshis
-    prop('script', bufferVarSlice)             // 1-9 bytes (VarInt), Locking-Script Size; Variable, Locking-Script
+    addProp('scriptPubKey', voutScript),
+    prop('scriptPubKey', bufferVarSlice)       // 1-9 bytes (VarInt), Locking-Script Size; Variable, Locking-Script
   ])(vout, EMPTY_BUFFER)
 )
+
+const vinScript = ({keyPair}) => {
+  const kpPubKey = keyPair.getPublicKeyBuffer()
+  const script = bscript.pubKeyHash.output.encode(bcrypto.hash160(kpPubKey))
+  // console.log(`script = ${script}`)
+  return script
+}
+
+// TODO: pass network as a param.
+// voutScript :: Object<Address> -> ScriptHex
+const voutScript = ({addr}) => baddress.toOutputScript(addr, bitcoin.networks.testnet)
 
 /**
  * Transaction's hash is displayed in a reverse order.
@@ -75,5 +94,7 @@ module.exports = {
   bufferInputs,
   bufferInput,
   bufferOutput,
-  bufferHash
+  bufferHash,
+  vinScript,
+  voutScript
 }
