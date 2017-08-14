@@ -56,7 +56,10 @@ const bufferInput = vin =>
   compose([
     prop('hash', bufferHash),                // 32 bytes, Transaction Hash
     prop('index', bufferUInt32),             // 4 bytes, Output Index
-    addProp('scriptSig', vinScript),
+    addProp(
+      'scriptSig',
+      prop('keyPair', vinScript)
+    ),
     prop('scriptSig', bufferVarSlice),       // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     prop('sequence', bufferUInt32)           // 4 bytes, Sequence Number
   ])(vin, EMPTY_BUFFER)
@@ -67,12 +70,15 @@ const bufferOutput = vout =>
 (
   compose([
     prop('value', bufferUInt64),               // 8 bytes, Amount in satoshis
-    addProp('scriptPubKey', voutScript('address')),
+    addProp(
+      'scriptPubKey',
+      prop('address', voutScript)
+    ),
     prop('scriptPubKey', bufferVarSlice)       // 1-9 bytes (VarInt), Locking-Script Size; Variable, Locking-Script
   ])(vout, EMPTY_BUFFER)
 )
 
-const vinScript = ({keyPair}) => {
+const vinScript = (keyPair) => {
   const kpPubKey = keyPair.getPublicKeyBuffer()
   const script = bscript.pubKeyHash.output.encode(bcrypto.hash160(kpPubKey))
   // console.log(`script = ${script}`)
@@ -80,8 +86,8 @@ const vinScript = ({keyPair}) => {
 }
 
 // TODO: pass network as a param.
-// voutScript :: String -> Object<Address> -> ScriptHex
-const voutScript = propName => tx => baddress.toOutputScript(tx[propName], bitcoin.networks.testnet)
+// voutScript :: Address -> ScriptHex
+const voutScript = addr => baddress.toOutputScript(addr, bitcoin.networks.testnet)
 
 /**
  * Transaction's hash is displayed in a reverse order.
