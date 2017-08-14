@@ -29,5 +29,5 @@ const { vinScript, voutScript } = require('../src/tx-builder')
 const script = vinScript({keyPair: addrHdNode.keyPair})
 console.log(`script = ${script.toString('hex')}`)
 
-const scriptPubKey = voutScript({addr:'mricWicq8AV5d46cYWPApESirBXcB42h57'})
+const scriptPubKey = voutScript({addr: 'mricWicq8AV5d46cYWPApESirBXcB42h57'})
 console.log(`scriptPubKey = ${scriptPubKey.toString('hex')}`)

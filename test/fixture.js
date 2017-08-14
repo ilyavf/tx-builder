@@ -21,7 +21,24 @@ module.exports = {
       script: '76a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac'
     }]
   },
-  offsetVout1: 154
+  offsetVout1: 154,
+  tx: {
+    version: 1,
+    locktime: 0,
+    vin: [{
+      hash: '2d7a9f0534ddac231ef1978bda388791c32321f7e14e18e7df3bbed261615f54',
+      index: 1,
+      script: '',
+      sequence: '4294967295'
+    }],
+    vout: [{
+      value: 100000000,
+      address: 'mpS2RuNkAEALvMhksCa6fPpLVb5yCPanLu'
+    }, {
+      value: 99999000,
+      address: 'mp9GiieHrLQvLu4C8nE9bbwxNmXqcC3nVf'
+    }]
+  }
 }
 
 // Version:

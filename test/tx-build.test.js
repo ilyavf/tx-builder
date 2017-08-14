@@ -13,6 +13,7 @@ const {
   bufferHash
 } = require('../src/tx-builder')
 const fixture = require('./fixture')
+const fixtureNode = require('./fixtures/hdnode')
 
 describe('buffer-write utils', function () {
   describe('bufferInt32', function () {
@@ -63,16 +64,20 @@ describe('tx-build', function () {
       assert.equal(bufferHash(hash).reverse().toString('hex'), hash)
     })
   })
-  describe('bufferInput', function () {
-    it('should build vin', function () {
-      const buffer = bufferInput(fixture.decoded.vin[0])
-      assert.equal(buffer.toString('hex'), fixture.hexItems.vin)
-    })
-  })
   describe('bufferOutput', function () {
     it('should build vout-1', function () {
-      const buffer = bufferOutput(fixture.decoded.vout[0])
+      const buffer = bufferOutput(fixture.tx.vout[0])
       assert.equal(buffer.toString('hex'), fixture.hexItems.vout1)
+    })
+  })
+  describe('bufferInput', function () {
+    const keyPair = fixtureNode.keyPair
+    it('should build vin', function () {
+      const txVin = Object.assign({}, fixture.decoded.vin[0], {
+        keyPair
+      })
+      const buffer = bufferInput(txVin)
+      assert.equal(buffer.toString('hex'), fixture.hexItems.vin)
     })
   })
   describe('buildTx', function () {

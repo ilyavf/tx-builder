@@ -81,7 +81,7 @@ const vinScript = ({keyPair}) => {
 
 // TODO: pass network as a param.
 // voutScript :: Object<Address> -> ScriptHex
-const voutScript = ({addr}) => baddress.toOutputScript(addr, bitcoin.networks.testnet)
+const voutScript = ({address}) => baddress.toOutputScript(address, bitcoin.networks.testnet)
 
 /**
  * Transaction's hash is displayed in a reverse order.
