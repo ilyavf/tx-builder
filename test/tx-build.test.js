@@ -10,7 +10,8 @@ const {
   buildTx,
   bufferInput,
   bufferOutput,
-  bufferHash
+  bufferHash,
+  bufferInputEmptyScript
 } = require('../src/tx-builder')
 const fixture = require('./fixture')
 const fixtureNode = require('./fixtures/hdnode')
@@ -68,6 +69,12 @@ describe('tx-build', function () {
     it('should build vout-1', function () {
       const buffer = bufferOutput(fixture.tx.vout[0])
       assert.equal(buffer.toString('hex'), fixture.hexItems.vout1)
+    })
+  })
+  describe('bufferInputEmptyScript', function () {
+    it('should return buffer for scriptSeg', function () {
+      const buffer = bufferInputEmptyScript(fixture.tx.vin[0])
+      assert.equal(buffer.toString('hex'), fixture.hexItems.vin1emptyScript)
     })
   })
   describe('bufferInput', function () {

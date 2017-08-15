@@ -141,5 +141,6 @@ module.exports = {
   bufferOutput,
   bufferHash,
   vinScript,
-  voutScript
+  voutScript,
+  bufferInputEmptyScript
 }
