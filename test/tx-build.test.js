@@ -73,17 +73,25 @@ describe('tx-build', function () {
   describe('bufferInput', function () {
     const keyPair = fixtureNode.keyPair
     it('should build vin', function () {
-      const txVin = Object.assign({}, fixture.decoded.vin[0], {
+      const txVin = Object.assign({}, fixture.tx.vin[0], {
         keyPair
       })
-      const buffer = bufferInput(txVin)
+      const buffer = bufferInput(fixture.tx)(txVin)
       assert.equal(buffer.toString('hex'), fixture.hexItems.vin)
     })
   })
-  describe('buildTx', function () {
-    it('should build the whole transaction', function () {
-      const buffer = buildTx(fixture.decoded)
-      assert.equal(buffer.toString('hex'), fixture.hex)
-    })
-  })
+  // describe('bufferInputs', function () {
+  //   it('should process vins', function () {
+  //     const buffer = bufferInputs('vin', {
+  //       vin: []
+  //     })
+  //     assert.equal(buffer.toString('hex'), fixture.hexItems.vout1)
+  //   })
+  // })
+  // describe('buildTx', function () {
+  //   it('should build the whole transaction', function () {
+  //     const buffer = buildTx(fixture.decoded)
+  //     assert.equal(buffer.toString('hex'), fixture.hex)
+  //   })
+  // })
 })
