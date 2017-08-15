@@ -8,6 +8,7 @@ const {
 } = require('../src/buffer-build')
 const {
   buildTx,
+  buildTxCopy,
   bufferInput,
   bufferOutput,
   bufferHash,
@@ -72,9 +73,15 @@ describe('tx-build', function () {
     })
   })
   describe('bufferInputEmptyScript', function () {
-    it('should return buffer for scriptSeg', function () {
+    it('should return buffer of vin with empty script', function () {
       const buffer = bufferInputEmptyScript(fixture.tx.vin[0])
       assert.equal(buffer.toString('hex'), fixture.hexItems.vin1emptyScript)
+    })
+  })
+  describe('buildTxCopy', function () {
+    it('should return buffer of tx copy for scriptSig', function () {
+      const buffer = buildTxCopy(fixture.tx)
+      assert.equal(buffer.toString('hex'), fixture.hexItems.txCopy)
     })
   })
   describe('bufferInput', function () {

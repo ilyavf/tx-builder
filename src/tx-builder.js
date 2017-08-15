@@ -46,8 +46,8 @@ const buildTxCopy = tx =>
 (
   compose([
     prop('version', bufferInt32),
-    prop('vout', mapConcatBuffers(bufferOutput)),
     prop('vin', mapConcatBuffers(bufferInputEmptyScript)),
+    prop('vout', mapConcatBuffers(bufferOutput)),
     prop('locktime', bufferUInt32)
   ])(tx, EMPTY_BUFFER)
 )
@@ -81,6 +81,7 @@ const bufferInput = tx => vin =>
   ])(vin, EMPTY_BUFFER)
 )
 
+// bufferInputEmptyScript :: Object -> Buffer
 const bufferInputEmptyScript = vin =>
 (
   compose([
@@ -136,6 +137,7 @@ const bufferHash = hash => Buffer.from(hash, 'hex').reverse()
 
 module.exports = {
   buildTx,
+  buildTxCopy,
   bufferInputs,
   bufferInput,
   bufferOutput,
