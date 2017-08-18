@@ -105,7 +105,6 @@ describe('tx-build', function () {
       assert.equal(buffer.toString('hex'), fixture.hexItems.txCopyHex)
     })
   })
-
   describe('txCopyForHash', function () {
     const keyPair = fixtureNode.keyPair
     it('should prepare txCopy for hashing', function () {
@@ -113,14 +112,15 @@ describe('tx-build', function () {
       assert.equal(txCopyBuffer.toString('hex'), fixture.hexItems.txCopyForHash)
     })
   })
+  describe('vinScript', function () {
+    const keyPair = fixtureNode.keyPair
+    it('should create vin script', function () {
+      const script = vinScript(fixture.tx)(keyPair)
+      const scriptNoLen = script.slice(1)
+      assert.equal(scriptNoLen.toString('hex'), fixture.decoded.vin[0].scriptSig)
+    })
+  })
 
-  // describe('vinScript', function () {
-  //   const keyPair = fixtureNode.keyPair
-  //   it('should create vin script', function () {
-  //     const script = vinScript(fixture.tx)(keyPair)
-  //     assert.equal(script.toString('hex'), fixture.decoded.vin[0].script)
-  //   })
-  // })
   // describe('bufferInput', function () {
   //   const keyPair = fixtureNode.keyPair
   //   it('should build vin', function () {

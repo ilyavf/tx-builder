@@ -1,6 +1,13 @@
 const Buffer = require('safe-buffer').Buffer
 const varuint = require('varuint-bitcoin')
 
+// bufferUInt8 :: Int -> Buffer
+const bufferUInt8 = value => {
+  const buffer = Buffer.allocUnsafe(1)
+  buffer.writeUInt8(value)
+  return buffer
+}
+
 // bufferInt32 :: Int -> Buffer
 const bufferInt32 = value => {
   const buffer = Buffer.allocUnsafe(4)
@@ -34,6 +41,7 @@ const bufferVarSlice = value => {
 }
 
 module.exports = {
+  bufferUInt8,
   bufferInt32,
   bufferUInt32,
   bufferUInt64,

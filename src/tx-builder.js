@@ -16,6 +16,7 @@ const HASHTYPE = {
 }
 
 const {
+  bufferUInt8,
   bufferInt32,
   bufferUInt32,
   bufferUInt64,
@@ -151,17 +152,25 @@ const vinScript = tx => keyPair => {
   const hashType = 1
   const txCopyBufferWithType = Buffer.concat([txCopyBuffer, bufferInt32(hashType)])
 
-  console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
-  console.log('*** 2: ' + '0100000001a58a349e8d92bb9867884bf4b108da8df77143fbe8fcaf8a0f69a589de1c66a3010000001976a9143c8710460fc63d27e6741dd1927f0ece41e9b55588acffffffff0200c2eb0b000000001976a9147adddcbdf9f0ebcb814e2efb95debda73bfefd9888ace0453577000000001976a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac0000000001000000')
+  // console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
+  // console.log('*** 2: ' + '0100000001a58a349e8d92bb9867884bf4b108da8df77143fbe8fcaf8a0f69a589de1c66a3010000001976a9143c8710460fc63d27e6741dd1927f0ece41e9b55588acffffffff0200c2eb0b000000001976a9147adddcbdf9f0ebcb814e2efb95debda73bfefd9888ace0453577000000001976a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac0000000001000000')
 
   const hash = bcrypto.hash256(txCopyBufferWithType)
-  const sig = keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
+  // console.log(`hash          = ${hash.toString('hex')}`)
+  // console.log(`hash expected = d27fc0b87c10d49b59196742e2836b89e08df05f0b045aaeaa1bcd1d0278500b`)
 
-  const scriptBuffer = Buffer.concat([sig, kpPubKey])
+  const sig = keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
+  // console.log(`sig          = ${sig.toString('hex')}`)
+  // console.log(`sig expected = 30440220764bbe9ddff67409310c04ffb34fe937cc91c3d55303158f91a32bed8d9d7a7b02207fb30f6b9aaef93da8c88e2b818d993ad65aae54860c3de56c6304c57252cce101`)
+
+  const pushDataSig = bufferUInt8(sig.length)
+  const pushDataPubKey = bufferUInt8(kpPubKey.length)
+  const scriptBuffer = Buffer.concat([pushDataSig, sig, pushDataPubKey, kpPubKey])
+  // const scriptBuffer = bscript.compile([sig, kpPubKey])
+
   const scriptLen = bufferVarInt(scriptBuffer.length)
-  console.log(`sig = ${sig.toString('hex')}`)
-  console.log(`kpPubKey = ${kpPubKey.toString('hex')}`)
-  console.log(`scriptLen = ${scriptLen.toString('hex')}`)
+  // console.log(`kpPubKey = ${kpPubKey.toString('hex')}`)
+  // console.log(`scriptLen = ${scriptLen.toString('hex')}`)
 
   return Buffer.concat([scriptLen, scriptBuffer])
 }
