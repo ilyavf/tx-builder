@@ -12,6 +12,7 @@ const {
   txCopyForHash,
   txCopySubscript,
   bufferInput,
+  bufferInputs,
   bufferOutput,
   bufferHash,
   bufferInputEmptyScript,
@@ -130,19 +131,19 @@ describe('tx-build', function () {
       assert.equal(buffer.toString('hex'), fixture.hexItems.vin)
     })
   })
-
-  // describe('bufferInputs', function () {
-  //   it('should process vins', function () {
-  //     const buffer = bufferInputs('vin', {
-  //       vin: []
-  //     })
-  //     assert.equal(buffer.toString('hex'), fixture.hexItems.vout1)
-  //   })
-  // })
-  // describe('buildTx', function () {
-  //   it('should build the whole transaction', function () {
-  //     const buffer = buildTx(fixture.decoded)
-  //     assert.equal(buffer.toString('hex'), fixture.hex)
-  //   })
-  // })
+  describe('bufferInputs', function () {
+    it('should process vins', function () {
+      const keyPair = fixtureNode.keyPair
+      const tx = Object.assign({}, fixture.tx)
+      tx.vin[0].keyPair = keyPair
+      const buffer = bufferInputs('vin')(tx)
+      assert.equal(buffer.toString('hex'), '01' + fixture.hexItems.vin)
+    })
+  })
+  describe('buildTx', function () {
+    it('should build the whole transaction', function () {
+      const buffer = buildTx(fixture.tx)
+      assert.equal(buffer.toString('hex'), fixture.hex)
+    })
+  })
 })
