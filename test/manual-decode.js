@@ -74,8 +74,8 @@ offset += 4
 
 console.log(`BUFFER LEFT = ${buffer.slice(offset).toString('hex')}`)
 
-console.log(`VIN-1 hex: ${buffer.slice(5, 153).toString('hex')}`)
-console.log(`VOUT-1 hex: ${buffer.slice(154, 188).toString('hex')}`)
+console.log(`VIN-1 hex: ${buffer.slice(5, 152).toString('hex')}`)
+console.log(`VOUT-1 hex: ${buffer.slice(153, 187).toString('hex')}`)
 
 console.log(`scriptSig = ${scriptSig.toString('hex')}`)
 const asm = bitcoinjs.script.toASM(scriptSig)
