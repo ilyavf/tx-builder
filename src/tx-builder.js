@@ -168,11 +168,7 @@ const vinScript = tx => keyPair => {
   const scriptBuffer = Buffer.concat([pushDataSig, sig, pushDataPubKey, kpPubKey])
   // const scriptBuffer = bscript.compile([sig, kpPubKey])
 
-  const scriptLen = bufferVarInt(scriptBuffer.length)
-  // console.log(`kpPubKey = ${kpPubKey.toString('hex')}`)
-  // console.log(`scriptLen = ${scriptLen.toString('hex')}`)
-
-  return Buffer.concat([scriptLen, scriptBuffer])
+  return scriptBuffer
 }
 
 // TODO: pass network as a param.

@@ -116,21 +116,21 @@ describe('tx-build', function () {
     const keyPair = fixtureNode.keyPair
     it('should create vin script', function () {
       const script = vinScript(fixture.tx)(keyPair)
-      const scriptNoLen = script.slice(1)
-      assert.equal(scriptNoLen.toString('hex'), fixture.decoded.vin[0].scriptSig)
+      assert.equal(script.toString('hex'), fixture.decoded.vin[0].scriptSig)
     })
   })
 
-  // describe('bufferInput', function () {
-  //   const keyPair = fixtureNode.keyPair
-  //   it('should build vin', function () {
-  //     const txVin = Object.assign({}, fixture.tx.vin[0], {
-  //       keyPair
-  //     })
-  //     const buffer = bufferInput(fixture.tx)(txVin)
-  //     assert.equal(buffer.toString('hex'), fixture.hexItems.vin)
-  //   })
-  // })
+  describe('bufferInput', function () {
+    const keyPair = fixtureNode.keyPair
+    it('should build vin', function () {
+      const txVin = Object.assign({}, fixture.tx.vin[0], {
+        keyPair
+      })
+      const buffer = bufferInput(fixture.tx)(txVin)
+      assert.equal(buffer.toString('hex'), fixture.hexItems.vin)
+    })
+  })
+
   // describe('bufferInputs', function () {
   //   it('should process vins', function () {
   //     const buffer = bufferInputs('vin', {
