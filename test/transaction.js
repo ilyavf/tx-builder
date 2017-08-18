@@ -24,7 +24,7 @@ const decoded = decodeTx(buffer)[0]
 console.log(JSON.stringify(decoded))
 console.log('\nscript' + JSON.stringify(decoded.vin[0].script.toString('hex')))
 
-////////
+/// /////
 const { vinScript, voutScript } = require('../src/tx-builder')
 const script = vinScript({keyPair: addrHdNode.keyPair})
 console.log(`script = ${script.toString('hex')}`)

@@ -71,7 +71,7 @@ const txCopyForHash = (keyPair, tx, index = 0) => {
 
 const txCopySubscript = keyPair =>
 (
-  bscript.pubKeyHash.output.encode(bcrypto.hash160( keyPair.getPublicKeyBuffer() ))
+  bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
 )
 
 // bufferInputs :: String -> Tx -> Buffer
@@ -155,8 +155,8 @@ const vinScript = tx => keyPair => {
   console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
   console.log('*** 2: ' + '0100000001a58a349e8d92bb9867884bf4b108da8df77143fbe8fcaf8a0f69a589de1c66a3010000001976a9143c8710460fc63d27e6741dd1927f0ece41e9b55588acffffffff0200c2eb0b000000001976a9147adddcbdf9f0ebcb814e2efb95debda73bfefd9888ace0453577000000001976a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac0000000001000000')
 
-  const hash = bcrypto.hash256( txCopyBufferWithType )
-  const sig = keyPair.sign( hash ).toScriptSignature( HASHTYPE.SIGHASH_ALL )
+  const hash = bcrypto.hash256(txCopyBufferWithType)
+  const sig = keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
 
   const scriptBuffer = Buffer.concat([sig, kpPubKey])
   const scriptLen = bufferVarInt(scriptBuffer.length)
