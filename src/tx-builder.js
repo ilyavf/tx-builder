@@ -51,7 +51,7 @@ const buildTxCopy = tx =>
 (
   compose([
     prop('version', bufferInt32),
-    // prop('vin', mapConcatBuffers(bufferInputEmptyScript)),
+    prop('vin', mapConcatBuffers(bufferInputEmptyScript)),
     prop('vout', mapConcatBuffers(bufferOutput)),
     prop('locktime', bufferUInt32)
   ])(tx, EMPTY_BUFFER)
@@ -109,8 +109,7 @@ const bufferInputEmptyScript = vin =>
   compose([
     prop('hash', bufferHash),
     prop('index', bufferUInt32),
-    prop('script', script => (!script ? bufferVarInt(0) : bufferVarSlice(script))),
-    // () => bufferVarInt(0),                   // Empty script (1 byte 0x00)
+    prop('script', script => (!script ? bufferVarInt(0) : bufferVarSlice(script))), // Empty script (1 byte 0x00)
     prop('sequence', bufferUInt32)
   ])(vin, EMPTY_BUFFER)
 )
