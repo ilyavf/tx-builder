@@ -11,6 +11,10 @@ const bcrypto = bitcoin.crypto
 const bscript = bitcoin.script
 const baddress = bitcoin.address
 
+const HASHTYPE = {
+  SIGHASH_ALL: 0x01
+}
+
 const {
   bufferInt32,
   bufferUInt32,
@@ -36,20 +40,38 @@ const buildTx = tx =>
 (
   compose([
     prop('version', bufferInt32),                   // 4 bytes
-    prop('vout', mapConcatBuffers(bufferOutput)),   // 1-9 bytes (VarInt), Output counter; Variable, Outputs
     bufferInputs('vin'),                            // 1-9 bytes (VarInt), Input counter; Variable, Inputs
+    prop('vout', mapConcatBuffers(bufferOutput)),   // 1-9 bytes (VarInt), Output counter; Variable, Outputs
     prop('locktime', bufferUInt32)                  // 4 bytes
   ])(tx, EMPTY_BUFFER)
 )
 
+// buildTxCopy :: Tx -> Buffer
 const buildTxCopy = tx =>
 (
   compose([
     prop('version', bufferInt32),
-    prop('vin', mapConcatBuffers(bufferInputEmptyScript)),
+    // prop('vin', mapConcatBuffers(bufferInputEmptyScript)),
     prop('vout', mapConcatBuffers(bufferOutput)),
     prop('locktime', bufferUInt32)
   ])(tx, EMPTY_BUFFER)
+)
+
+const txCopyForHash = (keyPair, tx, index = 0) => {
+  const subScript = txCopySubscript(keyPair)
+  const txCopy = Object.assign({}, tx)
+  txCopy.vin.forEach((vin, i) => vin.script = i === index ? subScript : '')
+  console.log('*** txCopy', txCopy)
+  const txCopyBuffer = buildTxCopy(txCopy)
+  const hashType = 1
+  const txCopyBufferWithType = Buffer.concat([txCopyBuffer, bufferInt32(hashType)])
+
+  return txCopyBufferWithType
+}
+
+const txCopySubscript = keyPair =>
+(
+  bscript.pubKeyHash.output.encode(bcrypto.hash160( keyPair.getPublicKeyBuffer() ))
 )
 
 // bufferInputs :: String -> Tx -> Buffer
@@ -87,7 +109,8 @@ const bufferInputEmptyScript = vin =>
   compose([
     prop('hash', bufferHash),
     prop('index', bufferUInt32),
-    () => bufferVarInt(0),                   // Empty script (1 byte 0x00)
+    prop('script', script => (!script ? bufferVarInt(0) : bufferVarSlice(script))),
+    // () => bufferVarInt(0),                   // Empty script (1 byte 0x00)
     prop('sequence', bufferUInt32)
   ])(vin, EMPTY_BUFFER)
 )
@@ -106,7 +129,8 @@ const bufferOutput = vout =>
 )
 
 /**
- * Unlocking script consists of: `<signature> <pubkey>`
+ * Unlocking script consists of: `<signature> <pubkey>`.
+ * The hex should start with the length of the script (var_uint).
  * See: https://en.bitcoin.it/wiki/OP_CHECKSIG#How_it_works
  * - A copy is made of the current transaction (hereby referred to txCopy)
  * - The scripts for all transaction inputs in txCopy are set to empty scripts (exactly 1 byte 0x00)
@@ -119,10 +143,28 @@ const bufferOutput = vout =>
  */
 const vinScript = tx => keyPair => {
   const kpPubKey = keyPair.getPublicKeyBuffer()
+
+  const subScript = bscript.pubKeyHash.output.encode(bcrypto.hash160(kpPubKey))
+  // TODO: tmp, should pass vin index here.
   const txCopy = Object.assign({}, tx)
-  const script = bscript.pubKeyHash.output.encode(bcrypto.hash160(kpPubKey))
-  // console.log(`script = ${script}`)
-  return script
+  txCopy.vin[0].script = subScript
+  const txCopyBuffer = buildTxCopy(txCopy)
+  const hashType = 1
+  const txCopyBufferWithType = Buffer.concat([txCopyBuffer, bufferInt32(hashType)])
+
+  console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
+  console.log('*** 2: ' + '0100000001a58a349e8d92bb9867884bf4b108da8df77143fbe8fcaf8a0f69a589de1c66a3010000001976a9143c8710460fc63d27e6741dd1927f0ece41e9b55588acffffffff0200c2eb0b000000001976a9147adddcbdf9f0ebcb814e2efb95debda73bfefd9888ace0453577000000001976a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac0000000001000000')
+
+  const hash = bcrypto.hash256( txCopyBufferWithType )
+  const sig = keyPair.sign( hash ).toScriptSignature( HASHTYPE.SIGHASH_ALL )
+
+  const scriptBuffer = Buffer.concat([sig, kpPubKey])
+  const scriptLen = bufferVarInt(scriptBuffer.length)
+  console.log(`sig = ${sig.toString('hex')}`)
+  console.log(`kpPubKey = ${kpPubKey.toString('hex')}`)
+  console.log(`scriptLen = ${scriptLen.toString('hex')}`)
+
+  return Buffer.concat([scriptLen, scriptBuffer])
 }
 
 // TODO: pass network as a param.
@@ -138,6 +180,8 @@ const bufferHash = hash => Buffer.from(hash, 'hex').reverse()
 module.exports = {
   buildTx,
   buildTxCopy,
+  txCopyForHash,
+  txCopySubscript,
   bufferInputs,
   bufferInput,
   bufferOutput,

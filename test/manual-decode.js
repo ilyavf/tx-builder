@@ -1,4 +1,5 @@
 const varuint = require('varuint-bitcoin')
+const bitcoinjs = require('bitcoinjs-lib')
 const Buffer = require('safe-buffer').Buffer
 const fixture = require('./fixture')
 
@@ -24,13 +25,13 @@ const index = buffer.readUInt32LE(offset)
 console.log(`* index = ${index}, offset=${offset}, length=4`)
 offset += 4
 
-const scriptLen = varuint.decode(buffer, offset)
-console.log(`* scriptLen = ${scriptLen}, offset=${offset}, length=${varuint.decode.bytes}`)
+const scriptSigLen = varuint.decode(buffer, offset)
+console.log(`* scriptLen = ${scriptSigLen}, offset=${offset}, length=${varuint.decode.bytes}`)
 offset += varuint.decode.bytes
 
-const script = buffer.slice(offset, offset + scriptLen)
-console.log(`* script = ${script.toString('hex')}, offset=${offset}, length=${scriptLen}`)
-offset += scriptLen
+const scriptSig = buffer.slice(offset, offset + scriptSigLen)
+console.log(`* scriptSig = ${scriptSig.toString('hex')}, offset=${offset}, length=${scriptSigLen}`)
+offset += scriptSigLen
 
 const sequence = buffer.readUInt32LE(offset)
 console.log(`* sequence = ${sequence}, offset=${offset}, length=4`)
@@ -50,13 +51,13 @@ const readVout = (buffer, offset) => {
   console.log(`* value = ${value}, offset=${offset}, length=8`)
   offset += 8
 
-  const lockingScriptLen = varuint.decode(buffer, offset)
-  console.log(`* lockingScriptLen = ${lockingScriptLen}, offset=${offset}, length=${varuint.decode.bytes}`)
+  const scriptPubKeyLen = varuint.decode(buffer, offset)
+  console.log(`* scriptPubKeyLen = ${scriptPubKeyLen}, offset=${offset}, length=${varuint.decode.bytes}`)
   offset += varuint.decode.bytes
 
-  const lockingScript = buffer.slice(offset, offset + lockingScriptLen)
-  console.log(`* lockingScript = ${lockingScript.toString('hex')}, offset=${offset}, length=${lockingScriptLen}`)
-  offset += lockingScriptLen
+  const scriptPubKey = buffer.slice(offset, offset + scriptPubKeyLen)
+  console.log(`* scriptPubKey = ${scriptPubKey.toString('hex')}, offset=${offset}, length=${scriptPubKeyLen}`)
+  offset += scriptPubKeyLen
 
   return offset
 }
@@ -75,3 +76,7 @@ console.log(`BUFFER LEFT = ${buffer.slice(offset).toString('hex')}`)
 
 console.log(`VIN-1 hex: ${buffer.slice(5, 153).toString('hex')}`)
 console.log(`VOUT-1 hex: ${buffer.slice(154, 188).toString('hex')}`)
+
+console.log(`scriptSig = ${scriptSig.toString('hex')}`)
+const asm = bitcoinjs.script.toASM(scriptSig)
+console.log(`asm = ${asm}`)
