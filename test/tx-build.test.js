@@ -106,13 +106,14 @@ describe('tx-build', function () {
     })
   })
 
-  // describe('txCopyForHash', function () {
-  //   const keyPair = fixtureNode.keyPair
-  //   it('should prepare txCopy for hashing', function () {
-  //     const txCopyBuffer = txCopyForHash(keyPair, fixture.tx, 0)
-  //     assert.equal(txCopyBuffer.toString('hex'), fixture.hexItems.txCopyForHash)
-  //   })
-  // })
+  describe('txCopyForHash', function () {
+    const keyPair = fixtureNode.keyPair
+    it('should prepare txCopy for hashing', function () {
+      const txCopyBuffer = txCopyForHash(keyPair, fixture.tx, 0)
+      assert.equal(txCopyBuffer.toString('hex'), fixture.hexItems.txCopyForHash)
+    })
+  })
+
   // describe('vinScript', function () {
   //   const keyPair = fixtureNode.keyPair
   //   it('should create vin script', function () {
