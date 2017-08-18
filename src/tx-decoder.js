@@ -52,7 +52,7 @@ const readInput = buffer =>
   compose([
     addProp('hash', readHash),                // 32 bytes, Transaction Hash
     addProp('index', readUInt32),             // 4 bytes, Output Index
-    addProp('script', readVarSlice),          // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
+    addProp('scriptSig', readVarSlice),       // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     addProp('sequence', readUInt32)           // 4 bytes, Sequence Number
   ])({}, buffer)
 )
@@ -62,7 +62,7 @@ const readOutput = buffer =>
 (
   compose([
     addProp('value', readUInt64),             // 8 bytes, Amount in satoshis
-    addProp('script', readVarSlice)           // 1-9 bytes (VarInt), Locking-Script Size; Variable, Locking-Script
+    addProp('scriptPubKey', readVarSlice)     // 1-9 bytes (VarInt), Locking-Script Size; Variable, Locking-Script
   ])({}, buffer)
 )
 

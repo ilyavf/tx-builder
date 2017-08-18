@@ -8,11 +8,18 @@ const {
 } = require('../src/buffer-build')
 const {
   buildTx,
+  buildTxCopy,
+  txCopyForHash,
+  txCopySubscript,
   bufferInput,
+  bufferInputs,
   bufferOutput,
-  bufferHash
+  bufferHash,
+  bufferInputEmptyScript,
+  vinScript
 } = require('../src/tx-builder')
-const fixture = require('./fixture')
+const fixture = require('./fixtures/tx-hex-decoded')
+const fixtureNode = require('./fixtures/hdnode')
 
 describe('buffer-write utils', function () {
   describe('bufferInt32', function () {
@@ -63,21 +70,79 @@ describe('tx-build', function () {
       assert.equal(bufferHash(hash).reverse().toString('hex'), hash)
     })
   })
+  describe('bufferOutput', function () {
+    it('should build vout-1', function () {
+      const buffer = bufferOutput(fixture.tx.vout[0])
+      assert.equal(buffer.toString('hex'), fixture.hexItems.vout1)
+    })
+  })
+  describe('bufferInputEmptyScript', function () {
+    it('should return buffer of vin with empty script', function () {
+      const buffer = bufferInputEmptyScript(fixture.tx.vin[0])
+      assert.equal(buffer.toString('hex'), fixture.hexItems.vin1emptyScript)
+    })
+    it('should return buffer of vin with subscript', function () {
+      const keyPair = fixtureNode.keyPair
+      const subscript = txCopySubscript(keyPair)
+      const vin = Object.assign({}, fixture.tx.vin[0], {script: subscript})
+      const buffer = bufferInputEmptyScript(vin)
+      assert.equal(buffer.toString('hex'), fixture.hexItems.vin1Subscript)
+    })
+  })
+  describe('txCopySubscript', function () {
+    it('should create a subscript for txCopy vin', function () {
+      const keyPair = fixtureNode.keyPair
+      const subscript = txCopySubscript(keyPair)
+      assert.equal(subscript.toString('hex'), fixture.hexItems.txCopySubscript)
+    })
+  })
+  describe('buildTxCopy', function () {
+    it('should return buffer of tx copy for scriptSig', function () {
+      const keyPair = fixtureNode.keyPair
+      const subscript = txCopySubscript(keyPair)
+      const txCopyWithScript = Object.assign({}, fixture.tx)
+      txCopyWithScript.vin[0].script = subscript
+      const buffer = buildTxCopy(txCopyWithScript)
+      assert.equal(buffer.toString('hex'), fixture.hexItems.txCopyHex)
+    })
+  })
+  describe('txCopyForHash', function () {
+    const keyPair = fixtureNode.keyPair
+    it('should prepare txCopy for hashing', function () {
+      const txCopyBuffer = txCopyForHash(keyPair, fixture.tx, 0)
+      assert.equal(txCopyBuffer.toString('hex'), fixture.hexItems.txCopyForHash)
+    })
+  })
+  describe('vinScript', function () {
+    const keyPair = fixtureNode.keyPair
+    it('should create vin script', function () {
+      const script = vinScript(fixture.tx)(keyPair)
+      assert.equal(script.toString('hex'), fixture.decoded.vin[0].scriptSig)
+    })
+  })
+
   describe('bufferInput', function () {
+    const keyPair = fixtureNode.keyPair
     it('should build vin', function () {
-      const buffer = bufferInput(fixture.decoded.vin[0])
+      const txVin = Object.assign({}, fixture.tx.vin[0], {
+        keyPair
+      })
+      const buffer = bufferInput(fixture.tx)(txVin)
       assert.equal(buffer.toString('hex'), fixture.hexItems.vin)
     })
   })
-  describe('bufferOutput', function () {
-    it('should build vout-1', function () {
-      const buffer = bufferOutput(fixture.decoded.vout[0])
-      assert.equal(buffer.toString('hex'), fixture.hexItems.vout1)
+  describe('bufferInputs', function () {
+    it('should process vins', function () {
+      const keyPair = fixtureNode.keyPair
+      const tx = Object.assign({}, fixture.tx)
+      tx.vin[0].keyPair = keyPair
+      const buffer = bufferInputs('vin')(tx)
+      assert.equal(buffer.toString('hex'), '01' + fixture.hexItems.vin)
     })
   })
   describe('buildTx', function () {
     it('should build the whole transaction', function () {
-      const buffer = buildTx(fixture.decoded)
+      const buffer = buildTx(fixture.tx)
       assert.equal(buffer.toString('hex'), fixture.hex)
     })
   })
