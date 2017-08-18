@@ -1,6 +1,7 @@
 const bip39 = require('bip39')
 const bitcoin = require('bitcoinjs-lib')
 const { decodeTx } = require('../src/tx-decoder')
+const fixture = require('./fixtures/tx-hex-decoded')
 
 const mnemonic = 'talent destroy radar dinosaur punch muscle swear diary mango unit gallery bus'
 const seed = bip39.mnemonicToSeed(mnemonic, '')
@@ -26,8 +27,8 @@ console.log('\nscript' + JSON.stringify(decoded.vin[0].script.toString('hex')))
 
 /// /////
 const { vinScript, voutScript } = require('../src/tx-builder')
-const script = vinScript({keyPair: addrHdNode.keyPair})
+const script = vinScript(fixture.tx)(addrHdNode.keyPair)
 console.log(`script = ${script.toString('hex')}`)
 
-const scriptPubKey = voutScript({addr: 'mricWicq8AV5d46cYWPApESirBXcB42h57'})
-console.log(`scriptPubKey = ${scriptPubKey.toString('hex')}`)
+// const scriptPubKey = voutScript({addr: 'mricWicq8AV5d46cYWPApESirBXcB42h57'})
+// console.log(`scriptPubKey = ${scriptPubKey.toString('hex')}`)

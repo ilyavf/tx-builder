@@ -17,7 +17,7 @@ const {
   bufferInputEmptyScript,
   vinScript
 } = require('../src/tx-builder')
-const fixture = require('./fixture')
+const fixture = require('./fixtures/tx-hex-decoded')
 const fixtureNode = require('./fixtures/hdnode')
 
 describe('buffer-write utils', function () {
@@ -93,12 +93,13 @@ describe('tx-build', function () {
       assert.equal(subscript.toString('hex'), fixture.hexItems.txCopySubscript)
     })
   })
-  describe('buildTxCopy', function () {
-    it('should return buffer of tx copy for scriptSig', function () {
-      const buffer = buildTxCopy(fixture.tx)
-      assert.equal(buffer.toString('hex'), fixture.hexItems.txCopyHex)
-    })
-  })
+  // describe('buildTxCopy', function () {
+  //   it('should return buffer of tx copy for scriptSig', function () {
+  //     const buffer = buildTxCopy(fixture.tx)
+  //     assert.equal(buffer.toString('hex'), fixture.hexItems.txCopyHex)
+  //   })
+  // })
+
   // describe('txCopyForHash', function () {
   //   const keyPair = fixtureNode.keyPair
   //   it('should prepare txCopy for hashing', function () {
