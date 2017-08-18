@@ -61,7 +61,7 @@ const buildTxCopy = tx =>
 const txCopyForHash = (keyPair, tx, index = 0) => {
   const subScript = txCopySubscript(keyPair)
   const txCopy = Object.assign({}, tx)
-  txCopy.vin.forEach((vin, i) => vin.script = i === index ? subScript : '')
+  txCopy.vin.forEach((vin, i) => { vin.script = i === index ? subScript : '' })
   // console.log('*** txCopy', txCopy)
   const txCopyBuffer = buildTxCopy(txCopy)
   const hashType = 1

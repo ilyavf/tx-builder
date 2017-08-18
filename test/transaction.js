@@ -9,7 +9,7 @@ const root = bitcoin.HDNode.fromSeedBuffer(seed, bitcoin.networks.testnet)
 const hdNode = root.derivePath("m/44'/0'/0'")
 
 const addrHdNode = hdNode.derive(0).derive(0)
-const address = addrHdNode.getAddress()
+// const address = addrHdNode.getAddress()
 
 const tx = new bitcoin.TransactionBuilder(bitcoin.networks.testnet)
 tx.addInput('a3661cde89a5690f8aaffce8fb4371f78dda08b1f44b886798bb928d9e348aa5', 1)
@@ -23,12 +23,12 @@ console.log(`hex = ${hex}`)
 const buffer = Buffer.from(hex, 'hex')
 const decoded = decodeTx(buffer)[0]
 console.log(JSON.stringify(decoded))
-console.log('\nscript' + JSON.stringify(decoded.vin[0].script.toString('hex')))
+console.log('\nscript' + JSON.stringify(decoded.vin[0].scriptSig.toString('hex')))
 
 /// /////
 const { vinScript, voutScript } = require('../src/tx-builder')
 const script = vinScript(fixture.tx)(addrHdNode.keyPair)
 console.log(`script = ${script.toString('hex')}`)
 
-// const scriptPubKey = voutScript({addr: 'mricWicq8AV5d46cYWPApESirBXcB42h57'})
-// console.log(`scriptPubKey = ${scriptPubKey.toString('hex')}`)
+const scriptPubKey = voutScript('mricWicq8AV5d46cYWPApESirBXcB42h57')
+console.log(`scriptPubKey = ${scriptPubKey.toString('hex')}`)

@@ -14,7 +14,7 @@ const compose = args => (tx, buffer) => {
 const prop = (propName, fn) => obj => fn(obj[propName])
 
 // addProp :: String -> Fn -> Obj -> Buffer
-addProp = (propName, fn) => obj => {
+const addProp = (propName, fn) => obj => {
   obj[propName] = fn(obj)
   return EMPTY_BUFFER
 }
