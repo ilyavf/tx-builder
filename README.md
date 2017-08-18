@@ -112,6 +112,7 @@ console.log( buildTx( tx ).toString( 'hex' ) )
 - decode script
 
 ## Release Notes:
+- 0.4.0 Build tx input scripts.
 - 0.3.0 Added transaction builder
 - 0.2.0 Added readHash helper
   - Reverse the hash (tx id) after its read from hex.
