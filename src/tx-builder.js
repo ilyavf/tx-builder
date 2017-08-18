@@ -5,6 +5,7 @@
 // tx.sign( vin, keyPair )
 // tx.build().toHex()
 
+const { clone } = require('ramda')
 const Buffer = require('safe-buffer').Buffer
 const bitcoin = require('bitcoinjs-lib')
 const bcrypto = bitcoin.crypto
@@ -146,7 +147,7 @@ const vinScript = tx => keyPair => {
 
   const subScript = bscript.pubKeyHash.output.encode(bcrypto.hash160(kpPubKey))
   // TODO: tmp, should pass vin index here.
-  const txCopy = Object.assign({}, tx)
+  const txCopy = clone(tx)
   txCopy.vin[0].script = subScript
   const txCopyBuffer = buildTxCopy(txCopy)
   const hashType = 1
