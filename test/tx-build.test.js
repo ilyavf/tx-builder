@@ -56,7 +56,7 @@ describe('buffer-write utils', function () {
   })
   describe('bufferVarSlice', function () {
     const hex = '2d7a9f05'
-    const buffer = bufferVarSlice(hex)
+    const buffer = bufferVarSlice('hex')(hex)
     it('should create a variable length buffer', function () {
       assert.equal(buffer.toString('hex'), '04' + hex)
     })

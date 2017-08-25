@@ -100,8 +100,8 @@ const bufferInput = tx => vin =>
       'scriptSig',
       prop('keyPair', vinScript(tx))
     ),
-    prop('scriptSig', bufferVarSlice),       // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
-    prop('sequence', bufferUInt32)           // 4 bytes, Sequence Number
+    prop('scriptSig', bufferVarSlice('hex')),  // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
+    prop('sequence', bufferUInt32)             // 4 bytes, Sequence Number
   ])(vin, EMPTY_BUFFER)
 )
 
@@ -111,7 +111,7 @@ const bufferInputEmptyScript = vin =>
   compose([
     prop('hash', bufferHash),
     prop('index', bufferUInt32),
-    prop('script', script => (!script ? bufferVarInt(0) : bufferVarSlice(script))), // Empty script (1 byte 0x00)
+    prop('script', script => (!script ? bufferVarInt(0) : bufferVarSlice('hex')(script))), // Empty script (1 byte 0x00)
     prop('sequence', bufferUInt32)
   ])(vin, EMPTY_BUFFER)
 )
@@ -125,7 +125,7 @@ const bufferOutput = vout =>
       'scriptPubKey',
       prop('address', voutScript)
     ),
-    prop('scriptPubKey', bufferVarSlice)       // 1-9 bytes (VarInt), Locking-Script Size; Variable, Locking-Script
+    prop('scriptPubKey', bufferVarSlice('hex'))       // 1-9 bytes (VarInt), Locking-Script Size; Variable, Locking-Script
   ])(vout, EMPTY_BUFFER)
 )
 
@@ -193,5 +193,6 @@ module.exports = {
   bufferHash,
   vinScript,
   voutScript,
-  bufferInputEmptyScript
+  bufferInputEmptyScript,
+  mapConcatBuffers
 }

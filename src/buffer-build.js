@@ -30,11 +30,11 @@ const bufferUInt64 = value => {
   return buffer
 }
 
-// bufferInt32 :: VarInt -> Buffer
+// bufferVarInt :: VarInt -> Buffer
 const bufferVarInt = value => varuint.encode(value)
 
-// bufferInt32 :: HexString -> Buffer
-const bufferVarSlice = value => {
+// bufferVarSlice :: String -> String -> Buffer
+const bufferVarSlice = encoding => value => {
   const buffer = Buffer.from(value, 'hex')
   const bVarInt = bufferVarInt(buffer.length)
   return Buffer.concat([bVarInt, buffer])
