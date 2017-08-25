@@ -22,7 +22,8 @@ const {
   bufferUInt32,
   bufferUInt64,
   bufferVarInt,
-  bufferVarSlice
+  bufferVarSlice,
+  mapConcatBuffers
 } = require('./buffer-build')
 const {
   compose,
@@ -80,14 +81,6 @@ const txCopySubscript = keyPair =>
 const bufferInputs = propName => tx =>
 (
   mapConcatBuffers(bufferInput(tx))(tx[propName])
-)
-
-// mapConcatBuffers :: Fn -> Array -> Buffer
-const mapConcatBuffers = bufferFn => vins =>
-(
-  Buffer.concat(
-    [bufferVarInt(vins.length)].concat(vins.map(bufferFn))
-  )
 )
 
 // bufferInput :: Tx -> Object -> Buffer

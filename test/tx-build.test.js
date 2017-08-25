@@ -4,7 +4,8 @@ const {
   bufferInt32,
   bufferUInt64,
   bufferVarInt,
-  bufferVarSlice
+  bufferVarSlice,
+  mapConcatBuffers
 } = require('../src/buffer-build')
 const {
   buildTx,
@@ -21,7 +22,7 @@ const {
 const fixture = require('./fixtures/tx-hex-decoded')
 const fixtureNode = require('./fixtures/hdnode')
 
-describe('buffer-write utils', function () {
+describe('buffer-build utils', function () {
   describe('bufferInt32', function () {
     const buffer = bufferInt32(25)
     it('should create a buffer with 32bit integer', function () {
@@ -59,6 +60,14 @@ describe('buffer-write utils', function () {
     const buffer = bufferVarSlice('hex')(hex)
     it('should create a variable length buffer', function () {
       assert.equal(buffer.toString('hex'), '04' + hex)
+    })
+  })
+  describe('mapConcatBuffers', function () {
+    it('should concat buffers', function () {
+      const fn = a => Buffer.from((a * 5) + '')
+      const arr = [1, 2, 3]
+      const expected = '033531303135'
+      assert.equal(mapConcatBuffers(fn)(arr).toString('hex'), expected)
     })
   })
 })

@@ -40,11 +40,23 @@ const bufferVarSlice = encoding => value => {
   return Buffer.concat([bVarInt, buffer])
 }
 
+/**
+ * Maps function to array elements and concats results into a buffer.
+ */
+// mapConcatBuffers :: Fn -> Array -> Buffer
+const mapConcatBuffers = bufferFn => vins =>
+(
+  Buffer.concat(
+    [bufferVarInt(vins.length)].concat(vins.map(bufferFn))
+  )
+)
+
 module.exports = {
   bufferUInt8,
   bufferInt32,
   bufferUInt32,
   bufferUInt64,
   bufferVarInt,
-  bufferVarSlice
+  bufferVarSlice,
+  mapConcatBuffers
 }
