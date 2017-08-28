@@ -43,14 +43,14 @@ const buildTx = tx =>
 (
   compose([
     prop('version', bufferInt32),                   // 4 bytes
-    bufferInputs('vin'),                            // 1-9 bytes (VarInt), Input counter; Variable, Inputs
+    bufferInputs(bufferInput(bufferOutput), 'vin'),                            // 1-9 bytes (VarInt), Input counter; Variable, Inputs
     prop('vout', mapConcatBuffers(bufferOutput)),   // 1-9 bytes (VarInt), Output counter; Variable, Outputs
     prop('locktime', bufferUInt32)                  // 4 bytes
   ])(tx, EMPTY_BUFFER)
 )
 
 // buildTxCopy :: Tx -> Buffer
-const buildTxCopy = tx =>
+const buildTxCopy = (bufferOutput, tx) =>
 (
   compose([
     prop('version', bufferInt32),
@@ -78,20 +78,20 @@ const txCopySubscript = keyPair =>
 )
 
 // bufferInputs :: String -> Tx -> Buffer
-const bufferInputs = propName => tx =>
+const bufferInputs = (bufferInput, propName) => tx =>
 (
   mapConcatBuffers(bufferInput(tx))(tx[propName])
 )
 
 // bufferInput :: Tx -> Object -> Buffer
-const bufferInput = tx => vin =>
+const bufferInput = bufferOutput => tx => vin =>
 (
   compose([
     prop('hash', bufferHash),                // 32 bytes, Transaction Hash
     prop('index', bufferUInt32),             // 4 bytes, Output Index
     addProp(
       'scriptSig',
-      prop('keyPair', vinScript(tx))
+      prop('keyPair', vinScript(bufferOutput, tx))
     ),
     prop('scriptSig', bufferVarSlice('hex')),  // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     prop('sequence', bufferUInt32)             // 4 bytes, Sequence Number
@@ -135,14 +135,14 @@ const bufferOutput = vout =>
  *   - SIGHASH_SINGLE (0x00000003)
  *   - SIGHASH_ANYONECANPAY (0x00000080)
  */
-const vinScript = tx => keyPair => {
+const vinScript = bufferOutput => tx => keyPair => {
   const kpPubKey = keyPair.getPublicKeyBuffer()
 
   const subScript = bscript.pubKeyHash.output.encode(bcrypto.hash160(kpPubKey))
   // TODO: tmp, should pass vin index here.
   const txCopy = clone(tx)
   txCopy.vin[0].script = subScript
-  const txCopyBuffer = buildTxCopy(txCopy)
+  const txCopyBuffer = buildTxCopy(bufferOutput, txCopy)
   const hashType = 1
   const txCopyBufferWithType = Buffer.concat([txCopyBuffer, bufferInt32(hashType)])
 

@@ -145,7 +145,7 @@ describe('tx-build', function () {
       const keyPair = fixtureNode.keyPair
       const tx = Object.assign({}, fixture.tx)
       tx.vin[0].keyPair = keyPair
-      const buffer = bufferInputs('vin')(tx)
+      const buffer = bufferInputs(bufferInput(bufferOutput), 'vin')(tx)
       assert.equal(buffer.toString('hex'), '01' + fixture.hexItems.vin)
     })
   })
