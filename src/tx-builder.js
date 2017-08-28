@@ -49,8 +49,8 @@ const buildTx = tx =>
   ])(tx, EMPTY_BUFFER)
 )
 
-// buildTxCopy :: Tx -> Buffer
-const buildTxCopy = tx =>
+// buildTxCopy :: Fn -> Tx -> Buffer
+const makeBuildTxCopy = bufferOutput => tx =>
 (
   compose([
     prop('version', bufferInt32),
@@ -83,8 +83,8 @@ const bufferInputs = (propName, bufferInput) => tx =>
   mapConcatBuffers(bufferInput(tx))(tx[propName])
 )
 
-// bufferInput :: Tx -> (Object, Int) -> Buffer
-const bufferInput = tx => (vin, index) =>
+// bufferInput :: Fn -> Tx -> (Object, Int) -> Buffer
+const makeBufferInput = buildTxCopy => tx => (vin, index) =>
 (
   compose([
     prop('hash', bufferHash),                // 32 bytes, Transaction Hash
@@ -169,6 +169,15 @@ const voutScript = addr => baddress.toOutputScript(addr, bitcoin.networks.testne
 // bufferHash :: HexString -> Buffer
 const bufferHash = hash => Buffer.from(hash, 'hex').reverse()
 
+/**
+ * Implementation specific functions:
+ *  - `buildTxCopy` depends on `bufferOutput`
+ *  - `bufferInput` depends on `buildTxCopy`
+ * E.g. Equibit blockchain transaction differs from Bitcoin blockchain's with the VOUT structure.
+ */
+const buildTxCopy = makeBuildTxCopy(bufferOutput)
+const bufferInput = makeBufferInput(buildTxCopy)
+
 module.exports = {
   buildTx,
   buildTxCopy,
@@ -181,5 +190,7 @@ module.exports = {
   vinScript,
   voutScript,
   bufferInputEmptyScript,
-  mapConcatBuffers
+  mapConcatBuffers,
+  makeBufferInput,
+  makeBuildTxCopy
 }
