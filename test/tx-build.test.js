@@ -123,14 +123,14 @@ describe('tx-build', function () {
   describe('txCopyForHash', function () {
     const keyPair = fixtureNode.keyPair
     it('should prepare txCopy for hashing', function () {
-      const txCopyBuffer = txCopyForHash(keyPair, fixture.tx, 0)
+      const txCopyBuffer = txCopyForHash(buildTxCopy)(keyPair, fixture.tx, 0)
       assert.equal(txCopyBuffer.toString('hex'), fixture.hexItems.txCopyForHash)
     })
   })
   describe('vinScript', function () {
     const keyPair = fixtureNode.keyPair
     it('should create vin script', function () {
-      const script = vinScript(fixture.tx, 0)(keyPair)
+      const script = vinScript(buildTxCopy)(fixture.tx, 0)(keyPair)
       assert.equal(script.toString('hex'), fixture.decoded.vin[0].scriptSig)
     })
   })
