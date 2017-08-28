@@ -43,7 +43,7 @@ const buildTx = tx =>
 (
   compose([
     prop('version', bufferInt32),                   // 4 bytes
-    bufferInputs('vin'),                            // 1-9 bytes (VarInt), Input counter; Variable, Inputs
+    bufferInputs('vin', bufferInput),               // 1-9 bytes (VarInt), Input counter; Variable, Inputs
     prop('vout', mapConcatBuffers(bufferOutput)),   // 1-9 bytes (VarInt), Output counter; Variable, Outputs
     prop('locktime', bufferUInt32)                  // 4 bytes
   ])(tx, EMPTY_BUFFER)
@@ -77,8 +77,8 @@ const txCopySubscript = keyPair =>
   bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
 )
 
-// bufferInputs :: String -> Tx -> Buffer
-const bufferInputs = propName => tx =>
+// bufferInputs :: (String, Fn) -> Tx -> Buffer
+const bufferInputs = (propName, bufferInput) => tx =>
 (
   mapConcatBuffers(bufferInput(tx))(tx[propName])
 )
