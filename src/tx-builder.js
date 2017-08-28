@@ -60,9 +60,9 @@ const buildTxCopy = tx =>
   ])(tx, EMPTY_BUFFER)
 )
 
-const txCopyForHash = (keyPair, tx, index = 0) => {
+const txCopyForHash = (keyPair, tx, index) => {
   const subScript = txCopySubscript(keyPair)
-  const txCopy = Object.assign({}, tx)
+  const txCopy = clone(tx)
   txCopy.vin.forEach((vin, i) => { vin.script = i === index ? subScript : '' })
   // console.log('*** txCopy', txCopy)
   const txCopyBuffer = buildTxCopy(txCopy)
@@ -83,15 +83,15 @@ const bufferInputs = propName => tx =>
   mapConcatBuffers(bufferInput(tx))(tx[propName])
 )
 
-// bufferInput :: Tx -> Object -> Buffer
-const bufferInput = tx => vin =>
+// bufferInput :: Tx -> (Object, Int) -> Buffer
+const bufferInput = tx => (vin, index) =>
 (
   compose([
     prop('hash', bufferHash),                // 32 bytes, Transaction Hash
     prop('index', bufferUInt32),             // 4 bytes, Output Index
     addProp(
       'scriptSig',
-      prop('keyPair', vinScript(tx))
+      prop('keyPair', vinScript(tx, index))
     ),
     prop('scriptSig', bufferVarSlice('hex')),  // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     prop('sequence', bufferUInt32)             // 4 bytes, Sequence Number
@@ -135,16 +135,10 @@ const bufferOutput = vout =>
  *   - SIGHASH_SINGLE (0x00000003)
  *   - SIGHASH_ANYONECANPAY (0x00000080)
  */
-const vinScript = tx => keyPair => {
+const vinScript = (tx, index) => keyPair => {
   const kpPubKey = keyPair.getPublicKeyBuffer()
 
-  const subScript = bscript.pubKeyHash.output.encode(bcrypto.hash160(kpPubKey))
-  // TODO: tmp, should pass vin index here.
-  const txCopy = clone(tx)
-  txCopy.vin[0].script = subScript
-  const txCopyBuffer = buildTxCopy(txCopy)
-  const hashType = 1
-  const txCopyBufferWithType = Buffer.concat([txCopyBuffer, bufferInt32(hashType)])
+  const txCopyBufferWithType = txCopyForHash(keyPair, tx, index)
 
   // console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
   // console.log('*** 2: ' + '0100000001a58a349e8d92bb9867884bf4b108da8df77143fbe8fcaf8a0f69a589de1c66a3010000001976a9143c8710460fc63d27e6741dd1927f0ece41e9b55588acffffffff0200c2eb0b000000001976a9147adddcbdf9f0ebcb814e2efb95debda73bfefd9888ace0453577000000001976a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac0000000001000000')

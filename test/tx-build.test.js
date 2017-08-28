@@ -130,7 +130,7 @@ describe('tx-build', function () {
   describe('vinScript', function () {
     const keyPair = fixtureNode.keyPair
     it('should create vin script', function () {
-      const script = vinScript(fixture.tx)(keyPair)
+      const script = vinScript(fixture.tx, 0)(keyPair)
       assert.equal(script.toString('hex'), fixture.decoded.vin[0].scriptSig)
     })
   })
@@ -141,7 +141,7 @@ describe('tx-build', function () {
       const txVin = Object.assign({}, fixture.tx.vin[0], {
         keyPair
       })
-      const buffer = bufferInput(fixture.tx)(txVin)
+      const buffer = bufferInput(fixture.tx)(txVin, 0)
       assert.equal(buffer.toString('hex'), fixture.hexItems.vin)
     })
   })
