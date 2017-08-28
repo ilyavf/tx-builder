@@ -112,6 +112,7 @@ console.log( buildTx( tx ).toString( 'hex' ) )
 - decode script
 
 ## Release Notes:
+- 0.4.3 Sign multiple VINs.
 - 0.4.1
   - bufferVarSlice accept encoding param;
   - clone tx config when creating a copy.
