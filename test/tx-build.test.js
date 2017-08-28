@@ -56,10 +56,15 @@ describe('buffer-build utils', function () {
     })
   })
   describe('bufferVarSlice', function () {
-    const hex = '2d7a9f05'
-    const buffer = bufferVarSlice('hex')(hex)
-    it('should create a variable length buffer', function () {
+    it('should create a variable length buffer from hex', function () {
+      const hex = '2d7a9f05'
+      const buffer = bufferVarSlice('hex')(hex)
       assert.equal(buffer.toString('hex'), '04' + hex)
+    })
+    it('should create a variable length buffer from ascii', function () {
+      const ascii = '{a:123}'
+      const buffer = bufferVarSlice('ascii')(ascii)
+      assert.equal(buffer.toString(), '\u0007' + ascii)
     })
   })
   describe('mapConcatBuffers', function () {

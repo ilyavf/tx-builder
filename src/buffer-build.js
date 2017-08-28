@@ -1,5 +1,6 @@
 const Buffer = require('safe-buffer').Buffer
 const varuint = require('varuint-bitcoin')
+const typeforce = require('typeforce')
 
 // bufferUInt8 :: Int -> Buffer
 const bufferUInt8 = value => {
@@ -35,7 +36,11 @@ const bufferVarInt = value => varuint.encode(value)
 
 // bufferVarSlice :: String -> String -> Buffer
 const bufferVarSlice = encoding => value => {
-  const buffer = Buffer.from(value, 'hex')
+  typeforce(typeforce.oneOf(
+    typeforce.value('hex'),
+    typeforce.value('ascii')
+  ), encoding)
+  const buffer = Buffer.from(value, encoding)
   const bVarInt = bufferVarInt(buffer.length)
   return Buffer.concat([bVarInt, buffer])
 }
