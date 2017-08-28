@@ -112,6 +112,9 @@ console.log( buildTx( tx ).toString( 'hex' ) )
 - decode script
 
 ## Release Notes:
+- 0.4.1
+  - bufferVarSlice accept encoding param;
+  - clone tx config when creating a copy.
 - 0.4.0 Build tx input scripts.
 - 0.3.0 Added transaction builder
 - 0.2.0 Added readHash helper
