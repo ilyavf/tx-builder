@@ -87,8 +87,8 @@ const bufferInputs = (propName, bufferInput) => tx =>
 const makeBufferInput = buildTxCopy => tx => (vin, index) =>
 (
   compose([
-    prop('hash', bufferHash),                // 32 bytes, Transaction Hash
-    prop('index', bufferUInt32),             // 4 bytes, Output Index
+    prop('txid', bufferHash),                // 32 bytes, Transaction Hash
+    prop('vout', bufferUInt32),              // 4 bytes, Output Index
     addProp(
       'scriptSig',
       prop('keyPair', vinScript(buildTxCopy)(tx, index))
@@ -102,8 +102,8 @@ const makeBufferInput = buildTxCopy => tx => (vin, index) =>
 const bufferInputEmptyScript = vin =>
 (
   compose([
-    prop('hash', bufferHash),
-    prop('index', bufferUInt32),
+    prop('txid', bufferHash),
+    prop('vout', bufferUInt32),
     prop('script', script => (!script ? bufferVarInt(0) : bufferVarSlice('hex')(script))), // Empty script (1 byte 0x00)
     prop('sequence', bufferUInt32)
   ])(vin, EMPTY_BUFFER)

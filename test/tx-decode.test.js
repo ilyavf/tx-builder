@@ -10,9 +10,9 @@ describe('Decode hex', function () {
 
   describe('readHash', function () {
     const offset = 4 + 1
-    const [hash, bufferLeft] = readHash(buffer.slice(offset))
+    const [txid, bufferLeft] = readHash(buffer.slice(offset))
     it('should read tx hash from buffer and reverse it', function () {
-      assert.equal(hash, fixture.decoded.vin[0].hash)
+      assert.equal(txid, fixture.decoded.vin[0].txid)
       assert.ok(bufferLeft.length < buffer.length)
     })
   })
@@ -20,11 +20,11 @@ describe('Decode hex', function () {
   describe('readInput', function () {
     const offsetVersionAndVinLength = 4 + 1
     const [input, bufferLeft] = readInput(buffer.slice(offsetVersionAndVinLength))
-    it('should read hash', function () {
-      assert.equal(input.hash.toString('hex'), fixture.decoded.vin[0].hash)
+    it('should read txid', function () {
+      assert.equal(input.txid.toString('hex'), fixture.decoded.vin[0].txid)
     })
-    it('should read index', function () {
-      assert.equal(input.index, fixture.decoded.vin[0].index)
+    it('should read vout index', function () {
+      assert.equal(input.vout, fixture.decoded.vin[0].vout)
     })
     it('should read scriptSig', function () {
       assert.equal(input.scriptSig.toString('hex'), fixture.decoded.vin[0].scriptSig)

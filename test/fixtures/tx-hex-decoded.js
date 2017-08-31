@@ -17,8 +17,8 @@ module.exports = {
     version: 1,
     locktime: 0,
     vin: [{
-      hash: 'a3661cde89a5690f8aaffce8fb4371f78dda08b1f44b886798bb928d9e348aa5',
-      index: 1,
+      txid: 'a3661cde89a5690f8aaffce8fb4371f78dda08b1f44b886798bb928d9e348aa5',
+      vout: 1,
       scriptSig: '4730440220764bbe9ddff67409310c04ffb34fe937cc91c3d55303158f91a32bed8d9d7a7b02207fb30f6b9aaef93da8c88e2b818d993ad65aae54860c3de56c6304c57252cce1012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a3',
       sequence: '4294967295'
     }],
@@ -35,8 +35,8 @@ module.exports = {
     version: 1,
     locktime: 0,
     vin: [{
-      hash: 'a3661cde89a5690f8aaffce8fb4371f78dda08b1f44b886798bb928d9e348aa5',
-      index: 1,
+      txid: 'a3661cde89a5690f8aaffce8fb4371f78dda08b1f44b886798bb928d9e348aa5',
+      vout: 1,
       script: '',
       sequence: '4294967295'
     }],

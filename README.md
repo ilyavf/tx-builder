@@ -112,6 +112,10 @@ console.log( buildTx( tx ).toString( 'hex' ) )
 - decode script
 
 ## Release Notes:
+- 0.5.0 Renamed input fields:
+  - vin.hash to vin.txid
+  - vin.index to vin.out
+- 0.4.5 Made bufferInput and buildTxCopy implementation specific.
 - 0.4.3 Sign multiple VINs.
 - 0.4.1
   - bufferVarSlice accept encoding param;

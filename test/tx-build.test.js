@@ -79,9 +79,9 @@ describe('buffer-build utils', function () {
 
 describe('tx-build', function () {
   describe('bufferHash', function () {
-    it('should create a buffer with hash', function () {
-      const hash = '2d7a9f0534ddac231ef1978bda388791c32321f7e14e18e7df3bbed261615f54'
-      assert.equal(bufferHash(hash).reverse().toString('hex'), hash)
+    it('should create a buffer with txid', function () {
+      const txid = '2d7a9f0534ddac231ef1978bda388791c32321f7e14e18e7df3bbed261615f54'
+      assert.equal(bufferHash(txid).reverse().toString('hex'), txid)
     })
   })
   describe('bufferOutput', function () {

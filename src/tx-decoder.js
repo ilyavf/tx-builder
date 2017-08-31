@@ -50,8 +50,8 @@ const decodeTx = buffer =>
 const readInput = buffer =>
 (
   compose([
-    addProp('hash', readHash),                // 32 bytes, Transaction Hash
-    addProp('index', readUInt32),             // 4 bytes, Output Index
+    addProp('txid', readHash),                // 32 bytes, Transaction Hash
+    addProp('vout', readUInt32),             // 4 bytes, Output Index
     addProp('scriptSig', readVarSlice),       // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     addProp('sequence', readUInt32)           // 4 bytes, Sequence Number
   ])({}, buffer)
