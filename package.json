@@ -1,6 +1,6 @@
 {
   "name": "tx-builder",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "Composable helpers for building and decoding blockchain transactions",
   "main": "index.js",
   "repository": "https://github.com/ilyavf/tx-builder.git",
@@ -36,5 +36,8 @@
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
     "standard": "^10.0.2"
+  },
+  "browserify": {
+    "transform": [["babelify", { "presets": ["env"] }]]
   }
 }
