@@ -3,6 +3,8 @@
  * to make a decoder.
  */
 
+const bitcoin = require('bitcoinjs-lib')
+const bcrypto = bitcoin.crypto
 const { compose, addProp } = require('./compose-read')
 const {
   readSlice,
@@ -66,10 +68,13 @@ const readOutput = buffer =>
   ])({}, buffer)
 )
 
+const getTxId = buffer => bcrypto.hash256(buffer).reverse().toString('hex')
+
 module.exports = {
   decodeTx,
   readHash,
   readInputs,
   readInput,
-  readOutput
+  readOutput,
+  getTxId
 }

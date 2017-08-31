@@ -1,7 +1,7 @@
 'use strict'
 const Buffer = require('safe-buffer').Buffer
 const assert = require('assert')
-const { decodeTx, readHash, readInput, readOutput, readInputs } = require('../src/tx-decoder')
+const { decodeTx, readHash, readInput, readOutput, readInputs, getTxId } = require('../src/tx-decoder')
 const fixture = require('./fixtures/tx-hex-decoded')
 
 describe('Decode hex', function () {
@@ -100,6 +100,13 @@ describe('Decode hex', function () {
       }
       assert.equal(decoded[0].vin[0].sequence, fixture.decoded.vin[0].sequence)
       assert.equal(decoded[0].vout[1].scriptPubKey.toString('hex'), fixture.decoded.vout[1].scriptPubKey)
+    })
+  })
+
+  describe('getTxId', function () {
+    it('should get txid', function () {
+      const txBuffer = Buffer.from(fixture.hex, 'hex')
+      assert.equal(getTxId(txBuffer), fixture.decoded.txid)
     })
   })
 })
