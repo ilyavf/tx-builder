@@ -16,12 +16,13 @@ const {
 } = require('./buffer-read')
 
 /**
- * Transaction's hash is displayed in a reverse order, we need to un-reverse it.
+ * Transaction's hash is a 256-bit integer, so we need to reverse bytes due to Little Endian byte order.
  */
 // readHash :: Buffer -> [Hash, Buffer]
 const readHash = buffer => {
   const [res, bufferLeft] = readSlice(32)(buffer)
-  const hash = Buffer.from(res, 'hex').reverse().toString('hex')
+  // Note: `buffer.reverse()` mutates the buffer, so make a copy:
+  const hash = Buffer.from(res).reverse().toString('hex')
   return [hash, bufferLeft]
 }
 
@@ -68,6 +69,7 @@ const readOutput = buffer =>
   ])({}, buffer)
 )
 
+// Since a hash is a 256-bit integer and is stored using Little Endian, we reverse it for showing to user (who reads BE).
 const getTxId = buffer => bcrypto.hash256(buffer).reverse().toString('hex')
 
 module.exports = {

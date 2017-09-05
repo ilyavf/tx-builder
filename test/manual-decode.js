@@ -18,7 +18,8 @@ offset += varuint.decode.bytes
 
 // VIN-1:
 const hash = buffer.slice(offset, offset + 32)
-console.log(`* hash = ${hash.toString('hex')}, offset=${offset}, length=32`)
+console.log(`* hash          = ${hash.toString('hex')}, offset=${offset}, length=32`)
+console.log(`* hash reversed = ${hash.reverse().toString('hex')}, offset=${offset}, length=32`)
 offset += 32
 
 const index = buffer.readUInt32LE(offset)
