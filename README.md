@@ -5,15 +5,15 @@ Composable helpers for building and decoding blockchain transactions
 
 ### Table of Contents
 
-1. [Intro](#intro)
+- [Intro](#intro)
   - [Install](#install)
   - [Usage](#usage)
-3. [API](#api)
-4. [Examples](#examples)
+- [API](#api)
+- [Examples](#examples)
   - [Decoding a transaction](#decoding-a-transaction)
   - [Building a transaction](#building-a-transaction)
-5. [Upcoming](#upcoming)
-6. [Release Notes](#release-notes)
+- [Upcoming](#upcoming)
+- [Release Notes](#release-notes)
 
 ## Intro
 
