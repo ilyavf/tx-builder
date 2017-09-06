@@ -36,7 +36,7 @@ npm install tx-builder
 
 For more examples see section [Examples](#examples)
 
-```
+```javascript
 const Buffer = require("safe-buffer").Buffer
 const { readInt32, readUInt32 } = require("tx-builder/src/buffer-read")
 const { compose, addProp } = require("tx-builder/src/compose-read")
@@ -112,13 +112,13 @@ If you are not familiar with how to decode a transaction in general checkout `te
 Also, feel free to checkout tests for precise examples of how to use the package helpers.
 
 To convert a hex string into buffer:
-```
+```javascript
 const hexString = "0f015a"
 const buffer = Buffer.from(hexString, "hex")
 ```
 
 To convert a buffer into a hex string:
-```
+```javascript
 const hexString = buffer.toString("hex")
 ```
 
