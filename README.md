@@ -9,6 +9,8 @@ Composable helpers for building and decoding blockchain transactions
   - [Install](#install)
   - [Usage](#usage)
 - [API](#api)
+  - [Decoder](#decoder)
+  - [Builder](#builder)
 - [Examples](#examples)
   - [Decoding a transaction](#decoding-a-transaction)
   - [Building a transaction](#building-a-transaction)
@@ -55,7 +57,7 @@ const decodeTx = buffer =>
 
 *All buffer helpers assume Little Endian.*
 
-- **Decoder**
+### Decoder
   - **Buffer helpers**. Each helper returns a value that contains a pair (array of two values) - a result and a buffer left after reading.
     - `readInt32 :: Buffer -> (Number, Buffer)` Reads 32-bit integer.
     - `readUInt32 :: Buffer -> (Number, Buffer)` Reads 32-bit unsigned integer.
@@ -74,7 +76,7 @@ const decodeTx = buffer =>
     - `readOutput :: Buffer -> (Res, Buffer)` Reads a buffer that contains transaction output (VOUT)
     - `getTxId :: Buffer -> String` Given transaction buffer calculates transaction hash (TXID).
 
-- **Builder**
+### Builder
   - **Buffer helpers**.
     - `bufferUInt8 :: Int -> Buffer` Creates a buffer that contains the given 8-bit unsigned integer.
     - `bufferInt32 :: Int -> Buffer`
@@ -87,14 +89,14 @@ const decodeTx = buffer =>
     - `compose :: [Fn] -> Tx -> Buffer -> Buffer`
     - `prop :: String -> Fn -> (Obj -> Buffer)`
     - `addProp :: String -> Fn -> Obj -> Buffer`
-  - **High-level helpers**. See `test/tx-build.test.js` for examples of usage.
+  - **High-level helpers**. See `test/tx-build.test.js` for examples of usage. Some of this helpers can be reused for a specific blockchain implementation. E.g. see package `tx-builder-equibit` for [Equibit Securities Platform ](https://equibitgroup.com/) implementation.
     - `buildTx :: Tx -> Buffer` Main function to build a bitcoin transaction. Returns an instance of Buffer.
     - buildTxCopy,
     - txCopyForHash,
     - txCopySubscript,
     - bufferInputs,
     - bufferInput,
-    - bufferOutput,
+    - `bufferOutput :: Object -> Buffer` Returns a buffer that contains transaction VOUT (value, scriptPubKey).
     - `bufferHash :: HexString -> Buffer` Returns a buffer that contains transaction hex (note: because of Little Endian txid in buffer is reversed).
     - vinScript,
     - `voutScript :: NetworkConfig -> Address -> ScriptHex` Given a bitcoin address creates a VOUT script.
@@ -212,6 +214,7 @@ console.log( buildTx( tx ).toString( 'hex' ) )
 
 - full docs
 - broserify-ied build
+- an example of other than Bitcoin-specific implementation
 
 ## Release Notes:
 - 0.6.0 Added network argument to voutScript. Added API docs.
