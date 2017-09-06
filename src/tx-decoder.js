@@ -26,7 +26,7 @@ const readHash = buffer => {
   return [hash, bufferLeft]
 }
 
-// readInputs :: Buffer -> (Res, Buffer)
+// readInputs :: Fn -> Buffer -> (Res, Buffer)
 const readInputs = readFn => buffer => {
   const vins = []
   let [vinLen, bufferLeft] = readVarInt(buffer)
@@ -38,7 +38,7 @@ const readInputs = readFn => buffer => {
   return [vins, bufferLeft]
 }
 
-// decodeTx :: Buffer -> [Res, Buffer]
+// decodeTx :: Buffer -> [Object, Buffer]
 const decodeTx = buffer =>
 (
   compose([
@@ -70,6 +70,7 @@ const readOutput = buffer =>
 )
 
 // Since a hash is a 256-bit integer and is stored using Little Endian, we reverse it for showing to user (who reads BE).
+// getTxId :: Buffer -> String
 const getTxId = buffer => bcrypto.hash256(buffer).reverse().toString('hex')
 
 module.exports = {

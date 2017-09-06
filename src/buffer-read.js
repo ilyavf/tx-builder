@@ -13,7 +13,7 @@ function readUInt32 (buffer) {
   return [i, buffer.slice(4)]
 }
 
-// readUInt32 :: Buffer -> (Number, Buffer)
+// readInt32 :: Buffer -> (Number, Buffer)
 function readInt32 (buffer) {
   typeforce(typeforce.Buffer, buffer)
   const i = buffer.readInt32LE(0)

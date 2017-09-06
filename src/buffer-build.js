@@ -23,7 +23,7 @@ const bufferUInt32 = value => {
   return buffer
 }
 
-// bufferInt32 :: Int -> Buffer
+// bufferUInt64 :: Int -> Buffer
 const bufferUInt64 = value => {
   const buffer = Buffer.allocUnsafe(8)
   buffer.writeInt32LE(value & -1)
@@ -34,7 +34,7 @@ const bufferUInt64 = value => {
 // bufferVarInt :: VarInt -> Buffer
 const bufferVarInt = value => varuint.encode(value)
 
-// bufferVarSlice :: String -> String -> Buffer
+// bufferVarSlice :: Encoding -> String -> Buffer
 const bufferVarSlice = encoding => value => {
   typeforce(typeforce.oneOf(
     typeforce.value('hex'),
