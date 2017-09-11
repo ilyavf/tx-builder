@@ -181,6 +181,7 @@ const bufferInput = makeBufferInput(buildTxCopy)
  * Coinbase transaction. Docs: https://bitcoin.org/en/developer-reference#coinbase
  * @param tx
  */
+// buildCoinbaseTx :: Object => Buffer
 const buildCoinbaseTx = tx =>
 (
   compose([
@@ -191,6 +192,7 @@ const buildCoinbaseTx = tx =>
   ])(tx, EMPTY_BUFFER)
 )
 
+// coinbaseInput :: Object<blockHeight> => Buffer
 const coinbaseInput = (vin) =>
 (
   compose([
@@ -201,6 +203,7 @@ const coinbaseInput = (vin) =>
   ])(vin, EMPTY_BUFFER)
 )
 
+// coinbaseScript :: Integer => Buffer
 const coinbaseScript = blockHeight => {
   const blockHeightBuffer = bufferVarInt(blockHeight)
   const arbitraryData = Buffer.allocUnsafe(10)

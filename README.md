@@ -14,6 +14,7 @@ Composable helpers for building and decoding blockchain transactions
 - [Examples](#examples)
   - [Decoding a transaction](#decoding-a-transaction)
   - [Building a transaction](#building-a-transaction)
+  - [Coinbase transaction](#coinbase-transaction)
 - [Upcoming](#upcoming)
 - [Release Notes](#release-notes)
 
@@ -208,6 +209,67 @@ const buildTx = tx =>
 
 console.log( buildTx( tx ).toString( 'hex' ) )
 // > "0100000001545f6161d2be3bdfe7184ee1f7..."
+```
+
+### Coinbase transaction
+
+According to [spec](https://bitcoin.org/en/developer-reference#coinbase) a coinbase transaction should contain one
+input that has a 32-byte null transaction id and `0xffffffff` index (since there is no previous output), and a script
+that is of a variable lenge and contains block height (BIP34) and some arbitrary data (aka _extranonce_ that contributes
+to enlarge the domain for the proof of work function).
+
+A coinbase transaction builder can be made as:
+```js
+// buildCoinbaseTx :: Object => Buffer
+const buildCoinbaseTx = tx =>
+(
+  compose([
+    prop('version', bufferInt32),                   // 4 bytes, version
+    prop('vin', mapConcatBuffers(coinbaseInput)),   // <<<< COINBASE INPUT
+    prop('vout', mapConcatBuffers(bufferOutput)),   // 1-9 bytes, vout
+    prop('locktime', bufferUInt32)                  // 4 bytes, locktime
+  ])(tx, EMPTY_BUFFER)
+)
+
+// coinbaseInput :: Object<blockHeight> => Buffer
+const coinbaseInput = (vin) =>
+(
+  compose([
+    () => Buffer.from('0000000000000000000000000000000000000000000000000000000000000000', 'hex'),  // 32 bytes, txid
+    () => Buffer.from('ffffffff', 'hex'),   // 4 bytes, vout
+    prop('blockHeight', coinbaseScript),    // <<<< COINBASE SCRIPT, contains block height and arbitrary data
+    () => bufferUInt32(4294967295)          // 4 bytes, sequence number
+  ])(vin, EMPTY_BUFFER)
+)
+
+// coinbaseScript :: Integer => Buffer
+const coinbaseScript = blockHeight => {
+  const blockHeightBuffer = bufferVarInt(blockHeight)
+  const arbitraryData = Buffer.allocUnsafe(10)
+  const bVarInt = bufferVarInt(blockHeightBuffer.length + arbitraryData.length)
+  return Buffer.concat([bVarInt, blockHeightBuffer, arbitraryData])
+}
+```
+
+To run the coinbase builder we can feed is with transaction object like this:
+```
+// Import the implemented builder (a part of `tx-builder` export):
+const { buildCoinbaseTx } = require("tx-builder/src/tx-builder")
+
+const tx = {
+  version: 1,
+  locktime: 0,
+  vin: [{
+    blockHeight: 40500
+  }],
+  vout: [{
+    value: 12.5 + 0.02 * 100000000,         // <<<<
+    address: "mricWicq8AV5d46cYWPApESirBXcB42h57"
+  }]
+}
+
+const coinbaseTx = buildCoinbaseTx(tx)
+console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 ```
 
 ## Upcoming
