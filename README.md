@@ -217,6 +217,7 @@ console.log( buildTx( tx ).toString( 'hex' ) )
 - an example of other than Bitcoin-specific implementation
 
 ## Release Notes:
+- 0.6.4 Added example of how to create a coinbase transaction.
 - 0.6.0 Added network argument to voutScript. Added API docs.
 - 0.5.0 Renamed input fields:
   - vin.hash to vin.txid
