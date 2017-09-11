@@ -15,6 +15,7 @@ Composable helpers for building and decoding blockchain transactions
   - [Decoding a transaction](#decoding-a-transaction)
   - [Building a transaction](#building-a-transaction)
   - [Coinbase transaction](#coinbase-transaction)
+- [Notes on monadic composition](notes-on-monadic-composition.md)
 - [Upcoming](#upcoming)
 - [Release Notes](#release-notes)
 
@@ -252,7 +253,7 @@ const coinbaseScript = blockHeight => {
 ```
 
 To run the coinbase builder we can feed is with transaction object like this:
-```
+```js
 // Import the implemented builder (a part of `tx-builder` export):
 const { buildCoinbaseTx } = require("tx-builder/src/tx-builder")
 
