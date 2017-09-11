@@ -177,6 +177,37 @@ const bufferHash = hash => Buffer.from(hash, 'hex').reverse()
 const buildTxCopy = makeBuildTxCopy(bufferOutput)
 const bufferInput = makeBufferInput(buildTxCopy)
 
+/**
+ * Coinbase transaction. Docs: https://bitcoin.org/en/developer-reference#coinbase
+ * @param tx
+ */
+const buildCoinbaseTx = tx =>
+(
+  compose([
+    prop('version', bufferInt32),                   // 4 bytes, version
+    prop('vin', mapConcatBuffers(coinbaseInput)),   // a coinbase input
+    prop('vout', mapConcatBuffers(bufferOutput)),   // 1-9 bytes, vout
+    prop('locktime', bufferUInt32)                  // 4 bytes
+  ])(tx, EMPTY_BUFFER)
+)
+
+const coinbaseInput = (vin) =>
+(
+  compose([
+    () => Buffer.from('0000000000000000000000000000000000000000000000000000000000000000', 'hex'),  // 32 bytes, txid
+    () => Buffer.from('ffffffff', 'hex'),   // 4 bytes, vout
+    prop('blockHeight', coinbaseScript),    // 4+ bytes (VarInt), coinbase script contains block height and arbitrary data
+    () => bufferUInt32(4294967295)          // 4 bytes, sequence number
+  ])(vin, EMPTY_BUFFER)
+)
+
+const coinbaseScript = blockHeight => {
+  const blockHeightBuffer = bufferVarInt(blockHeight)
+  const arbitraryData = Buffer.allocUnsafe(10)
+  const bVarInt = bufferVarInt(blockHeightBuffer.length + arbitraryData.length)
+  return Buffer.concat([bVarInt, blockHeightBuffer, arbitraryData])
+}
+
 module.exports = {
   buildTx,
   buildTxCopy,
@@ -191,5 +222,8 @@ module.exports = {
   bufferInputEmptyScript,
   mapConcatBuffers,
   makeBufferInput,
-  makeBuildTxCopy
+  makeBuildTxCopy,
+  buildCoinbaseTx,
+  coinbaseInput,
+  coinbaseScript
 }

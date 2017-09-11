@@ -17,7 +17,10 @@ const {
   bufferOutput,
   bufferHash,
   bufferInputEmptyScript,
-  vinScript
+  vinScript,
+  buildCoinbaseTx,
+  coinbaseInput,
+  coinbaseScript
 } = require('../src/tx-builder')
 const fixture = require('./fixtures/tx-hex-decoded')
 const fixtureNode = require('./fixtures/hdnode')
@@ -159,5 +162,34 @@ describe('tx-build', function () {
       const buffer = buildTx(fixture.tx)
       assert.equal(buffer.toString('hex'), fixture.hex)
     })
+  })
+})
+
+describe('buildCoinbaseTx', function () {
+  const tx = {
+    version: 1,
+    locktime: 0,
+    vin: [{
+      blockHeight: 40500
+    }],
+    vout: [{
+      value: 12.5 + 0.02 * 100000000,
+      address: 'mricWicq8AV5d46cYWPApESirBXcB42h57'
+    }]
+  }
+  it('should build coinbase script', function () {
+    const script = coinbaseScript(40500).toString('hex')
+    // console.log(`script = ${script}`)
+    assert.ok(script)
+  })
+  it('should build coinbase input', function () {
+    const vin = coinbaseInput({ blockHeight: 40500 }).toString('hex')
+    // console.log(`vin = ${vin}`)
+    assert.ok(vin)
+  })
+  it('should build a coinbase tx', function () {
+    const coinbaseHex = buildCoinbaseTx(tx).toString('hex')
+    // console.log(`coinbaseHex = ${coinbaseHex}`)
+    assert.ok(coinbaseHex)
   })
 })
