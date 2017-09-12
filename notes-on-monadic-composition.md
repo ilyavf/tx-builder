@@ -54,34 +54,34 @@ redefine it.
 
 ### V2: use composition to avoid manual gluing
 
-Now, lets see if we can come up with a `compose` function to avoid gluing the results of our two unit functions manually.
+Now, lets see if we can come up with a `composeState` function to avoid gluing the results of our two unit functions manually.
 
 ```js
-const compose = (fn1, fn2, param1, param2, state) => {
+const composeState = (fn1, fn2, param1, param2, state) => {
   return fun2(fn1(state, param1), param2)
 }
 ```
 
 And our app can be defined now like this:
 ```
-const myAppV2 = compose(
+const myAppV2 = composeState(
   increaseTotal, addNewProp,
   10, "test",
   {total: 0}
 )
 ```
 
-Of course we can be fancy: group a function and its param together, and generalize our `compose` to work with an array
+Of course we can be fancy: group a function and its param together, and generalize our `composeState` to work with an array
 of arguments:
 
 ```js
-const compose = (parameterizedFns, state) => {
+const composeState = (parameterizedFns, state) => {
   return parameterizedFns.reduce((state, ([fn, param])) => {
     return fn(state, param)
   }, state)
 }
 
-const myAppV2a = compose(
+const myAppV2a = composeState(
   [
     [increaseTotal, 10],
     [addNewProp, "test"],
@@ -104,7 +104,7 @@ const addNewProp = state => newPropValue {
   return state
 }
 
-const compose = (fns, state) => {
+const composeState = (fns, state) => {
   return fns.reduce((state, fn) => {
     return fn(state, param)
   }, state)
@@ -119,9 +119,9 @@ const myAppV2b = compose([
 ### V3: an ideal composition
 
 Something here is still not ideal. We would like to define our app first and only then call it passing some
-initial params (the `state` in our case). Lets modify our `compose` using currying:
+initial params (the `state` in our case). Lets modify our `composeState` using currying:
 ```js
-const compose = fns => state => {
+const composeState = fns => state => {
   return fns.reduce((state, fn) => {
     return fn(state, param)
   }, state)
@@ -130,7 +130,7 @@ const compose = fns => state => {
 
 And now we can define our app and call it later like this:
 ```js
-const myAppV2b = compose([
+const myAppV2b = composeState([
   increaseTotal(10),
   addNewProp("test")
 ])
