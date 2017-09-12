@@ -17,7 +17,11 @@ functional style.
 ### Intro
 
 A monad is a way of composing functionality. It was invented to target mutations (e.g. state) and asynchronous IO
-in a pure functional way. Let's look at the following example of how a state mutation could be managed in a pure way.
+in a pure functional way. The idea is that gluing is made outside of the main functions (which can stay pure), but
+inside the compose helper. So, the most interesting thing here is that for every app there could be a different way
+of composing its pieces.
+
+Let's look at the following example of how a state mutation could be managed in a pure way.
 
 ### V1: manage state in a pure way imperatively
 
