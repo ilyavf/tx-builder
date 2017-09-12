@@ -1,7 +1,7 @@
 
 ## Monadic composition
 
-A monad is no more a scary unknown word. Everybody heard of them, and even of examples such as `Maybe`, `Either`
+A monad is no more a scary unknown word. Everybody heard of them, and even is familiar with the examples such as `Maybe`, `Either`
 or `IO` monads. However to use these monads in your day-to-day coding may take some time of learning and efforts of
 trying.
 
@@ -31,7 +31,7 @@ function increaseTotal (state, value) {
   return state
 }
 ```
-- this is a pure function that's intended to update state property based on some parameter input.
+\- this is a pure function that's intended to update state property based on some parameter input.
 
 Now lets make another pure function that changes the state in some way
 ```js
@@ -94,12 +94,13 @@ Isn't it looking much better now?
 Or we even can use currying to setup our function avoiding grouping with an array so that we don't have to destruct
 pairs inside our compose function:
 ```js
-const increaseTotal = state => value {
+// Notice that the setup parameter comes first, and the data parameter (state) comes last:
+const increaseTotal = value => state {
   state.total + value
   return state
 }
 
-const addNewProp = state => newPropValue {
+const addNewProp = newPropValue => state {
   state.newProp = newPropValue
   return state
 }
