@@ -157,3 +157,5 @@ This package provides some composition helpers that allow to make a Blockchain t
 composition style. There are two "applications" in the package - a transaction builder and a decoder. Both have
 their own composition functions because there are differences in how to glue the unit functions they are composed
 of.
+
+In the [next article](compose-decoder-explained.md) we are discussing how a transaction decoder is implemented.
