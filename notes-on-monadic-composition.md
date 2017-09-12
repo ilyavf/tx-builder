@@ -17,7 +17,7 @@ functional style.
 ### Intro
 
 A monad is a way of composing functionality. It was invented to target mutations (e.g. state) and asynchronous IO
-in a pure functional way. The idea is that gluing is made outside of the main functions (which can stay pure), but
+in a pure functional way. The idea is that gluing (side effects, io) is made outside of the main functions (which can stay pure), but
 inside the compose helper. So, the most interesting thing here is that for every app there could be a different way
 of composing its pieces.
 
