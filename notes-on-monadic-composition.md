@@ -148,4 +148,6 @@ to the world of composition!
 
 Feel free to check out a real-world example app - [tx-builder](https://www.npmjs.com/package/tx-builder).
 This package provides some composition helpers that allow to make a Blockchain transaction builder in the monadic
-composition style.
+composition style. There are two "applications" in the package - a transaction builder and a decoder. Both have
+their own composition functions because there are differences in how to glue the unit functions they are composed
+of.
