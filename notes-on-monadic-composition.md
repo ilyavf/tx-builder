@@ -31,9 +31,9 @@ function increaseTotal (state, value) {
   return state
 }
 ```
-\- this is a pure function that's intended to update state property based on some parameter input.
+\- this is a pure function that's intended to update state's property based on some parameter input.
 
-Now lets make another pure function that changes the state in some way
+Now lets make another pure function that changes the state in some way, e.g. adds a new property with a value:
 ```js
 function addNewProp (state, newPropValue) {
   state.newProp = newPropValue
@@ -41,7 +41,7 @@ function addNewProp (state, newPropValue) {
 }
 ```
 
-and finally, lets write a composition of these two functions:
+and finally, lets write an app that uses (composes) these two functions together:
 ```js
 const myApp = state => {
   state = increaseTotal(state, 10)
@@ -49,8 +49,9 @@ const myApp = state => {
   return state
 }
 ```
-Technically we do not have to return state since we knew that our unit functions only mutate the state and does not
-redefine it.
+Technically, since in JavaScript an object is passed by a reference, in our "unit" functions we do not have to return
+the state since we know that they only mutate the state and do not redefine it. But lets still do this in the sake of
+demonstrating the purity.
 
 ### V2: use composition to avoid manual gluing
 
@@ -71,8 +72,8 @@ const myAppV2 = composeState(
 )
 ```
 
-Of course we can be fancy: group a function and its param together, and generalize our `composeState` to work with an array
-of arguments:
+Lets now improve the API and group a function and its parameter together. And also generalize our `composeState` to
+work with an array of arguments:
 
 ```js
 const composeState = (parameterizedFns, state) => {
