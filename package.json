@@ -14,9 +14,15 @@
     "build"
   ],
   "scripts": {
-    "test": "npm run lint && npm run mocha",
+    "build": "make build",
     "lint": "standard --fix",
-    "mocha": "nyc mocha -u tdd --timeout 999999 --colors test/ --recursive"
+    "lint:fix": "standard --fix",
+    "mocha": "nyc mocha -u tdd --timeout 999999 --colors test/ --recursive",
+    "preversion": "npm run lint && npm test",
+    "release:patch": "npm version patch && make publish",
+    "release:minor": "npm version minor && make publish",
+    "release:major": "npm version major && make publish",
+    "test": "npm run mocha"
   },
   "standard": {
     "env": [
@@ -29,15 +35,14 @@
     "ramda": "^0.24.1",
     "safe-buffer": "^5.1.1",
     "typeforce": "^1.11.1",
+    "uglify-es": "^3.1.0",
     "varuint-bitcoin": "^1.0.4"
   },
   "devDependencies": {
     "assert": "^1.4.1",
+    "browserify": "^14.4.0",
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
     "standard": "^10.0.2"
-  },
-  "browserify": {
-    "transform": [["babelify", { "presets": ["env"] }]]
   }
 }

@@ -59,6 +59,9 @@ const decodeTx = buffer =>
 
 *All buffer helpers assume Little Endian.*
 
+The package exports two objects: `decoder` and `buider`. Each of them contains `bufferHelpers`, `composeHelpers`
+and high-level helpers (e.g. `decodeTx` and `buildTx`).
+
 ### Decoder
   - **Buffer helpers**. Each helper returns a value that contains a pair (array of two values) - a result and a buffer left after reading.
     - `readInt32 :: Buffer -> (Number, Buffer)` Reads 32-bit integer.
@@ -77,6 +80,14 @@ const decodeTx = buffer =>
     - `readInput :: Buffer -> (Res, Buffer)` Reads a buffer that contains transaction input (VIN)
     - `readOutput :: Buffer -> (Res, Buffer)` Reads a buffer that contains transaction output (VOUT)
     - `getTxId :: Buffer -> String` Given transaction buffer calculates transaction hash (TXID).
+
+```js
+const decoder = require('tx-builder').decoder       // Main `builder` container.
+const { decodeTx, readHash, getTxId } = decoder     // High-level helpers.
+const { bufferHelpers, composeHelpers } = decoder   // Buffer and composition helpers.
+const { readInt32, readVarInt, readVarSlice } = bufferHelpers
+const { compose as composeDecoder, addProp } = composeHelpers
+```
 
 ### Builder
   - **Buffer helpers**.
@@ -106,6 +117,14 @@ const decodeTx = buffer =>
     - mapConcatBuffers,
     - makeBufferInput,
     - makeBuildTxCopy
+
+```js
+const builder = require('tx-builder').builder        // Main `builder` container.
+const { buildTx, vinScript } = builder               // High-level helpers.
+const { bufferHelpers, composeHelpers } = builder    // Buffer and composition helpers.
+const { bufferUInt8, bufferVarInt, mapConcatBuffers } = bufferHelpers
+const { compose as composeBuilder, prop, addProp as addPropBuilder } = composeHelpers
+```
 
 ## Examples
 
@@ -275,11 +294,12 @@ console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 
 ## Upcoming
 
-- full docs
-- broserify-ied build
-- an example of other than Bitcoin-specific implementation
+- [] full docs
+- [x] broserify-ied build
+- [] an example of other than Bitcoin-specific implementation
 
 ## Release Notes:
+- 0.7.0 Restructured main index. Added a build.
 - 0.6.4 Added example of how to create a coinbase transaction.
 - 0.6.0 Added network argument to voutScript. Added API docs.
 - 0.5.0 Renamed input fields:
