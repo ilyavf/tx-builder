@@ -118,6 +118,9 @@ const { compose as composeDecoder, addProp } = composeHelpers
     - makeBufferInput,
     - makeBuildTxCopy
 
+### Hash
+  - `hashFromBuffer :: Buffer -> String` Given a buffer calculates hash. E.g. transaction id is a hash.
+
 ```js
 const builder = require('tx-builder').builder        // Main `builder` container.
 const { buildTx, vinScript } = builder               // High-level helpers.
@@ -299,6 +302,7 @@ console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 - [] an example of other than Bitcoin-specific implementation
 
 ## Release Notes:
+- 0.7.1 Added `hashFromBuffer` to the main export.
 - 0.7.0 Restructured main index. Added a build.
 - 0.6.4 Added example of how to create a coinbase transaction.
 - 0.6.0 Added network argument to voutScript. Added API docs.

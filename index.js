@@ -14,5 +14,6 @@ builder.composeHelpers = builderCompose
 
 module.exports = {
   decoder,
-  builder
+  builder,
+  hashFromBuffer: decoder.getTxId
 }
