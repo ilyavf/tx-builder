@@ -143,11 +143,12 @@ const vinScript = buildTxCopy => (tx, index) => keyPair => {
   // console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
   // console.log('*** 2: ' + '0100000001a58a349e8d92bb9867884bf4b108da8df77143fbe8fcaf8a0f69a589de1c66a3010000001976a9143c8710460fc63d27e6741dd1927f0ece41e9b55588acffffffff0200c2eb0b000000001976a9147adddcbdf9f0ebcb814e2efb95debda73bfefd9888ace0453577000000001976a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac0000000001000000')
 
-  const hash = bcrypto.hash256(txCopyBufferWithType)
+  // const hash = bcrypto.hash256(txCopyBufferWithType)
   // console.log(`hash          = ${hash.toString('hex')}`)
   // console.log(`hash expected = d27fc0b87c10d49b59196742e2836b89e08df05f0b045aaeaa1bcd1d0278500b`)
+  // const sig = keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
 
-  const sig = keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
+  const sig = signBuffer(keyPair)(txCopyBufferWithType)
   // console.log(`sig          = ${sig.toString('hex')}`)
   // console.log(`sig expected = 30440220764bbe9ddff67409310c04ffb34fe937cc91c3d55303158f91a32bed8d9d7a7b02207fb30f6b9aaef93da8c88e2b818d993ad65aae54860c3de56c6304c57252cce101`)
 
@@ -181,7 +182,7 @@ const bufferInput = makeBufferInput(buildTxCopy)
  * Coinbase transaction. Docs: https://bitcoin.org/en/developer-reference#coinbase
  * @param tx
  */
-// buildCoinbaseTx :: Object => Buffer
+// buildCoinbaseTx :: Object -> Buffer
 const buildCoinbaseTx = tx =>
 (
   compose([
@@ -203,12 +204,18 @@ const coinbaseInput = (vin) =>
   ])(vin, EMPTY_BUFFER)
 )
 
-// coinbaseScript :: Integer => Buffer
+// coinbaseScript :: Integer -> Buffer
 const coinbaseScript = blockHeight => {
   const blockHeightBuffer = bufferVarInt(blockHeight)
   const arbitraryData = Buffer.allocUnsafe(10)
   const bVarInt = bufferVarInt(blockHeightBuffer.length + arbitraryData.length)
   return Buffer.concat([bVarInt, blockHeightBuffer, arbitraryData])
+}
+
+// signBuffer :: keyPair -> MessageBuffer -> SignatureBuffer
+const signBuffer = keyPair => buffer => {
+  const hash = bcrypto.hash256(buffer)
+  return keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
 }
 
 module.exports = {
@@ -228,5 +235,6 @@ module.exports = {
   makeBuildTxCopy,
   buildCoinbaseTx,
   coinbaseInput,
-  coinbaseScript
+  coinbaseScript,
+  signBuffer
 }

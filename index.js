@@ -15,5 +15,6 @@ builder.composeHelpers = builderCompose
 module.exports = {
   decoder,
   builder,
-  hashFromBuffer: decoder.getTxId
+  hashFromBuffer: decoder.getTxId,
+  signBuffer: builder.signBuffer
 }

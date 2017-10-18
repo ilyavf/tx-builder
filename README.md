@@ -11,7 +11,7 @@ Composable helpers for building and decoding blockchain transactions
 - [API](#api)
   - [Decoder](#decoder)
   - [Builder](#builder)
-  - [Hash](#hash)
+  - [Hash and Signature](#hash-and-signature)
 - [Examples](#examples)
   - [Decoding a transaction](#decoding-a-transaction)
   - [Building a transaction](#building-a-transaction)
@@ -119,8 +119,9 @@ const { compose as composeDecoder, addProp } = composeHelpers
     - makeBufferInput,
     - makeBuildTxCopy
 
-### Hash
+### Hash and Signature
   - `hashFromBuffer :: Buffer -> String` Given a buffer calculates hash. E.g. transaction id is a hash.
+  - `signBuffer :: keyPair -> MessageBuffer -> SignatureBuffer` Given a buffer calculates its hash and signs it.
 
 ```js
 const builder = require('tx-builder').builder        // Main `builder` container.

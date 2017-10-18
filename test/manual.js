@@ -2,9 +2,12 @@ const varuint = require('varuint-bitcoin')
 const bitcoinjs = require('bitcoinjs-lib')
 const Buffer = require('safe-buffer').Buffer
 const fixture = require('./fixtures/tx-hex-decoded')
+const fixtureNode = require('./fixtures/hdnode')
+const { signBuffer } = require('../src/tx-builder')
 
 const txHex = fixture.hex
 const buffer = Buffer.from(txHex, 'hex')
+const keyPair = fixtureNode.keyPair
 let offset = 0
 
 const version = buffer.readInt32LE(offset)
@@ -80,3 +83,7 @@ console.log(`VOUT-1 hex: ${buffer.slice(153, 187).toString('hex')}`)
 console.log(`scriptSig = ${scriptSig.toString('hex')}`)
 const asm = bitcoinjs.script.toASM(scriptSig)
 console.log(`asm = ${asm}`)
+
+// Signature:
+const sig = signBuffer(keyPair)(buffer)
+console.log(`sig = ${sig instanceof Buffer} ${sig.toString('hex')}`)
