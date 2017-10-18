@@ -11,6 +11,7 @@ Composable helpers for building and decoding blockchain transactions
 - [API](#api)
   - [Decoder](#decoder)
   - [Builder](#builder)
+  - [Hash](#hash)
 - [Examples](#examples)
   - [Decoding a transaction](#decoding-a-transaction)
   - [Building a transaction](#building-a-transaction)
@@ -302,6 +303,7 @@ console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 - [] an example of other than Bitcoin-specific implementation
 
 ## Release Notes:
+- 0.7.2 Validation: check 1st argument of the 2 argument curried `bufferVarSlice` on time.
 - 0.7.1 Added `hashFromBuffer` to the main export.
 - 0.7.0 Restructured main index. Added a build.
 - 0.6.4 Added example of how to create a coinbase transaction.

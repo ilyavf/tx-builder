@@ -35,14 +35,16 @@ const bufferUInt64 = value => {
 const bufferVarInt = value => varuint.encode(value)
 
 // bufferVarSlice :: Encoding -> String -> Buffer
-const bufferVarSlice = encoding => value => {
+const bufferVarSlice = encoding => {
   typeforce(typeforce.oneOf(
     typeforce.value('hex'),
     typeforce.value('ascii')
   ), encoding)
-  const buffer = Buffer.from(value, encoding)
-  const bVarInt = bufferVarInt(buffer.length)
-  return Buffer.concat([bVarInt, buffer])
+  return value => {
+    const buffer = Buffer.from(value, encoding)
+    const bVarInt = bufferVarInt(buffer.length)
+    return Buffer.concat([bVarInt, buffer])
+  }
 }
 
 /**
