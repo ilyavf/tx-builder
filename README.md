@@ -61,7 +61,11 @@ const decodeTx = buffer =>
 *All buffer helpers assume Little Endian.*
 
 The package exports two objects: `decoder` and `buider`. Each of them contains `bufferHelpers`, `composeHelpers`
-and high-level helpers (e.g. `decodeTx` and `buildTx`).
+and high-level helpers (e.g. `decodeTx` and `buildTx`). Main export also contains `hashFromBuffer` and `signBuffer` functions.
+
+```js
+const { decoder, builder, hashFromBuffer, signBuffer } = require("tx-builder")
+```
 
 ### Decoder
   - **Buffer helpers**. Each helper returns a value that contains a pair (array of two values) - a result and a buffer left after reading.
@@ -83,11 +87,10 @@ and high-level helpers (e.g. `decodeTx` and `buildTx`).
     - `getTxId :: Buffer -> String` Given transaction buffer calculates transaction hash (TXID).
 
 ```js
-const decoder = require('tx-builder').decoder       // Main `builder` container.
-const { decodeTx, readHash, getTxId } = decoder     // High-level helpers.
-const { bufferHelpers, composeHelpers } = decoder   // Buffer and composition helpers.
-const { readInt32, readVarInt, readVarSlice } = bufferHelpers
-const { compose as composeDecoder, addProp } = composeHelpers
+const decoder = require('tx-builder').decoder           // Main `decoder` container.
+const { decodeTx, readHash, getTxId } = decoder         // High-level methods.
+const { readInt32, readVarInt, readVarSlice } = decoder // Buffer helpers.
+const { compose as composeDecoder, addProp } = decoder  // Composition helpers.
 ```
 
 ### Builder
@@ -119,16 +122,19 @@ const { compose as composeDecoder, addProp } = composeHelpers
     - makeBufferInput,
     - makeBuildTxCopy
 
+```js
+const builder = require('tx-builder').builder        // Main `builder` container.
+const { buildTx, vinScript } = builder               // High-level helpers.
+const { bufferUInt8, bufferVarInt, mapConcatBuffers } = builder   // Buffer helpers.
+const { compose, prop, addProp } = builder                        // Composition helpers.
+```
+
 ### Hash and Signature
   - `hashFromBuffer :: Buffer -> String` Given a buffer calculates hash. E.g. transaction id is a hash.
   - `signBuffer :: keyPair -> MessageBuffer -> SignatureBuffer` Given a buffer calculates its hash and signs it.
 
 ```js
-const builder = require('tx-builder').builder        // Main `builder` container.
-const { buildTx, vinScript } = builder               // High-level helpers.
-const { bufferHelpers, composeHelpers } = builder    // Buffer and composition helpers.
-const { bufferUInt8, bufferVarInt, mapConcatBuffers } = bufferHelpers
-const { compose as composeBuilder, prop, addProp as addPropBuilder } = composeHelpers
+const { hashFromBuffer, signBuffer } = require("tx-builder")
 ```
 
 ## Examples
@@ -304,6 +310,7 @@ console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 - [] an example of other than Bitcoin-specific implementation
 
 ## Release Notes:
+- 0.7.3 Added `signBuffer` method, main export.
 - 0.7.2 Validation: check 1st argument of the 2 argument curried `bufferVarSlice` on time.
 - 0.7.1 Added `hashFromBuffer` to the main export.
 - 0.7.0 Restructured main index. Added a build.
