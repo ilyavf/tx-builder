@@ -4,7 +4,7 @@ const assert = require('assert')
 const { decodeTx, readHash, readInput, readOutput, readInputs, getTxId } = require('../src/tx-decoder')
 const fixture = require('./fixtures/tx-hex-decoded')
 
-describe('Decode hex', function () {
+describe('decoder', function () {
   const txHex = fixture.hex
   const buffer = Buffer.from(txHex, 'hex')
 

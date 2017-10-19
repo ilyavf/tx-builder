@@ -17,7 +17,7 @@
     "build": "make build",
     "lint": "standard --fix",
     "lint:fix": "standard --fix",
-    "mocha": "nyc mocha -u tdd --timeout 999999 --colors test/ --recursive",
+    "mocha": "nyc mocha -u tdd --timeout 999999 --colors test/test.js",
     "preversion": "npm run lint && npm test",
     "release:patch": "npm version patch && make publish",
     "release:minor": "npm version minor && make publish",

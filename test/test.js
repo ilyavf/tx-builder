@@ -2,7 +2,7 @@ require('./buffer-read.test')
 require('./tx-decode.test')
 require('./tx-build.test')
 
-const { hashFromBuffer, decoder, builder } = require('../index')
+const { decoder, builder, hashFromBuffer, signBuffer } = require('../index')
 const assert = require('assert')
 describe('Main export', function () {
   describe('hashFromBuffer', function () {
@@ -10,11 +10,16 @@ describe('Main export', function () {
       assert.equal(typeof hashFromBuffer, 'function')
     })
   })
+  describe('signBuffer', function () {
+    it('should be a function', function () {
+      assert.equal(typeof signBuffer, 'function')
+    })
+  })
   describe('decoder', function () {
     it('should be an object', function () {
       assert.equal(typeof decoder, 'object')
     })
-    it('should contein main method `decodeTx`', function () {
+    it('should contain main method `decodeTx`', function () {
       assert.equal(typeof decoder.decodeTx, 'function')
     })
   })
@@ -22,7 +27,7 @@ describe('Main export', function () {
     it('should be an object', function () {
       assert.equal(typeof builder, 'object')
     })
-    it('should contein main method `decodeTx`', function () {
+    it('should contain main method `decodeTx`', function () {
       assert.equal(typeof builder.buildTx, 'function')
     })
   })
