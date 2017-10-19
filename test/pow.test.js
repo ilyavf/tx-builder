@@ -8,12 +8,19 @@ describe.only('proof-of-work', function () {
     const buffer = bufferInt32(25)
     const count = 10
     let i
+    let nonce = 0
     for (i = 1; i <= count; i++) {
       (function (i) {
         it(`should calculate nonce for difficulty ${i}`, function () {
-          assert.ok(pow(i)(buffer))
+          if (i === 7) {
+            nonce = 43190940
+          }
+          nonce = pow(i)(buffer, nonce)
+          assert.ok(nonce)
         })
       }(i))
     }
   })
 })
+
+// Finished with: time = 741, nonce = 43190948, hash = 000000019ac673e207a146c5b9bc50961bdbbd6ecfd3d5630403a73fff451bdd
