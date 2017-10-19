@@ -5,18 +5,18 @@ const hashFromBuffer = require('./tx-decoder').getTxId
 // pow :: Buffer -> Number -> NonceNumber
 const pow = difficulty => (buffer, nonce = 0) => {
   let hash
-  let now = Date.now()
+  // let now = Date.now()
   const check = Array(difficulty).fill('0').join('')
   nonce--
-  console.log(`Starting PoW for ${difficulty} (${check}), initial nonce = ${nonce}:`)
+  // console.log(`Starting PoW for ${difficulty} (${check}), initial nonce = ${nonce}:`)
   do {
     nonce++
     hash = hashFromBuffer(Buffer.concat([buffer, bufferUInt64(nonce)]))
     if (nonce % (10 * 1000 * 1000) === 0) {  // (10^7) takes ~168sec
-      console.log(`- ${Math.floor((Date.now() - now) / 1000)}, nonce = ${nonce}, hash = ${hash}`)
+      // console.log(`- ${Math.floor((Date.now() - now) / 1000)}, nonce = ${nonce}, hash = ${hash}`)
     }
   } while (hash.slice(0, difficulty) !== check)
-  console.log(`Finished ${difficulty} with: time = ${Math.floor((Date.now() - now) / 1000)}, nonce = ${nonce}, hash = ${hash}`)
+  // console.log(`Finished ${difficulty} with: time = ${Math.floor((Date.now() - now) / 1000)}, nonce = ${nonce}, hash = ${hash}`)
   return nonce
 }
 
