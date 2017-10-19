@@ -4,9 +4,9 @@ const pow = require('../src/pow')
 
 describe.only('proof-of-work', function () {
   describe('pow', function () {
-    this.timeout(2 * 3600 * 1000) // 2 minutes
+    this.timeout(50 * 3600 * 1000) // 50 minutes
     const buffer = bufferInt32(25)
-    const count = 3
+    const count = 10
     let i
     for (i = 1; i <= count; i++) {
       (function (i) {

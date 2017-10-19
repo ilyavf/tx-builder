@@ -12,8 +12,8 @@ const pow = difficulty => (buffer, nonce = 0) => {
   do {
     nonce++
     hash = hashFromBuffer(Buffer.concat([buffer, bufferUInt64(nonce)]))
-    if (nonce % 100000 === 0) {
-      // console.log(`${Math.floor((Date.now() - now) / 1000)}, nonce = ${nonce}, hash = ${hash}`)
+    if (nonce % 500000 === 0) {
+      console.log(`- ${Math.floor((Date.now() - now) / 1000)}, nonce = ${nonce}, hash = ${hash}`)
     }
   } while (hash.slice(0, difficulty) !== check)
   console.log(`Finished with: time = ${Math.floor((Date.now() - now) / 1000)}, nonce = ${nonce}, hash = ${hash}`)
