@@ -6,6 +6,8 @@ const builder = require('./src/tx-builder')
 const builderBuffer = require('./src/buffer-build')
 const builderCompose = require('./src/compose-build')
 
+const pow = require('./src/pow')
+
 decoder.bufferHelpers = decoderBuffer
 decoder.composeHelpers = decoderCompose
 
@@ -16,5 +18,6 @@ module.exports = {
   decoder,
   builder,
   hashFromBuffer: decoder.getTxId,
-  signBuffer: builder.signBuffer
+  signBuffer: builder.signBuffer,
+  pow
 }
