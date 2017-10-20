@@ -2,7 +2,7 @@ const Buffer = require('safe-buffer').Buffer
 const { bufferUInt64 } = require('./buffer-build')
 const hashFromBuffer = require('./tx-decoder').getTxId
 
-// pow :: Buffer -> Number -> NonceNumber
+// pow :: Number -> (Buffer, Number, Number) -> NonceNumber
 const pow = difficulty => (buffer, nonce = 0, increment = 1) => {
   let hash
   let now = Date.now()

@@ -3,7 +3,7 @@ require('./tx-decode.test')
 require('./tx-build.test')
 require('./pow.test')
 
-const { decoder, builder, hashFromBuffer, signBuffer } = require('../index')
+const { decoder, builder, hashFromBuffer, signBuffer, pow } = require('../index')
 const assert = require('assert')
 describe('Main export', function () {
   describe('hashFromBuffer', function () {
@@ -14,6 +14,11 @@ describe('Main export', function () {
   describe('signBuffer', function () {
     it('should be a function', function () {
       assert.equal(typeof signBuffer, 'function')
+    })
+  })
+  describe('pow', function () {
+    it('should be a function', function () {
+      assert.equal(typeof pow, 'function')
     })
   })
   describe('decoder', function () {

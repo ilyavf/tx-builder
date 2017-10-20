@@ -6,7 +6,7 @@ describe('proof-of-work', function () {
   describe('pow', function () {
     this.timeout(50 * 3600 * 1000) // 50 minutes
     const buffer = bufferInt32(25)
-    const count = 6
+    const count = 2
     let i
     let nonce = 0
     for (i = 1; i <= count; i++) {

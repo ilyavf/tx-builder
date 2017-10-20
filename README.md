@@ -11,7 +11,7 @@ Composable helpers for building and decoding blockchain transactions
 - [API](#api)
   - [Decoder](#decoder)
   - [Builder](#builder)
-  - [Hash and Signature](#hash-and-signature)
+  - [Hash, Signature, etc](#hash-and-signature)
 - [Examples](#examples)
   - [Decoding a transaction](#decoding-a-transaction)
   - [Building a transaction](#building-a-transaction)
@@ -132,9 +132,10 @@ const { compose, prop, addProp } = builder                        // Composition
 ### Hash and Signature
   - `hashFromBuffer :: Buffer -> String` Given a buffer calculates hash. E.g. transaction id is a hash.
   - `signBuffer :: keyPair -> MessageBuffer -> SignatureBuffer` Given a buffer calculates its hash and signs it.
+  - `pow :: Number -> (Buffer, Number, Number) -> NonceNumber` Given a difficulty and a Buffer finds a nonce number (Proof of Work).
 
 ```js
-const { hashFromBuffer, signBuffer } = require("tx-builder")
+const { hashFromBuffer, signBuffer, pow } = require("tx-builder")
 ```
 
 ## Examples
@@ -305,11 +306,13 @@ console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 
 ## Upcoming
 
-- [] full docs
+- [ ] full docs
 - [x] broserify-ied build
-- [] an example of other than Bitcoin-specific implementation
+- [ ] an example of other than Bitcoin-specific implementation
+- [ ] parallelize `pow` with Web Workers
 
 ## Release Notes:
+- 0.7.4 Added `pow` (Proof of Work) method for finding a `nonce` value, main export.
 - 0.7.3 Added `signBuffer` method, main export.
 - 0.7.2 Validation: check 1st argument of the 2 argument curried `bufferVarSlice` on time.
 - 0.7.1 Added `hashFromBuffer` to the main export.
