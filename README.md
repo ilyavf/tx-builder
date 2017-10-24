@@ -101,6 +101,7 @@ const { compose as composeDecoder, addProp } = decoder  // Composition helpers.
     - `bufferUInt64 :: Int -> Buffer`
     - `bufferVarInt :: Int -> Buffer` Creates a buffer that contains a variable length integer.
     - `bufferVarSlice :: Encoding -> String -> Buffer` Creates a buffer that contains a variable length string of the given encoding.
+    - `bufferVarSliceBuffer :: Buffer -> Buffer` Creates a variable length buffer with from the given buffer value.
     - `mapConcatBuffers :: Fn -> Array -> Buffer` Maps function to array elements and concats results into a buffer.
   - **Composition helpers**.
     - `compose :: [Fn] -> Tx -> Buffer -> Buffer`
@@ -312,6 +313,7 @@ console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 - [ ] parallelize `pow` with Web Workers
 
 ## Release Notes:
+- 0.8.0 Added `bufferVarSliceBuffer` to create a variable length buffer from a buffer.
 - 0.7.4 Added `pow` (Proof of Work) method for finding a `nonce` value, main export.
 - 0.7.3 Added `signBuffer` method, main export.
 - 0.7.2 Validation: check 1st argument of the 2 argument curried `bufferVarSlice` on time.
