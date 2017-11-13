@@ -10,8 +10,14 @@ const compose = args => (tx, buffer) => {
   return args.reduce((buffer, f) => Buffer.concat([buffer, f(tx)]), buffer)
 }
 
-// prop :: String -> Fn -> (Obj -> Buffer)
+// prop :: (String -> Fn a) -> (Obj -> a)
 const prop = (propName, fn) => obj => fn(obj[propName])
+
+// prop :: (Array -> Fn a) -> (Obj -> a)
+const props = (propNames, fn) => obj => {
+  const props = propNames.map(propName => obj[propName])
+  return fn.apply(this, props)
+}
 
 // addProp :: String -> Fn -> Obj -> Buffer
 const addProp = (propName, fn) => obj => {
@@ -22,5 +28,6 @@ const addProp = (propName, fn) => obj => {
 module.exports = {
   compose,
   prop,
+  props,
   addProp
 }

@@ -121,7 +121,8 @@ const { compose as composeDecoder, addProp } = decoder  // Composition helpers.
     - bufferInputEmptyScript,
     - mapConcatBuffers,
     - makeBufferInput,
-    - makeBuildTxCopy
+    - makeBuildTxCopy,
+    - `makeBufferOutput :: ScriptBuilder -> (Object -> Buffer)` Allows to customise a locking script (`scriptPubKey`).
 
 ```js
 const builder = require('tx-builder').builder        // Main `builder` container.
@@ -313,6 +314,7 @@ console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 - [ ] parallelize `pow` with Web Workers
 
 ## Release Notes:
+- 0.9.0 Allow to create a custom locking script for transaction outputs. See `makeBufferOutput`.
 - 0.8.0 Added `bufferVarSliceBuffer` to create a variable length buffer from a buffer.
 - 0.7.4 Added `pow` (Proof of Work) method for finding a `nonce` value, main export.
 - 0.7.3 Added `signBuffer` method, main export.

@@ -109,14 +109,14 @@ const bufferInputEmptyScript = vin =>
   ])(vin, EMPTY_BUFFER)
 )
 
-// bufferOutput :: Object -> Buffer
-const bufferOutput = vout =>
+// makeBufferOutput :: ScriptBuilder -> (Object -> Buffer)
+const makeBufferOutput = scriptPubKey => vout =>
 (
   compose([
     prop('value', bufferUInt64),               // 8 bytes, Amount in satoshis
     addProp(
       'scriptPubKey',
-      prop('address', voutScript(bitcoin.networks.testnet))
+      scriptPubKey
     ),
     prop('scriptPubKey', bufferVarSlice('hex'))       // 1-9 bytes (VarInt), Locking-Script Size; Variable, Locking-Script
   ])(vout, EMPTY_BUFFER)
@@ -171,10 +171,15 @@ const bufferHash = hash => Buffer.from(hash, 'hex').reverse()
 
 /**
  * Implementation specific functions:
+ *  - `bufferOutput` in this example creates a regular P2PKH scriptPubKey;
  *  - `buildTxCopy` depends on `bufferOutput`
  *  - `bufferInput` depends on `buildTxCopy`
  * E.g. Equibit blockchain transaction differs from Bitcoin blockchain's with the VOUT structure.
  */
+// bufferOutput :: Object -> Buffer
+const bufferOutput = makeBufferOutput(
+  prop('address', voutScript(bitcoin.networks.testnet))
+)
 const buildTxCopy = makeBuildTxCopy(bufferOutput)
 const bufferInput = makeBufferInput(buildTxCopy)
 
@@ -232,6 +237,7 @@ module.exports = {
   bufferInputEmptyScript,
   mapConcatBuffers,
   makeBufferInput,
+  makeBufferOutput,
   makeBuildTxCopy,
   buildCoinbaseTx,
   coinbaseInput,

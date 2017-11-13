@@ -1,4 +1,5 @@
 const varuint = require('varuint-bitcoin')
+const bitcoin = require('bitcoinjs-lib')
 const assert = require('assert')
 const {
   bufferInt32,
@@ -18,11 +19,14 @@ const {
   bufferOutput,
   bufferHash,
   bufferInputEmptyScript,
+  makeBufferOutput,
   vinScript,
+  voutScript,
   buildCoinbaseTx,
   coinbaseInput,
   coinbaseScript
 } = require('../src/tx-builder')
+const { prop } = require('../src/compose-build')
 const fixture = require('./fixtures/tx-hex-decoded')
 const fixtureNode = require('./fixtures/hdnode')
 
@@ -95,6 +99,15 @@ describe('builder', function () {
     it('should create a buffer with txid', function () {
       const txid = '2d7a9f0534ddac231ef1978bda388791c32321f7e14e18e7df3bbed261615f54'
       assert.equal(bufferHash(txid).reverse().toString('hex'), txid)
+    })
+  })
+  describe('makeBufferOutput', function () {
+    it('should make a bufferOutput function', function () {
+      const bufferOutput = makeBufferOutput(
+        prop('address', voutScript(bitcoin.networks.testnet))
+      )
+      const buffer = bufferOutput(fixture.tx.vout[0])
+      assert.equal(buffer.toString('hex'), fixture.hexItems.vout1)
     })
   })
   describe('bufferOutput', function () {
