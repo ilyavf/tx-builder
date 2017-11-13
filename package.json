@@ -27,6 +27,10 @@
   "standard": {
     "env": [
       "mocha"
+    ],
+    "ignore": [
+      "dist/",
+      "playground/"
     ]
   },
   "dependencies": {
@@ -35,7 +39,6 @@
     "ramda": "^0.24.1",
     "safe-buffer": "^5.1.1",
     "typeforce": "^1.11.1",
-    "uglify-es": "^3.1.0",
     "varuint-bitcoin": "^1.0.4"
   },
   "devDependencies": {
@@ -43,6 +46,7 @@
     "browserify": "^14.4.0",
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
-    "standard": "^10.0.2"
+    "standard": "^10.0.2",
+    "uglify-es": "^3.1.0"
   }
 }
