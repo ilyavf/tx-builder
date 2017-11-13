@@ -1,4 +1,5 @@
 require('./buffer-read.test')
+require('./compose-build.test')
 require('./tx-decode.test')
 require('./tx-build.test')
 require('./pow.test')
