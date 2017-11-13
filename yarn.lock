@@ -2830,7 +2830,7 @@ typeforce@^1.11.1, typeforce@^1.11.3:
   version "1.11.7"
   resolved "https://registry.yarnpkg.com/typeforce/-/typeforce-1.11.7.tgz#7af0d3b017e7e3b46fa0697a96a6829a46a383a5"
 
-uglify-es@^3.1.0:
+uglify-es@^3.1.9:
   version "3.1.9"
   resolved "https://registry.yarnpkg.com/uglify-es/-/uglify-es-3.1.9.tgz#6c82df628ac9eb7af9c61fd70c744a084abe6161"
   dependencies:
