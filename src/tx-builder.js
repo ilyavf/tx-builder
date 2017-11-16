@@ -5,6 +5,8 @@
 // tx.sign( vin, keyPair )
 // tx.build().toHex()
 
+const typeforce = require('typeforce')
+const types = require('./types')
 const { clone } = require('ramda')
 const Buffer = require('safe-buffer').Buffer
 const bitcoin = require('bitcoinjs-lib')
@@ -39,28 +41,40 @@ const EMPTY_BUFFER = Buffer.allocUnsafe(0)
  * @return {Buffer}
  */
 // buildTx :: Tx -> Buffer
-const buildTx = tx =>
-(
-  compose([
+const buildTx = tx => {
+  typeforce(types.TxConfig, tx)
+
+  return compose([
     prop('version', bufferInt32),                   // 4 bytes
     bufferInputs('vin', bufferInput),               // 1-9 bytes (VarInt), Input counter; Variable, Inputs
     prop('vout', mapConcatBuffers(bufferOutput)),   // 1-9 bytes (VarInt), Output counter; Variable, Outputs
     prop('locktime', bufferUInt32)                  // 4 bytes
   ])(tx, EMPTY_BUFFER)
-)
+}
 
 // buildTxCopy :: Fn -> Tx -> Buffer
-const makeBuildTxCopy = bufferOutput => tx =>
-(
-  compose([
+const makeBuildTxCopy = bufferOutput => tx => {
+  typeforce(typeforce.tuple(
+    types.FunctionType,
+    types.TxConfig
+  ), [bufferOutput, tx])
+
+  return compose([
     prop('version', bufferInt32),
     prop('vin', mapConcatBuffers(bufferInputEmptyScript)),
     prop('vout', mapConcatBuffers(bufferOutput)),
     prop('locktime', bufferUInt32)
   ])(tx, EMPTY_BUFFER)
-)
+}
 
 const txCopyForHash = buildTxCopy => (keyPair, tx, index) => {
+  typeforce(typeforce.tuple(
+    types.FunctionType,
+    'ECPair',
+    types.TxConfig,
+    types.Number
+  ), [buildTxCopy, keyPair, tx, index])
+
   const subScript = txCopySubscript(keyPair)
   const txCopy = clone(tx)
   txCopy.vin.forEach((vin, i) => { vin.script = i === index ? subScript : '' })
@@ -72,10 +86,10 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index) => {
   return txCopyBufferWithType
 }
 
-const txCopySubscript = keyPair =>
-(
-  bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
-)
+const txCopySubscript = keyPair => {
+  typeforce('ECPair', keyPair)
+  return bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
+}
 
 // bufferInputs :: (String, Fn) -> Tx -> Buffer
 const bufferInputs = (propName, bufferInput) => tx =>
@@ -84,9 +98,15 @@ const bufferInputs = (propName, bufferInput) => tx =>
 )
 
 // bufferInput :: Fn -> Tx -> (Object, Int) -> Buffer
-const makeBufferInput = buildTxCopy => tx => (vin, index) =>
-(
-  compose([
+const makeBufferInput = buildTxCopy => tx => (vin, index) => {
+  typeforce(typeforce.tuple(
+    types.FunctionType,
+    types.TxConfig,
+    types.TxVin,
+    types.Number
+  ), [buildTxCopy, tx, vin, index])
+
+  return compose([
     prop('txid', bufferHash),                // 32 bytes, Transaction Hash
     prop('vout', bufferUInt32),              // 4 bytes, Output Index
     addProp(
@@ -96,7 +116,7 @@ const makeBufferInput = buildTxCopy => tx => (vin, index) =>
     prop('scriptSig', bufferVarSlice('hex')),  // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     prop('sequence', bufferUInt32)             // 4 bytes, Sequence Number
   ])(vin, EMPTY_BUFFER)
-)
+}
 
 // bufferInputEmptyScript :: Object -> Buffer
 const bufferInputEmptyScript = vin =>
@@ -136,8 +156,13 @@ const makeBufferOutput = scriptPubKey => vout =>
  *   - SIGHASH_ANYONECANPAY (0x00000080)
  */
 const vinScript = buildTxCopy => (tx, index) => keyPair => {
-  const kpPubKey = keyPair.getPublicKeyBuffer()
+  typeforce(typeforce.tuple(
+    types.TxConfig,
+    types.Number,
+    'ECPair'
+  ), [tx, index, keyPair])
 
+  const kpPubKey = keyPair.getPublicKeyBuffer()
   const txCopyBufferWithType = txCopyForHash(buildTxCopy)(keyPair, tx, index)
 
   // console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
@@ -161,7 +186,10 @@ const vinScript = buildTxCopy => (tx, index) => keyPair => {
 }
 
 // voutScript :: NetworkConfig -> Address -> ScriptHex
-const voutScript = network => addr => baddress.toOutputScript(addr, network)
+const voutScript = network => addr => {
+  typeforce(types.Address, addr)
+  return baddress.toOutputScript(addr, network)
+}
 
 /**
  * Transaction's hash is displayed in a reverse order.
