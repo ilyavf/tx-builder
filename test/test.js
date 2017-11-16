@@ -3,6 +3,7 @@ require('./compose-build.test')
 require('./tx-decode.test')
 require('./tx-build.test')
 require('./pow.test')
+require('./types.test')
 
 const { decoder, builder, hashFromBuffer, signBuffer, pow } = require('../index')
 const assert = require('assert')

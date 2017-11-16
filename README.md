@@ -314,7 +314,8 @@ console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 - [ ] parallelize `pow` with Web Workers
 
 ## Release Notes:
-- 0.9.0 Allow to create a custom locking script for transaction outputs. See `makeBufferOutput`.
+- 0.11.0 Added custom types (`Address`, 'TxConfig', 'TxVin'). Typeforce main `tx-build` functions.
+- 0.10.0 Allow to create a custom locking script for transaction outputs. See `makeBufferOutput`.
 - 0.8.0 Added `bufferVarSliceBuffer` to create a variable length buffer from a buffer.
 - 0.7.4 Added `pow` (Proof of Work) method for finding a `nonce` value, main export.
 - 0.7.3 Added `signBuffer` method, main export.
