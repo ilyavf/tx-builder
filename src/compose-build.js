@@ -19,6 +19,18 @@ const props = (propNames, fn) => obj => {
   return fn.apply(this, props)
 }
 
+const iff = (predicate, fn, elseFn) => obj => {
+  const res = predicate(obj)
+  if (res) {
+    return fn(obj)
+  }
+  return typeof elseFn === 'function' ? elseFn(obj) : EMPTY_BUFFER
+}
+
+const has = prop => obj => (typeof obj[prop] !== 'undefined')
+
+const hasNo = prop => obj => (typeof obj[prop] === 'undefined')
+
 // addProp :: String -> Fn -> Obj -> Buffer
 const addProp = (propName, fn) => obj => {
   obj[propName] = fn(obj)
@@ -29,5 +41,8 @@ module.exports = {
   compose,
   prop,
   props,
-  addProp
+  addProp,
+  iff,
+  has,
+  hasNo
 }
