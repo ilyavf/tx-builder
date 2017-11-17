@@ -314,6 +314,7 @@ console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 - [ ] parallelize `pow` with Web Workers
 
 ## Release Notes:
+- 0.12.0 Added branching helper `iff` and predicates `has` and `hasNo`. Use them in `tx-build` allow to pass `scriptPubKey` for tx outputs.
 - 0.11.0 Added custom types (`Address`, 'TxConfig', 'TxVin'). Typeforce main `tx-build` functions.
 - 0.10.0 Allow to create a custom locking script for transaction outputs. See `makeBufferOutput`.
 - 0.8.0 Added `bufferVarSliceBuffer` to create a variable length buffer from a buffer.

@@ -29,6 +29,8 @@ const iff = (predicate, fn, elseFn) => obj => {
 
 const has = prop => obj => (typeof obj[prop] !== 'undefined')
 
+const hasNo = prop => obj => (typeof obj[prop] === 'undefined')
+
 // addProp :: String -> Fn -> Obj -> Buffer
 const addProp = (propName, fn) => obj => {
   obj[propName] = fn(obj)
@@ -41,5 +43,6 @@ module.exports = {
   props,
   addProp,
   iff,
-  has
+  has,
+  hasNo
 }

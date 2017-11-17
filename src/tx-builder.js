@@ -30,7 +30,9 @@ const {
 const {
   compose,
   prop,
-  addProp
+  addProp,
+  iff,
+  hasNo
 } = require('./compose-build')
 
 const EMPTY_BUFFER = Buffer.allocUnsafe(0)
@@ -134,9 +136,9 @@ const makeBufferOutput = scriptPubKey => vout =>
 (
   compose([
     prop('value', bufferUInt64),               // 8 bytes, Amount in satoshis
-    addProp(
-      'scriptPubKey',
-      scriptPubKey
+    iff(
+      hasNo('scriptPubKey'),
+      addProp('scriptPubKey', scriptPubKey)
     ),
     prop('scriptPubKey', bufferVarSlice('hex'))       // 1-9 bytes (VarInt), Locking-Script Size; Variable, Locking-Script
   ])(vout, EMPTY_BUFFER)
