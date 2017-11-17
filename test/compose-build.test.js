@@ -1,7 +1,8 @@
 const assert = require('assert')
-const { prop, props } = require('../src/compose-build')
+const Buffer = require('safe-buffer').Buffer
+const { compose, prop, props, iff, has } = require('../src/compose-build')
 
-describe('compose-build', function () {
+describe.only('compose-build', function () {
   describe('prop', function () {
     it('should create a function that expects the desired prop as argument', function () {
       const obj = {
@@ -22,6 +23,37 @@ describe('compose-build', function () {
       const myFn = (a, b) => a + b
       const myApp = props(['a', 'b'], myFn)
       assert.equal(myApp(obj), 11)
+    })
+  })
+  describe('iff', function () {
+    const myFn = () => Buffer.from([0x62])
+    const myFn2 = () => Buffer.from([0x70])
+    const predicate = ({doIt}) => doIt
+    const app = compose([
+      iff(predicate, myFn)
+    ])
+    it('should run myFn', function () {
+      const res = app({doIt: true}, Buffer.allocUnsafe(0))
+      assert.equal(res.toString('hex'), '62')
+    })
+    it('should skip myFn', function () {
+      const res = app({doIt: false}, Buffer.allocUnsafe(0))
+      assert.equal(res.toString('hex'), '')
+    })
+    it('should run myFn2 on else', function () {
+      const app = compose([
+        iff(predicate, myFn, myFn2)
+      ])
+      const res = app({doIt: false}, Buffer.allocUnsafe(0))
+      assert.equal(res.toString('hex'), '70')
+    })
+  })
+  describe('predicate has', function () {
+    it('should return false if given property is undefined on the object', function () {
+      assert.ok(!has('a')({b:1}))
+    })
+    it('should return true if given property is defined', function () {
+      assert.ok(has('a')({a:0, b:1}))
     })
   })
 })
