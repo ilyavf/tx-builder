@@ -2,7 +2,7 @@ const assert = require('assert')
 const Buffer = require('safe-buffer').Buffer
 const { compose, prop, props, iff, has } = require('../src/compose-build')
 
-describe.only('compose-build', function () {
+describe('compose-build', function () {
   describe('prop', function () {
     it('should create a function that expects the desired prop as argument', function () {
       const obj = {
@@ -50,10 +50,10 @@ describe.only('compose-build', function () {
   })
   describe('predicate has', function () {
     it('should return false if given property is undefined on the object', function () {
-      assert.ok(!has('a')({b:1}))
+      assert.ok(!has('a')({b: 1}))
     })
     it('should return true if given property is defined', function () {
-      assert.ok(has('a')({a:0, b:1}))
+      assert.ok(has('a')({a: 0, b: 1}))
     })
   })
 })
