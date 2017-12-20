@@ -16,7 +16,6 @@ const prop = (propName, fn) => obj => fn(obj[propName])
 // prop :: (Array -> Fn a) -> (Obj -> a)
 const props = (propNames, fn) => obj => {
   const props = propNames.map(propName => obj[propName])
-  console.log(`props: `, props)
   return fn.apply(this, props)
 }
 
