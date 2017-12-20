@@ -30,6 +30,7 @@ const {
 const {
   compose,
   prop,
+  props,
   addProp,
   iff,
   hasNo
@@ -113,7 +114,7 @@ const makeBufferInput = buildTxCopy => tx => (vin, index) => {
     prop('vout', bufferUInt32),              // 4 bytes, Output Index
     addProp(
       'scriptSig',
-      prop('keyPair', vinScript(buildTxCopy)(tx, index))
+      props(['keyPair', 'htlcSecret'], vinScript(buildTxCopy)(tx, index))
     ),
     prop('scriptSig', bufferVarSlice('hex')),  // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     prop('sequence', bufferUInt32)             // 4 bytes, Sequence Number
@@ -157,12 +158,15 @@ const makeBufferOutput = scriptPubKey => vout =>
  *   - SIGHASH_SINGLE (0x00000003)
  *   - SIGHASH_ANYONECANPAY (0x00000080)
  */
-const vinScript = buildTxCopy => (tx, index) => keyPair => {
+const vinScript = buildTxCopy => (tx, index) => (keyPair, htlcSecret) => {
   typeforce(typeforce.tuple(
     types.TxConfig,
     types.Number,
-    'ECPair'
-  ), [tx, index, keyPair])
+    'ECPair',
+    '?String'
+  ), [tx, index, keyPair, htlcSecret])
+
+  let scriptBuffer
 
   const kpPubKey = keyPair.getPublicKeyBuffer()
   const txCopyBufferWithType = txCopyForHash(buildTxCopy)(keyPair, tx, index)
@@ -179,10 +183,19 @@ const vinScript = buildTxCopy => (tx, index) => keyPair => {
   // console.log(`sig          = ${sig.toString('hex')}`)
   // console.log(`sig expected = 30440220764bbe9ddff67409310c04ffb34fe937cc91c3d55303158f91a32bed8d9d7a7b02207fb30f6b9aaef93da8c88e2b818d993ad65aae54860c3de56c6304c57252cce101`)
 
-  const pushDataSig = bufferUInt8(sig.length)
-  const pushDataPubKey = bufferUInt8(kpPubKey.length)
-  const scriptBuffer = Buffer.concat([pushDataSig, sig, pushDataPubKey, kpPubKey])
+  const sigLength = bufferUInt8(sig.length)
+  const pubkeyLength = bufferUInt8(kpPubKey.length)
   // const scriptBuffer = bscript.compile([sig, kpPubKey])
+
+  // HTLC: to unlock HTLC script we need to add a secret to the end of the unlocking script:
+  if (htlcSecret) {
+    const secretBuffer = Buffer.from(htlcSecret, 'hex')
+    const secretLength = bufferUInt8(secretBuffer.length)
+
+    scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey, secretLength, secretBuffer])
+  } else {
+    scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey])
+  }
 
   return scriptBuffer
 }
