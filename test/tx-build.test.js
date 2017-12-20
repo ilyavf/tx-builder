@@ -161,7 +161,7 @@ describe('builder', function () {
     })
   })
 
-  describe.only('vinScript HTLC', function () {
+  describe('vinScript HTLC', function () {
     const keyPair = fixtureNode.keyPair
     const secretHex = '56c44dc6ac176bb534679a8e4b6979b1'
     const expectedScript = '4730440220764bbe9ddff67409310c04ffb34fe937cc91c3d55303158f91a32bed8d9d7a7b02207fb30f6b9aaef93da8c88e2b818d993ad65aae54860c3de56c6304c57252cce1012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a31056c44dc6ac176bb534679a8e4b6979b1'
