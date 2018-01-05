@@ -91,14 +91,18 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcConfig) => {
 
 const { hashTimelockContract } = require('../../../src/script-builder')
 
-const txCopySubscript = (keyPair, { secretHash, addr, refundAddr, timelock } ) => {
+const txCopySubscript = (keyPair, htlcOpts ) => {
   typeforce('ECPair', keyPair)
-  if (secretHash) {
-    typeforce(typeforce.tuple(
-      'String', types.Address, types.Address, 'Number'
-    ), [secretHash, addr, refundAddr, timelock])
+  if (htlcOpts && htlcOpts.secretHash) {
+    typeforce({
+      secretHash: 'String',
+      addr: types.Address,
+      refundAddr: types.Address,
+      timelock: 'Number'
+    }, htlcOpts)
   }
-  if (secretHash) {
+  if (htlcOpts && htlcOpts.secretHash) {
+    const { secretHash, addr, refundAddr, timelock } = htlcOpts
     // redeemerAddr, funderAddr, commitment, locktime
     const subscript = hashTimelockContract(addr, refundAddr, secretHash, timelock)
     return subscript
@@ -188,12 +192,13 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlc) => {
   const kpPubKey = keyPair.getPublicKeyBuffer()
   const htlcSecretBuffer = htlc && htlc.secret && Buffer.from(htlc.secret, 'hex')
   const secretHash = htlcSecretBuffer && bcrypto.sha256(htlcSecretBuffer).toString('hex')
-  const txCopyBufferWithType = txCopyForHash(buildTxCopy)(keyPair, tx, index, {
-    secretHash,
-    addr: keyPair.getAddress(),
-    refundAddr: htlc.refundAddr,
-    timelock: htlc.timelock
-  })
+  const htlcOpts = htlc && htlc.secret && {
+      secretHash,
+      addr: keyPair.getAddress(),
+      refundAddr: htlc.refundAddr,
+      timelock: htlc.timelock
+    }
+  const txCopyBufferWithType = txCopyForHash(buildTxCopy)(keyPair, tx, index, htlcOpts)
 
   // console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
   // console.log('*** 2: ' + '0100000001a58a349e8d92bb9867884bf4b108da8df77143fbe8fcaf8a0f69a589de1c66a3010000001976a9143c8710460fc63d27e6741dd1927f0ece41e9b55588acffffffff0200c2eb0b000000001976a9147adddcbdf9f0ebcb814e2efb95debda73bfefd9888ace0453577000000001976a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac0000000001000000')
@@ -212,8 +217,8 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlc) => {
   // const scriptBuffer = bscript.compile([sig, kpPubKey])
 
   // HTLC: to unlock HTLC script we need to add a secret to the end of the unlocking script:
-  if (htlcSecret) {
-    const secretBuffer = Buffer.from(htlcSecret, 'hex')
+  if (htlcOpts && htlcOpts.secret) {
+    const secretBuffer = Buffer.from(htlcOpts.secret, 'hex')
     const secretLength = bufferUInt8(secretBuffer.length)
 
     scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey, secretLength, secretBuffer])
