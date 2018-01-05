@@ -70,7 +70,7 @@ const makeBuildTxCopy = bufferOutput => tx => {
   ])(tx, EMPTY_BUFFER)
 }
 
-const txCopyForHash = buildTxCopy => (keyPair, tx, index) => {
+const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcSecret, addr) => {
   typeforce(typeforce.tuple(
     types.FunctionType,
     'ECPair',
@@ -78,7 +78,7 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index) => {
     types.Number
   ), [buildTxCopy, keyPair, tx, index])
 
-  const subScript = txCopySubscript(keyPair)
+  const subScript = txCopySubscript(keyPair, htlcSecret, addr)
   const txCopy = clone(tx)
   txCopy.vin.forEach((vin, i) => { vin.script = i === index ? subScript : '' })
   // console.log('*** txCopy', txCopy)
@@ -89,9 +89,17 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index) => {
   return txCopyBufferWithType
 }
 
-const txCopySubscript = keyPair => {
+const { simpleHashlockSigContract } = require('../../../src/script-builder')
+
+const txCopySubscript = (keyPair, htlcSecret, addr) => {
   typeforce('ECPair', keyPair)
-  return bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
+  typeforce('?String', htlcSecret)
+  if (htlcSecret) {
+    const subscript = simpleHashlockSigContract(addr, htlcSecret)
+    return Buffer.concat([bufferVarInt(subscript.length), subscript])
+  } else {
+    return bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
+  }
 }
 
 // bufferInputs :: (String, Fn) -> Tx -> Buffer
@@ -158,18 +166,20 @@ const makeBufferOutput = scriptPubKey => vout =>
  *   - SIGHASH_SINGLE (0x00000003)
  *   - SIGHASH_ANYONECANPAY (0x00000080)
  */
-const vinScript = buildTxCopy => (tx, index) => (keyPair, htlcSecret) => {
+const vinScript = buildTxCopy => (tx, index) => (keyPair, htlcSecret, htlcRefundAddr) => {
   typeforce(typeforce.tuple(
     types.TxConfig,
     types.Number,
     'ECPair',
-    '?String'
+    '?String',
+    typeforce.maybe(types.Address)
   ), [tx, index, keyPair, htlcSecret])
 
   let scriptBuffer
 
   const kpPubKey = keyPair.getPublicKeyBuffer()
-  const txCopyBufferWithType = txCopyForHash(buildTxCopy)(keyPair, tx, index)
+  const htlcSecretHash = htlcSecret && bcrypto.sha256(htlcSecret)
+  const txCopyBufferWithType = txCopyForHash(buildTxCopy)(keyPair, tx, index, htlcSecretHash, keyPair.getAddress())
 
   // console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
   // console.log('*** 2: ' + '0100000001a58a349e8d92bb9867884bf4b108da8df77143fbe8fcaf8a0f69a589de1c66a3010000001976a9143c8710460fc63d27e6741dd1927f0ece41e9b55588acffffffff0200c2eb0b000000001976a9147adddcbdf9f0ebcb814e2efb95debda73bfefd9888ace0453577000000001976a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac0000000001000000')
@@ -193,6 +203,8 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlcSecret) => {
     const secretLength = bufferUInt8(secretBuffer.length)
 
     scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey, secretLength, secretBuffer])
+    // scriptBuffer = Buffer.concat([pubkeyLength, kpPubKey, secretLength, secretBuffer])
+    // scriptBuffer = Buffer.concat([secretLength, secretBuffer])
   } else {
     scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey])
   }
