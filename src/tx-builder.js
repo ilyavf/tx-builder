@@ -70,15 +70,17 @@ const makeBuildTxCopy = bufferOutput => tx => {
   ])(tx, EMPTY_BUFFER)
 }
 
-const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcSecret, addr) => {
+const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcSecretHash, addr) => {
   typeforce(typeforce.tuple(
     types.FunctionType,
     'ECPair',
     types.TxConfig,
-    types.Number
-  ), [buildTxCopy, keyPair, tx, index])
+    types.Number,
+    '?String',
+    typeforce.maybe(types.Address)
+  ), [buildTxCopy, keyPair, tx, index, htlcSecretHash, addr])
 
-  const subScript = txCopySubscript(keyPair, htlcSecret, addr)
+  const subScript = txCopySubscript(keyPair, htlcSecretHash, addr)
   const txCopy = clone(tx)
   txCopy.vin.forEach((vin, i) => { vin.script = i === index ? subScript : '' })
   // console.log('*** txCopy', txCopy)
@@ -91,12 +93,12 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcSecret, addr) => {
 
 const { simpleHashlockSigContract } = require('../../../src/script-builder')
 
-const txCopySubscript = (keyPair, htlcSecret, addr) => {
+const txCopySubscript = (keyPair, htlcSecretHash, addr) => {
   typeforce('ECPair', keyPair)
-  typeforce('?String', htlcSecret)
-  if (htlcSecret) {
-    const subscript = simpleHashlockSigContract(addr, htlcSecret)
-    return Buffer.concat([bufferVarInt(subscript.length), subscript])
+  typeforce('?String', htlcSecretHash)
+  if (htlcSecretHash) {
+    const subscript = simpleHashlockSigContract(addr, htlcSecretHash)
+    return subscript
   } else {
     return bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
   }
@@ -178,7 +180,8 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlcSecret, htlcRefund
   let scriptBuffer
 
   const kpPubKey = keyPair.getPublicKeyBuffer()
-  const htlcSecretHash = htlcSecret && bcrypto.sha256(htlcSecret)
+  const htlcSecretBuffer = htlcSecret && Buffer.from(htlcSecret, 'hex')
+  const htlcSecretHash = htlcSecret && bcrypto.sha256(htlcSecretBuffer).toString('hex')
   const txCopyBufferWithType = txCopyForHash(buildTxCopy)(keyPair, tx, index, htlcSecretHash, keyPair.getAddress())
 
   // console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
