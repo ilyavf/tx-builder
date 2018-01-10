@@ -75,7 +75,7 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcParams) => {
     types.FunctionType,
     'ECPair',
     types.TxConfig,
-    types.Number,
+    types.Number
   ), [buildTxCopy, keyPair, tx, index])
 
   const subScript = txCopySubscript(keyPair, htlcParams)
@@ -91,7 +91,7 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcParams) => {
 
 const { hashTimelockContract } = require('../../../src/script-builder')
 
-const txCopySubscript = (keyPair, htlcParams ) => {
+const txCopySubscript = (keyPair, htlcParams) => {
   typeforce('ECPair', keyPair)
   console.log(`txCopySubscript: htlcParams: `, htlcParams)
   if (htlcParams && htlcParams.secretHash) {
@@ -198,11 +198,11 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlc) => {
   const htlcSecretBuffer = htlc && htlc.secret && Buffer.from(htlc.secret, 'hex')
   const secretHash = htlcSecretBuffer && bcrypto.sha256(htlcSecretBuffer).toString('hex')
   const htlcParams = htlc && htlc.secret && {
-      secretHash,
-      addr: keyPair.getAddress(),
-      refundAddr: htlc.refundAddr,
-      timelock: htlc.timelock
-    }
+    secretHash,
+    addr: keyPair.getAddress(),
+    refundAddr: htlc.refundAddr,
+    timelock: htlc.timelock
+  }
   const txCopyBufferWithType = txCopyForHash(buildTxCopy)(keyPair, tx, index, htlcParams)
 
   // console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
