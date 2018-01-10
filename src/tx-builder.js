@@ -70,7 +70,7 @@ const makeBuildTxCopy = bufferOutput => tx => {
   ])(tx, EMPTY_BUFFER)
 }
 
-const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcConfig) => {
+const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcParams) => {
   typeforce(typeforce.tuple(
     types.FunctionType,
     'ECPair',
@@ -78,7 +78,7 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcConfig) => {
     types.Number,
   ), [buildTxCopy, keyPair, tx, index])
 
-  const subScript = txCopySubscript(keyPair, htlcConfig)
+  const subScript = txCopySubscript(keyPair, htlcParams)
   const txCopy = clone(tx)
   txCopy.vin.forEach((vin, i) => { vin.script = i === index ? subScript : '' })
   // console.log('*** txCopy', txCopy)
@@ -91,20 +91,25 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcConfig) => {
 
 const { hashTimelockContract } = require('../../../src/script-builder')
 
-const txCopySubscript = (keyPair, htlcOpts ) => {
+const txCopySubscript = (keyPair, htlcParams ) => {
   typeforce('ECPair', keyPair)
-  if (htlcOpts && htlcOpts.secretHash) {
+  console.log(`txCopySubscript: htlcParams: `, htlcParams)
+  if (htlcParams && htlcParams.secretHash) {
     typeforce({
       secretHash: 'String',
       addr: types.Address,
       refundAddr: types.Address,
       timelock: 'Number'
-    }, htlcOpts)
+    }, htlcParams)
   }
-  if (htlcOpts && htlcOpts.secretHash) {
-    const { secretHash, addr, refundAddr, timelock } = htlcOpts
+  if (htlcParams && htlcParams.secretHash) {
+    const { secretHash, addr, refundAddr, timelock } = htlcParams
     // redeemerAddr, funderAddr, commitment, locktime
     const subscript = hashTimelockContract(addr, refundAddr, secretHash, timelock)
+    // const subscript2 = Buffer.from('63a82088f1f9dcce43d0aea877b6be5d5ed4b90a470b151ccab39bc8d57584e6be03c78876a914d04a7422caea8c04f93b552c7c9b3caef2a91b306700696888ac', 'hex')
+    console.log(`subscript = ${subscript.toString('hex')}`)
+    // console.log(`subscript2 = ${subscript2.toString('hex')}`)
+
     return subscript
   } else {
     return bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
@@ -131,7 +136,7 @@ const makeBufferInput = buildTxCopy => tx => (vin, index) => {
     prop('vout', bufferUInt32),              // 4 bytes, Output Index
     addProp(
       'scriptSig',
-      props(['keyPair', 'htlcSecret'], vinScript(buildTxCopy)(tx, index))
+      props(['keyPair', 'htlc'], vinScript(buildTxCopy)(tx, index))
     ),
     prop('scriptSig', bufferVarSlice('hex')),  // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     prop('sequence', bufferUInt32)             // 4 bytes, Sequence Number
@@ -192,13 +197,13 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlc) => {
   const kpPubKey = keyPair.getPublicKeyBuffer()
   const htlcSecretBuffer = htlc && htlc.secret && Buffer.from(htlc.secret, 'hex')
   const secretHash = htlcSecretBuffer && bcrypto.sha256(htlcSecretBuffer).toString('hex')
-  const htlcOpts = htlc && htlc.secret && {
+  const htlcParams = htlc && htlc.secret && {
       secretHash,
       addr: keyPair.getAddress(),
       refundAddr: htlc.refundAddr,
       timelock: htlc.timelock
     }
-  const txCopyBufferWithType = txCopyForHash(buildTxCopy)(keyPair, tx, index, htlcOpts)
+  const txCopyBufferWithType = txCopyForHash(buildTxCopy)(keyPair, tx, index, htlcParams)
 
   // console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
   // console.log('*** 2: ' + '0100000001a58a349e8d92bb9867884bf4b108da8df77143fbe8fcaf8a0f69a589de1c66a3010000001976a9143c8710460fc63d27e6741dd1927f0ece41e9b55588acffffffff0200c2eb0b000000001976a9147adddcbdf9f0ebcb814e2efb95debda73bfefd9888ace0453577000000001976a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac0000000001000000')
@@ -217,8 +222,8 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlc) => {
   // const scriptBuffer = bscript.compile([sig, kpPubKey])
 
   // HTLC: to unlock HTLC script we need to add a secret to the end of the unlocking script:
-  if (htlcOpts && htlcOpts.secret) {
-    const secretBuffer = Buffer.from(htlcOpts.secret, 'hex')
+  if (htlc && htlc.secret) {
+    const secretBuffer = Buffer.from(htlc.secret, 'hex')
     const secretLength = bufferUInt8(secretBuffer.length)
 
     scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey, secretLength, secretBuffer])
