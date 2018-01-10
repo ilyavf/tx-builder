@@ -226,9 +226,9 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlc) => {
     const secretBuffer = Buffer.from(htlc.secret, 'hex')
     const secretLength = bufferUInt8(secretBuffer.length)
 
-    scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey, secretLength, secretBuffer])
+    scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey, secretLength, secretBuffer, bufferUInt8(81)])
     // scriptBuffer = Buffer.concat([pubkeyLength, kpPubKey, secretLength, secretBuffer])
-    // scriptBuffer = Buffer.concat([secretLength, secretBuffer])
+    // scriptBuffer = Buffer.concat([secretLength, secretBuffer, bufferUInt8(81)])
   } else {
     scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey])
   }
