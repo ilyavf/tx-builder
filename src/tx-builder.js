@@ -89,7 +89,7 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcParams) => {
   return txCopyBufferWithType
 }
 
-const { hashTimelockContract } = require('../../../src/script-builder')
+const { hashTimelockContract } = require('tx-builder-equibit/src/script-builder')
 
 const txCopySubscript = (keyPair, htlcParams) => {
   typeforce('ECPair', keyPair)
