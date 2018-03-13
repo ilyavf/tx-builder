@@ -186,7 +186,8 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlc) => {
     types.Number,
     'ECPair',
     typeforce.maybe({
-      secret: 'String',
+      secret: '?String',
+      secretHash: '?String',
       refundAddr: types.Address,
       timelock: 'Number'
     })
@@ -196,8 +197,9 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlc) => {
 
   const kpPubKey = keyPair.getPublicKeyBuffer()
   const htlcSecretBuffer = htlc && htlc.secret && Buffer.from(htlc.secret, 'hex')
-  const secretHash = htlcSecretBuffer && bcrypto.sha256(htlcSecretBuffer).toString('hex')
-  const htlcParams = htlc && htlc.secret && {
+  const secretHash = (htlcSecretBuffer && bcrypto.sha256(htlcSecretBuffer).toString('hex')) ||
+    (htlc && htlc.secretHash)
+  const htlcParams = secretHash && {
     secretHash,
     addr: keyPair.getAddress(),
     refundAddr: htlc.refundAddr,
@@ -229,6 +231,10 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlc) => {
     scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey, secretLength, secretBuffer, bufferUInt8(81)])
     // scriptBuffer = Buffer.concat([pubkeyLength, kpPubKey, secretLength, secretBuffer])
     // scriptBuffer = Buffer.concat([secretLength, secretBuffer, bufferUInt8(81)])
+  } else if (htlc && htlc.secretHash) {
+    // HTLC: to unlock HTLC script which timelock has expired we need to invoke the ELSE part of the HTLC script:
+    // (this case is identified based on the fact that secret is not passed but secretHash is).
+    scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey, bufferUInt8(80)])
   } else {
     scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey])
   }
