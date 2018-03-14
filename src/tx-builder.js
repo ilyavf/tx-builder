@@ -234,7 +234,7 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlc) => {
   } else if (htlc && htlc.secretHash) {
     // HTLC: to unlock HTLC script which timelock has expired we need to invoke the ELSE part of the HTLC script:
     // (this case is identified based on the fact that secret is not passed but secretHash is).
-    scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey, bufferUInt8(80)])
+    scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey, bufferUInt8(0)])
   } else {
     scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey])
   }
