@@ -185,7 +185,7 @@ describe('builder', function () {
       refundAddr: 'mm2zdwmiVBR7ipNiN3tr4CCu6sS5tFwKna',
       timelock: 144
     }
-    const expectedScript = '47304402202fc3de1b21a557a25bf4b2e3dd99d3e17edf4548cdc0b23ffa3a2c636688191302204adbffa92dca8119c0dd566fe75f9763031c7f605003c443da7209c9f92a128a012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a350'
+    const expectedScript = '47304402202fc3de1b21a557a25bf4b2e3dd99d3e17edf4548cdc0b23ffa3a2c636688191302204adbffa92dca8119c0dd566fe75f9763031c7f605003c443da7209c9f92a128a012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a300'
     it('should create vin script with HTLC', function () {
       const script = vinScript(buildTxCopy)(fixture.tx, 0)(keyPair, htlc)
       // console.log(`script: ${script.toString('hex')}`)
