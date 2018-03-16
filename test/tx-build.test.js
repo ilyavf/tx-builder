@@ -177,15 +177,16 @@ describe('builder', function () {
     })
   })
 
-  describe('vinScript HTLC expired timelock', function () {
+  describe('vinScript HTLC expired timelock (REFUND transaction)', function () {
     const keyPair = fixtureNode.keyPair
     const secretHash = '7c4222070fe4f287b70f12561fe93e703153d34cbc35bc3210ddd4eed609b077'
     const htlc = {
+      receiverAddr: 'n1nXTT79FU2bwHTLXQkydzfT7biCxW4ZqE',
+      refundAddr: keyPair.getAddress(),
       secretHash,
-      refundAddr: 'mm2zdwmiVBR7ipNiN3tr4CCu6sS5tFwKna',
       timelock: 144
     }
-    const expectedScript = '47304402202fc3de1b21a557a25bf4b2e3dd99d3e17edf4548cdc0b23ffa3a2c636688191302204adbffa92dca8119c0dd566fe75f9763031c7f605003c443da7209c9f92a128a012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a300'
+    const expectedScript = '473044022032650eefcb5ced3a6b2257386659668483354070f7468a0fc8ab53a9ba33166f0220084cf01b7ebd1a9dcbc6cdd7818e598b8240e8b56347b9ae69c4f5cb13d645b5012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a300'
     it('should create vin script with HTLC', function () {
       const script = vinScript(buildTxCopy)(fixture.tx, 0)(keyPair, htlc)
       // console.log(`script: ${script.toString('hex')}`)

@@ -199,9 +199,11 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlc) => {
   const htlcSecretBuffer = htlc && htlc.secret && Buffer.from(htlc.secret, 'hex')
   const secretHash = (htlcSecretBuffer && bcrypto.sha256(htlcSecretBuffer).toString('hex')) ||
     (htlc && htlc.secretHash)
+  // For the REFUND transaction `receiverAddr` in the left branch of IF belongs to the other user and thus is passed with htlc params.
+  const addr = (htlc && htlc.receiverAddr) || keyPair.getAddress()
   const htlcParams = secretHash && {
     secretHash,
-    addr: keyPair.getAddress(),
+    addr,
     refundAddr: htlc.refundAddr,
     timelock: htlc.timelock
   }
