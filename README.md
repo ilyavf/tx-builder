@@ -108,7 +108,10 @@ const { compose as composeDecoder, addProp } = decoder  // Composition helpers.
     - `prop :: String -> Fn -> (Obj -> Buffer)`
     - `addProp :: String -> Fn -> Obj -> Buffer`
   - **High-level helpers**. See `test/tx-build.test.js` for examples of usage. Some of this helpers can be reused for a specific blockchain implementation. E.g. see package `tx-builder-equibit` for [Equibit Securities Platform ](https://equibitgroup.com/) implementation.
-    - `buildTx :: Tx -> Buffer` Main function to build a bitcoin transaction. Returns an instance of Buffer.
+    - `buildTx :: (Tx, Options) -> Buffer` Main function to build a bitcoin transaction. Returns an instance of Buffer. Options are:
+      - `network`: "TESTNET", "MAINNET" or custom.
+      - `sha`: to support "SHA3_256", default: "SHA256";
+      - `hashTimelockContract`: function that resolves to HTLC contract string.
     - buildTxCopy,
     - txCopyForHash,
     - txCopySubscript,
@@ -245,6 +248,26 @@ console.log( buildTx( tx ).toString( 'hex' ) )
 // > "0100000001545f6161d2be3bdfe7184ee1f7..."
 ```
 
+The full implementation allows to pass options:
+```js
+const builder = require('tx-builder')
+const buildTx = builder.buildTx
+
+const txConfig = {
+  version: 1,
+  locktime: 0,
+  vin: [{ ... }],
+  ...
+}
+
+const options = {
+  network: "TESTNET",     // which is decault, or "MAINNET"
+  sha: "SHA3_256",        // default: "SHA256"
+}
+
+const txBuffer = buildTx(txConfig, options)
+```
+
 ### Coinbase transaction
 
 According to [spec](https://bitcoin.org/en/developer-reference#coinbase) a coinbase transaction should contain one
@@ -314,6 +337,10 @@ console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 - [ ] parallelize `pow` with Web Workers
 
 ## Release Notes:
+- 0.14.0 Parameterized `buildTx` with options: "network", "sha", "hashTimelockContract":
+  - `network`: "TESTNET", "MAINNET" or custom.
+  - `sha`: to support "SHA3_256", default: "SHA256";
+  - `hashTimelockContract`: function that resolves to HTLC contract string.
 - 0.13.0 Added an option for unlocking HTLC scripts.
 - 0.12.0 Added branching helper `iff` and predicates `has` and `hasNo`. Use them in `tx-build` allow to pass `scriptPubKey` for tx outputs.
 - 0.11.0 Added custom types (`Address`, 'TxConfig', 'TxVin'). Typeforce main `tx-build` functions.
