@@ -1,5 +1,6 @@
 const varuint = require('varuint-bitcoin')
 const assert = require('assert')
+const { hashTimelockContract } = require('tx-builder-equibit/src/script-builder')
 const {
   bufferInt32,
   bufferUInt64,
@@ -170,7 +171,7 @@ describe('builder', function () {
     }
     const expectedScript = '47304402202fc3de1b21a557a25bf4b2e3dd99d3e17edf4548cdc0b23ffa3a2c636688191302204adbffa92dca8119c0dd566fe75f9763031c7f605003c443da7209c9f92a128a012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a31056c44dc6ac176bb534679a8e4b6979b151'
     it('should create vin script with HTLC', function () {
-      const script = vinScript(buildTxCopy({}), {})(fixture.tx, 0)(keyPair, htlc)
+      const script = vinScript(buildTxCopy({}), { hashTimelockContract })(fixture.tx, 0)(keyPair, htlc)
       // console.log(`script: ${script.toString('hex')}`)
       assert.equal(script.toString('hex'), expectedScript)
     })
@@ -187,7 +188,7 @@ describe('builder', function () {
     }
     const expectedScript = '473044022032650eefcb5ced3a6b2257386659668483354070f7468a0fc8ab53a9ba33166f0220084cf01b7ebd1a9dcbc6cdd7818e598b8240e8b56347b9ae69c4f5cb13d645b5012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a300'
     it('should create vin script with HTLC', function () {
-      const script = vinScript(buildTxCopy({}), {})(fixture.tx, 0)(keyPair, htlc)
+      const script = vinScript(buildTxCopy({}), { hashTimelockContract })(fixture.tx, 0)(keyPair, htlc)
       // console.log(`script: ${script.toString('hex')}`)
       assert.equal(script.toString('hex'), expectedScript)
     })

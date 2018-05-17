@@ -87,7 +87,7 @@ const makeBuildTxCopy = bufferOutput => tx => {
   ])(tx, EMPTY_BUFFER)
 }
 
-const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcParams) => {
+const txCopyForHash = (buildTxCopy, options) => (keyPair, tx, index, htlcParams) => {
   typeforce(typeforce.tuple(
     types.FunctionType,
     'ECPair',
@@ -95,7 +95,7 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcParams) => {
     types.Number
   ), [buildTxCopy, keyPair, tx, index])
 
-  const subScript = txCopySubscript(keyPair, htlcParams)
+  const subScript = txCopySubscript(keyPair, htlcParams, options)
   const txCopy = clone(tx)
   txCopy.vin.forEach((vin, i) => { vin.script = i === index ? subScript : '' })
   // console.log('*** txCopy', txCopy)
@@ -106,9 +106,7 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index, htlcParams) => {
   return txCopyBufferWithType
 }
 
-const { hashTimelockContract } = require('tx-builder-equibit/src/script-builder')
-
-const txCopySubscript = (keyPair, htlcParams) => {
+const txCopySubscript = (keyPair, htlcParams, options) => {
   typeforce('ECPair', keyPair)
   console.log(`txCopySubscript: htlcParams: `, htlcParams)
   if (htlcParams && htlcParams.secretHash) {
@@ -118,11 +116,12 @@ const txCopySubscript = (keyPair, htlcParams) => {
       refundAddr: types.Address,
       timelock: 'Number'
     }, htlcParams)
+    typeforce(types.FunctionType, options.hashTimelockContract)
   }
   if (htlcParams && htlcParams.secretHash) {
     const { secretHash, addr, refundAddr, timelock } = htlcParams
     // redeemerAddr, funderAddr, commitment, locktime
-    const subscript = hashTimelockContract(addr, refundAddr, secretHash, timelock)
+    const subscript = options.hashTimelockContract(addr, refundAddr, secretHash, timelock)
     // const subscript2 = Buffer.from('63a82088f1f9dcce43d0aea877b6be5d5ed4b90a470b151ccab39bc8d57584e6be03c78876a914d04a7422caea8c04f93b552c7c9b3caef2a91b306700696888ac', 'hex')
     console.log(`subscript = ${subscript.toString('hex')}`)
     // console.log(`subscript2 = ${subscript2.toString('hex')}`)
@@ -197,7 +196,7 @@ const makeBufferOutput = scriptPubKey => vout =>
  *   - SIGHASH_SINGLE (0x00000003)
  *   - SIGHASH_ANYONECANPAY (0x00000080)
  */
-const vinScript = (buildTxCopy, { sha }) => (tx, index) => (keyPair, htlc) => {
+const vinScript = (buildTxCopy, options) => (tx, index) => (keyPair, htlc) => {
   typeforce(typeforce.tuple(
     types.TxConfig,
     types.Number,
@@ -227,7 +226,7 @@ const vinScript = (buildTxCopy, { sha }) => (tx, index) => (keyPair, htlc) => {
     refundAddr: htlc.refundAddr,
     timelock: htlc.timelock
   }
-  const txCopyBufferWithType = txCopyForHash(buildTxCopy)(keyPair, tx, index, htlcParams)
+  const txCopyBufferWithType = txCopyForHash(buildTxCopy, options)(keyPair, tx, index, htlcParams)
 
   // console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
   // console.log('*** 2: ' + '0100000001a58a349e8d92bb9867884bf4b108da8df77143fbe8fcaf8a0f69a589de1c66a3010000001976a9143c8710460fc63d27e6741dd1927f0ece41e9b55588acffffffff0200c2eb0b000000001976a9147adddcbdf9f0ebcb814e2efb95debda73bfefd9888ace0453577000000001976a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac0000000001000000')
@@ -237,7 +236,7 @@ const vinScript = (buildTxCopy, { sha }) => (tx, index) => (keyPair, htlc) => {
   // console.log(`hash expected = d27fc0b87c10d49b59196742e2836b89e08df05f0b045aaeaa1bcd1d0278500b`)
   // const sig = keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
 
-  const sig = signBuffer(keyPair, sha)(txCopyBufferWithType)
+  const sig = signBuffer(keyPair, options.sha)(txCopyBufferWithType)
   // console.log(`sig          = ${sig.toString('hex')}`)
   // console.log(`sig expected = 30440220764bbe9ddff67409310c04ffb34fe937cc91c3d55303158f91a32bed8d9d7a7b02207fb30f6b9aaef93da8c88e2b818d993ad65aae54860c3de56c6304c57252cce101`)
 
