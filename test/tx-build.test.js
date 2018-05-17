@@ -1,5 +1,4 @@
 const varuint = require('varuint-bitcoin')
-const bitcoin = require('bitcoinjs-lib')
 const assert = require('assert')
 const {
   bufferInt32,
@@ -104,7 +103,7 @@ describe('builder', function () {
   describe('makeBufferOutput', function () {
     it('should make a bufferOutput function', function () {
       const bufferOutput = makeBufferOutput(
-        prop('address', voutScript(bitcoin.networks.testnet))
+        prop('address', voutScript({network: 'TESTNET'}))
       )
       const buffer = bufferOutput(fixture.tx.vout[0])
       assert.equal(buffer.toString('hex'), fixture.hexItems.vout1)
@@ -112,7 +111,7 @@ describe('builder', function () {
   })
   describe('bufferOutput', function () {
     it('should build vout-1', function () {
-      const buffer = bufferOutput(fixture.tx.vout[0])
+      const buffer = bufferOutput({})(fixture.tx.vout[0])
       assert.equal(buffer.toString('hex'), fixture.hexItems.vout1)
     })
   })
@@ -142,21 +141,21 @@ describe('builder', function () {
       const subscript = txCopySubscript(keyPair)
       const txCopyWithScript = Object.assign({}, fixture.tx)
       txCopyWithScript.vin[0].script = subscript
-      const buffer = buildTxCopy(txCopyWithScript)
+      const buffer = buildTxCopy({})(txCopyWithScript)
       assert.equal(buffer.toString('hex'), fixture.hexItems.txCopyHex)
     })
   })
   describe('txCopyForHash', function () {
     const keyPair = fixtureNode.keyPair
     it('should prepare txCopy for hashing', function () {
-      const txCopyBuffer = txCopyForHash(buildTxCopy)(keyPair, fixture.tx, 0)
+      const txCopyBuffer = txCopyForHash(buildTxCopy({}))(keyPair, fixture.tx, 0)
       assert.equal(txCopyBuffer.toString('hex'), fixture.hexItems.txCopyForHash)
     })
   })
   describe('vinScript', function () {
     const keyPair = fixtureNode.keyPair
     it('should create vin script', function () {
-      const script = vinScript(buildTxCopy)(fixture.tx, 0)(keyPair)
+      const script = vinScript(buildTxCopy({}), {})(fixture.tx, 0)(keyPair)
       assert.equal(script.toString('hex'), fixture.decoded.vin[0].scriptSig)
     })
   })
@@ -171,7 +170,7 @@ describe('builder', function () {
     }
     const expectedScript = '47304402202fc3de1b21a557a25bf4b2e3dd99d3e17edf4548cdc0b23ffa3a2c636688191302204adbffa92dca8119c0dd566fe75f9763031c7f605003c443da7209c9f92a128a012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a31056c44dc6ac176bb534679a8e4b6979b151'
     it('should create vin script with HTLC', function () {
-      const script = vinScript(buildTxCopy)(fixture.tx, 0)(keyPair, htlc)
+      const script = vinScript(buildTxCopy({}), {})(fixture.tx, 0)(keyPair, htlc)
       // console.log(`script: ${script.toString('hex')}`)
       assert.equal(script.toString('hex'), expectedScript)
     })
@@ -188,7 +187,7 @@ describe('builder', function () {
     }
     const expectedScript = '473044022032650eefcb5ced3a6b2257386659668483354070f7468a0fc8ab53a9ba33166f0220084cf01b7ebd1a9dcbc6cdd7818e598b8240e8b56347b9ae69c4f5cb13d645b5012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a300'
     it('should create vin script with HTLC', function () {
-      const script = vinScript(buildTxCopy)(fixture.tx, 0)(keyPair, htlc)
+      const script = vinScript(buildTxCopy({}), {})(fixture.tx, 0)(keyPair, htlc)
       // console.log(`script: ${script.toString('hex')}`)
       assert.equal(script.toString('hex'), expectedScript)
     })
@@ -200,7 +199,7 @@ describe('builder', function () {
       const txVin = Object.assign({}, fixture.tx.vin[0], {
         keyPair
       })
-      const buffer = bufferInput(fixture.tx)(txVin, 0)
+      const buffer = bufferInput({})(fixture.tx)(txVin, 0)
       assert.equal(buffer.toString('hex'), fixture.hexItems.vin)
     })
   })
@@ -209,13 +208,13 @@ describe('builder', function () {
       const keyPair = fixtureNode.keyPair
       const tx = Object.assign({}, fixture.tx)
       tx.vin[0].keyPair = keyPair
-      const buffer = bufferInputs('vin', bufferInput)(tx)
+      const buffer = bufferInputs('vin', bufferInput({}))(tx)
       assert.equal(buffer.toString('hex'), '01' + fixture.hexItems.vin)
     })
   })
   describe('buildTx', function () {
     it('should build the whole transaction', function () {
-      const buffer = buildTx(fixture.tx)
+      const buffer = buildTx(fixture.tx, {})
       assert.equal(buffer.toString('hex'), fixture.hex)
     })
   })

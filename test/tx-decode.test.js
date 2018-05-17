@@ -106,7 +106,7 @@ describe('decoder', function () {
   describe('getTxId', function () {
     it('should get txid', function () {
       const txBuffer = Buffer.from(fixture.hex, 'hex')
-      assert.equal(getTxId(txBuffer), fixture.decoded.txid)
+      assert.equal(getTxId({})(txBuffer), fixture.decoded.txid)
     })
   })
 })
