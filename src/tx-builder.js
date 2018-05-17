@@ -36,22 +36,39 @@ const {
   hasNo
 } = require('./compose-build')
 
+const { doubleSha3 } = require('./tx-decoder')
+
 const EMPTY_BUFFER = Buffer.allocUnsafe(0)
 
 /**
  * Main function to build a bitcoin transaction. Creates an instance of Buffer.
+ * @param {Object} options
  * @param {Object} tx
  * @return {Buffer}
+ *
+ * ```
+ * const txConfig = { version: 1, vin: [...]}
+ * const options = {
+ *    network: bitcoin.networks.testnet   // or `bitcoin.networks.bitcoin` for mainnet.
+ *    sha: 'SHA3'                         // ('SHA256' | 'SHA3' | Fn)
+ * }
+ * ```
  */
-// buildTx :: Tx -> Buffer
-const buildTx = tx => {
+// buildTx :: (Tx, Options) -> Buffer
+const buildTx = (tx, options) => {
+  options = options || {}
   typeforce(types.TxConfig, tx)
+  typeforce({
+    network: typeforce.maybe(typeforce.oneOf(typeforce.value('TESTNET'), typeforce.value('MAINNET'), types.Network)),
+    sha: types.maybe(types.oneOf(typeforce.value('SHA256'), typeforce.value('SHA3_256'))),
+    hashTimelockContract: types.maybe(types.FunctionType)
+  }, options)
 
   return compose([
-    prop('version', bufferInt32),                   // 4 bytes
-    bufferInputs('vin', bufferInput),               // 1-9 bytes (VarInt), Input counter; Variable, Inputs
-    prop('vout', mapConcatBuffers(bufferOutput)),   // 1-9 bytes (VarInt), Output counter; Variable, Outputs
-    prop('locktime', bufferUInt32)                  // 4 bytes
+    prop('version', bufferInt32),                             // 4 bytes
+    bufferInputs('vin', bufferInput(options)),                // 1-9 bytes (VarInt), Input counter; Variable, Inputs
+    prop('vout', mapConcatBuffers(bufferOutput(options))),    // 1-9 bytes (VarInt), Output counter; Variable, Outputs
+    prop('locktime', bufferUInt32)                            // 4 bytes
   ])(tx, EMPTY_BUFFER)
 }
 
@@ -70,7 +87,7 @@ const makeBuildTxCopy = bufferOutput => tx => {
   ])(tx, EMPTY_BUFFER)
 }
 
-const txCopyForHash = buildTxCopy => (keyPair, tx, index) => {
+const txCopyForHash = (buildTxCopy, options) => (keyPair, tx, index, htlcParams) => {
   typeforce(typeforce.tuple(
     types.FunctionType,
     'ECPair',
@@ -78,7 +95,7 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index) => {
     types.Number
   ), [buildTxCopy, keyPair, tx, index])
 
-  const subScript = txCopySubscript(keyPair)
+  const subScript = txCopySubscript(keyPair, htlcParams, options)
   const txCopy = clone(tx)
   txCopy.vin.forEach((vin, i) => { vin.script = i === index ? subScript : '' })
   // console.log('*** txCopy', txCopy)
@@ -89,9 +106,30 @@ const txCopyForHash = buildTxCopy => (keyPair, tx, index) => {
   return txCopyBufferWithType
 }
 
-const txCopySubscript = keyPair => {
+const txCopySubscript = (keyPair, htlcParams, options) => {
   typeforce('ECPair', keyPair)
-  return bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
+  console.log(`txCopySubscript: htlcParams: `, htlcParams)
+  if (htlcParams && htlcParams.secretHash) {
+    typeforce({
+      secretHash: 'String',
+      addr: types.Address,
+      refundAddr: types.Address,
+      timelock: 'Number'
+    }, htlcParams)
+    typeforce(types.FunctionType, options.hashTimelockContract)
+  }
+  if (htlcParams && htlcParams.secretHash) {
+    const { secretHash, addr, refundAddr, timelock } = htlcParams
+    // redeemerAddr, funderAddr, commitment, locktime
+    const subscript = options.hashTimelockContract(addr, refundAddr, secretHash, timelock)
+    // const subscript2 = Buffer.from('63a82088f1f9dcce43d0aea877b6be5d5ed4b90a470b151ccab39bc8d57584e6be03c78876a914d04a7422caea8c04f93b552c7c9b3caef2a91b306700696888ac', 'hex')
+    console.log(`subscript = ${subscript.toString('hex')}`)
+    // console.log(`subscript2 = ${subscript2.toString('hex')}`)
+
+    return subscript
+  } else {
+    return bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
+  }
 }
 
 // bufferInputs :: (String, Fn) -> Tx -> Buffer
@@ -100,8 +138,8 @@ const bufferInputs = (propName, bufferInput) => tx =>
   mapConcatBuffers(bufferInput(tx))(tx[propName])
 )
 
-// bufferInput :: Fn -> Tx -> (Object, Int) -> Buffer
-const makeBufferInput = buildTxCopy => tx => (vin, index) => {
+// bufferInput :: (Fn -> Options) -> Tx -> (Object, Int) -> Buffer
+const makeBufferInput = (buildTxCopy, options) => tx => (vin, index) => {
   typeforce(typeforce.tuple(
     types.FunctionType,
     types.TxConfig,
@@ -114,7 +152,7 @@ const makeBufferInput = buildTxCopy => tx => (vin, index) => {
     prop('vout', bufferUInt32),              // 4 bytes, Output Index
     addProp(
       'scriptSig',
-      props(['keyPair', 'htlcSecret'], vinScript(buildTxCopy)(tx, index))
+      props(['keyPair', 'htlc'], vinScript(buildTxCopy, options)(tx, index))
     ),
     prop('scriptSig', bufferVarSlice('hex')),  // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     prop('sequence', bufferUInt32)             // 4 bytes, Sequence Number
@@ -158,18 +196,37 @@ const makeBufferOutput = scriptPubKey => vout =>
  *   - SIGHASH_SINGLE (0x00000003)
  *   - SIGHASH_ANYONECANPAY (0x00000080)
  */
-const vinScript = buildTxCopy => (tx, index) => (keyPair, htlcSecret) => {
+const vinScript = (buildTxCopy, options) => (tx, index) => (keyPair, htlc) => {
   typeforce(typeforce.tuple(
     types.TxConfig,
     types.Number,
     'ECPair',
-    '?String'
-  ), [tx, index, keyPair, htlcSecret])
+    typeforce.maybe({
+      secret: '?String',
+      secretHash: '?String',
+      refundAddr: types.Address,
+      timelock: 'Number'
+    })
+  ), [tx, index, keyPair, htlc])
 
   let scriptBuffer
 
   const kpPubKey = keyPair.getPublicKeyBuffer()
-  const txCopyBufferWithType = txCopyForHash(buildTxCopy)(keyPair, tx, index)
+  const htlcSecretBuffer = htlc && htlc.secret && Buffer.from(htlc.secret, 'hex')
+
+  // Note: for HTLC we use only SHA3 to hash a secret because Bitcoin node does not have SHA3.
+  const secretHash = (htlcSecretBuffer && bcrypto.sha256(htlcSecretBuffer).toString('hex')) ||
+    (htlc && htlc.secretHash)
+
+  // For the REFUND transaction `receiverAddr` in the left branch of IF belongs to the other user and thus is passed with htlc params.
+  const addr = (htlc && htlc.receiverAddr) || keyPair.getAddress()
+  const htlcParams = secretHash && {
+    secretHash,
+    addr,
+    refundAddr: htlc.refundAddr,
+    timelock: htlc.timelock
+  }
+  const txCopyBufferWithType = txCopyForHash(buildTxCopy, options)(keyPair, tx, index, htlcParams)
 
   // console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
   // console.log('*** 2: ' + '0100000001a58a349e8d92bb9867884bf4b108da8df77143fbe8fcaf8a0f69a589de1c66a3010000001976a9143c8710460fc63d27e6741dd1927f0ece41e9b55588acffffffff0200c2eb0b000000001976a9147adddcbdf9f0ebcb814e2efb95debda73bfefd9888ace0453577000000001976a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac0000000001000000')
@@ -179,7 +236,7 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlcSecret) => {
   // console.log(`hash expected = d27fc0b87c10d49b59196742e2836b89e08df05f0b045aaeaa1bcd1d0278500b`)
   // const sig = keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
 
-  const sig = signBuffer(keyPair)(txCopyBufferWithType)
+  const sig = signBuffer(keyPair, options.sha)(txCopyBufferWithType)
   // console.log(`sig          = ${sig.toString('hex')}`)
   // console.log(`sig expected = 30440220764bbe9ddff67409310c04ffb34fe937cc91c3d55303158f91a32bed8d9d7a7b02207fb30f6b9aaef93da8c88e2b818d993ad65aae54860c3de56c6304c57252cce101`)
 
@@ -188,11 +245,17 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlcSecret) => {
   // const scriptBuffer = bscript.compile([sig, kpPubKey])
 
   // HTLC: to unlock HTLC script we need to add a secret to the end of the unlocking script:
-  if (htlcSecret) {
-    const secretBuffer = Buffer.from(htlcSecret, 'hex')
+  if (htlc && htlc.secret) {
+    const secretBuffer = Buffer.from(htlc.secret, 'hex')
     const secretLength = bufferUInt8(secretBuffer.length)
 
-    scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey, secretLength, secretBuffer])
+    scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey, secretLength, secretBuffer, bufferUInt8(81)])
+    // scriptBuffer = Buffer.concat([pubkeyLength, kpPubKey, secretLength, secretBuffer])
+    // scriptBuffer = Buffer.concat([secretLength, secretBuffer, bufferUInt8(81)])
+  } else if (htlc && htlc.secretHash) {
+    // HTLC: to unlock HTLC script which timelock has expired we need to invoke the ELSE part of the HTLC script:
+    // (this case is identified based on the fact that secret is not passed but secretHash is).
+    scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey, bufferUInt8(0)])
   } else {
     scriptBuffer = Buffer.concat([sigLength, sig, pubkeyLength, kpPubKey])
   }
@@ -200,10 +263,17 @@ const vinScript = buildTxCopy => (tx, index) => (keyPair, htlcSecret) => {
   return scriptBuffer
 }
 
-// voutScript :: NetworkConfig -> Address -> ScriptHex
-const voutScript = network => addr => {
+// voutScript :: Options -> Address -> ScriptHex
+const voutScript = ({network}) => addr => {
+  typeforce(
+    typeforce.maybe(typeforce.oneOf(typeforce.value('TESTNET'), typeforce.value('MAINNET'), types.Network)),
+    network
+  )
   typeforce(types.Address, addr)
-  return baddress.toOutputScript(addr, network)
+  const networkObj = (!network || network === 'TESTNET')
+    ? bitcoin.networks.testnet                                        // <<< default
+    : (network === 'MAINNET' ? bitcoin.networks.bitcoin : network)
+  return baddress.toOutputScript(addr, networkObj)
 }
 
 /**
@@ -218,25 +288,27 @@ const bufferHash = hash => Buffer.from(hash, 'hex').reverse()
  *  - `buildTxCopy` depends on `bufferOutput`
  *  - `bufferInput` depends on `buildTxCopy`
  * E.g. Equibit blockchain transaction differs from Bitcoin blockchain's with the VOUT structure.
+ * @param {Object} options Options
+ * @result {Fn}
  */
-// bufferOutput :: Object -> Buffer
-const bufferOutput = makeBufferOutput(
-  prop('address', voutScript(bitcoin.networks.testnet))
+// bufferOutput :: Options -> (Object -> Buffer)
+const bufferOutput = options => makeBufferOutput(
+  prop('address', voutScript(options))
 )
-const buildTxCopy = makeBuildTxCopy(bufferOutput)
-const bufferInput = makeBufferInput(buildTxCopy)
+const buildTxCopy = options => makeBuildTxCopy(bufferOutput(options))
+const bufferInput = options => makeBufferInput(buildTxCopy(options), options)
 
 /**
  * Coinbase transaction. Docs: https://bitcoin.org/en/developer-reference#coinbase
  * @param tx
  */
 // buildCoinbaseTx :: Object -> Buffer
-const buildCoinbaseTx = tx =>
+const buildCoinbaseTx = (tx, options = {}) =>
 (
   compose([
     prop('version', bufferInt32),                   // 4 bytes, version
     prop('vin', mapConcatBuffers(coinbaseInput)),   // a coinbase input
-    prop('vout', mapConcatBuffers(bufferOutput)),   // 1-9 bytes, vout
+    prop('vout', mapConcatBuffers(bufferOutput(options))),   // 1-9 bytes, vout
     prop('locktime', bufferUInt32)                  // 4 bytes
   ])(tx, EMPTY_BUFFER)
 )
@@ -260,9 +332,13 @@ const coinbaseScript = blockHeight => {
   return Buffer.concat([bVarInt, blockHeightBuffer, arbitraryData])
 }
 
-// signBuffer :: keyPair -> MessageBuffer -> SignatureBuffer
-const signBuffer = keyPair => buffer => {
-  const hash = bcrypto.hash256(buffer)
+// signBuffer :: (KeyPair, String) -> MessageBuffer -> SignatureBuffer
+const signBuffer = (keyPair, sha) => buffer => {
+  let createHash = bcrypto.hash256
+  if (sha && sha === 'SHA3_256') {
+    createHash = doubleSha3
+  }
+  const hash = createHash(buffer)
   return keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
 }
 

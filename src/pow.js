@@ -1,6 +1,6 @@
 const Buffer = require('safe-buffer').Buffer
 const { bufferUInt64 } = require('./buffer-build')
-const hashFromBuffer = require('./tx-decoder').getTxId
+const hashFromBuffer = require('./tx-decoder').getTxId({})
 
 // pow :: Number -> (Buffer, Number, Number) -> NonceNumber
 const pow = difficulty => (buffer, nonce = 0, increment = 1) => {

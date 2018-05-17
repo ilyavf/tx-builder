@@ -5,6 +5,7 @@
 
 const bitcoin = require('bitcoinjs-lib')
 const bcrypto = bitcoin.crypto
+const sha3_256 = require('js-sha3').sha3_256              // eslint-disable-line
 const { compose, addProp } = require('./compose-read')
 const {
   readSlice,
@@ -69,9 +70,21 @@ const readOutput = buffer =>
   ])({}, buffer)
 )
 
+// doubleSha3 :: Buffer -> String
+const doubleSha3 = buffer => {
+  // Note: sha3_256 can accept either Buffer or String, and always outputs String.
+  return sha3_256(sha3_256(buffer))
+}
+
 // Since a hash is a 256-bit integer and is stored using Little Endian, we reverse it for showing to user (who reads BE).
 // getTxId :: Buffer -> String
-const getTxId = buffer => bcrypto.hash256(buffer).reverse().toString('hex')
+const getTxId = options => buffer => {
+  let createHash = bcrypto.hash256
+  if (options && options.sha === 'SHA3_256') {
+    createHash = doubleSha3
+  }
+  return createHash(buffer).reverse().toString('hex')
+}
 
 module.exports = {
   decodeTx,
@@ -79,5 +92,6 @@ module.exports = {
   readInputs,
   readInput,
   readOutput,
-  getTxId
+  getTxId,
+  doubleSha3
 }

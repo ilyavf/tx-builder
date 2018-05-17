@@ -1668,6 +1668,10 @@ istanbul-reports@^1.1.3:
   dependencies:
     handlebars "^4.0.3"
 
+js-sha3@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.7.0.tgz#0a5c57b36f79882573b2d84051f8bb85dd1bd63a"
+
 js-tokens@^3.0.0, js-tokens@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.2.tgz#9866df395102130e38f7f996bceb65443209c25b"
@@ -2823,6 +2827,14 @@ tty-browserify@~0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/tty-browserify/-/tty-browserify-0.0.0.tgz#a157ba402da24e9bf957f9aa69d524eed42901a6"
 
+"tx-builder-equibit@https://github.com/Equibit/tx-decoder.git#v0.10.0":
+  version "0.10.0"
+  resolved "https://github.com/Equibit/tx-decoder.git#0f278e4995d25b8bd2505b63881e2514d036b947"
+  dependencies:
+    randombytes "^2.0.5"
+    safe-buffer "^5.1.1"
+    typeforce "^1.11.7"
+
 type-check@~0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/type-check/-/type-check-0.3.2.tgz#5884cab512cf1d355e3fb784f30804b2b520db72"
@@ -2836,6 +2848,10 @@ typedarray@^0.0.6, typedarray@~0.0.5:
 typeforce@^1.11.1, typeforce@^1.11.3:
   version "1.11.7"
   resolved "https://registry.yarnpkg.com/typeforce/-/typeforce-1.11.7.tgz#7af0d3b017e7e3b46fa0697a96a6829a46a383a5"
+
+typeforce@^1.11.7:
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/typeforce/-/typeforce-1.12.0.tgz#ca40899919f1466d7819e37be039406beb912a2e"
 
 uglify-es@^3.1.9:
   version "3.1.9"
