@@ -30,9 +30,15 @@ const TxVin = typeforce.compile({
   vout: typeforce.Number
 })
 
+const TxBuilderOptions = typeforce.compile({
+  network: typeforce.maybe(typeforce.oneOf(typeforce.value('TESTNET'), typeforce.value('MAINNET'), types.Network)),
+  sha: types.maybe(types.oneOf(typeforce.value('SHA256'), typeforce.value('SHA3_256'))),
+  hashTimelockContract: types.maybe(types.FunctionType)
+})
 const txTypes = {
   Address,
   FunctionType,
+  TxBuilderOptions,
   TxConfig,
   TxVin
 }

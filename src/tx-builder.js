@@ -58,11 +58,7 @@ const EMPTY_BUFFER = Buffer.allocUnsafe(0)
 const buildTx = (tx, options) => {
   options = options || {}
   typeforce(types.TxConfig, tx)
-  typeforce({
-    network: typeforce.maybe(typeforce.oneOf(typeforce.value('TESTNET'), typeforce.value('MAINNET'), types.Network)),
-    sha: types.maybe(types.oneOf(typeforce.value('SHA256'), typeforce.value('SHA3_256'))),
-    hashTimelockContract: types.maybe(types.FunctionType)
-  }, options)
+  typeforce(types.TxBuilderOptions, options)
 
   return compose([
     prop('version', bufferInt32),                             // 4 bytes
