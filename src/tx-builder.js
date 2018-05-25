@@ -102,9 +102,9 @@ const txCopyForHash = (buildTxCopy, options) => (keyPair, tx, index, htlcParams)
   return txCopyBufferWithType
 }
 
-const txCopySubscript = (keyPair, htlcParams, options) => {
+const txCopySubscript = function txCopySubscriptFn (keyPair, htlcParams, options) {
   typeforce('ECPair', keyPair)
-  console.log(`txCopySubscript: htlcParams: `, htlcParams)
+  // console.log(`txCopySubscript: htlcParams: `, htlcParams)
   if (htlcParams && htlcParams.secretHash) {
     typeforce({
       secretHash: 'String',
@@ -329,7 +329,7 @@ const coinbaseScript = blockHeight => {
 }
 
 // signBuffer :: (KeyPair, String) -> MessageBuffer -> SignatureBuffer
-const signBuffer = (keyPair, sha) => buffer => {
+const signBuffer = (keyPair, sha) => function signBufferFn (buffer) {
   let createHash = bcrypto.hash256
   if (sha && sha === 'SHA3_256') {
     createHash = doubleSha3

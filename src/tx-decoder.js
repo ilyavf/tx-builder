@@ -70,10 +70,11 @@ const readOutput = buffer =>
   ])({}, buffer)
 )
 
-// doubleSha3 :: Buffer -> String
+// doubleSha3 :: Buffer -> Buffer
 const doubleSha3 = buffer => {
   // Note: sha3_256 can accept either Buffer or String, and always outputs String.
-  return sha3_256(sha3_256(buffer))
+  const hashString = sha3_256(sha3_256(buffer))
+  return Buffer.from(hashString, 'hex')
 }
 
 // Since a hash is a 256-bit integer and is stored using Little Endian, we reverse it for showing to user (who reads BE).
