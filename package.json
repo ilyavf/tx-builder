@@ -1,6 +1,6 @@
 {
   "name": "tx-builder",
-  "version": "0.14.1",
+  "version": "0.14.2",
   "description": "Composable helpers for building and decoding blockchain transactions",
   "main": "index.js",
   "repository": "https://github.com/ilyavf/tx-builder.git",
