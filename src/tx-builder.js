@@ -210,7 +210,7 @@ const vinScript = (buildTxCopy, options) => (tx, index) => (keyPair, htlc) => {
   const kpPubKey = keyPair.getPublicKeyBuffer()
   const htlcSecretBuffer = htlc && htlc.secret && Buffer.from(htlc.secret, 'hex')
 
-  // Note: for HTLC we use only SHA3 to hash a secret because Bitcoin node does not have SHA3.
+  // Note: for HTLC we use only SHA256 to hash a secret because Bitcoin node does not have SHA3.
   const secretHash = (htlcSecretBuffer && bcrypto.sha256(htlcSecretBuffer).toString('hex')) ||
     (htlc && htlc.secretHash)
 
