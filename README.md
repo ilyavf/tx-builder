@@ -337,6 +337,7 @@ console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 - [ ] parallelize `pow` with Web Workers
 
 ## Release Notes:
+- 0.14.2 Use single hashing for SHA3 option.
 - 0.14.0 Parameterized `buildTx` with options: "network", "sha", "hashTimelockContract":
   - `network`: "TESTNET", "MAINNET" or custom.
   - `sha`: to support "SHA3_256", default: "SHA256";
