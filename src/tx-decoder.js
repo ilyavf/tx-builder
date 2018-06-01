@@ -70,10 +70,11 @@ const readOutput = buffer =>
   ])({}, buffer)
 )
 
-// doubleSha3 :: Buffer -> Buffer
-const doubleSha3 = buffer => {
+// Single SHA3-256.
+// hashSha3 :: Buffer -> Buffer
+const hashSha3 = buffer => {
   // Note: sha3_256 can accept either Buffer or String, and always outputs String.
-  const hashString = sha3_256(sha3_256(buffer))
+  const hashString = sha3_256(buffer)
   return Buffer.from(hashString, 'hex')
 }
 
@@ -82,7 +83,7 @@ const doubleSha3 = buffer => {
 const getTxId = options => buffer => {
   let createHash = bcrypto.hash256
   if (options && options.sha === 'SHA3_256') {
-    createHash = doubleSha3
+    createHash = hashSha3
   }
   return createHash(buffer).reverse().toString('hex')
 }
@@ -94,5 +95,5 @@ module.exports = {
   readInput,
   readOutput,
   getTxId,
-  doubleSha3
+  hashSha3
 }

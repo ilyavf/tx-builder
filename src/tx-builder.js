@@ -36,7 +36,7 @@ const {
   hasNo
 } = require('./compose-build')
 
-const { doubleSha3 } = require('./tx-decoder')
+const { hashSha3 } = require('./tx-decoder')
 
 const EMPTY_BUFFER = Buffer.allocUnsafe(0)
 
@@ -332,7 +332,7 @@ const coinbaseScript = blockHeight => {
 const signBuffer = (keyPair, sha) => function signBufferFn (buffer) {
   let createHash = bcrypto.hash256
   if (sha && sha === 'SHA3_256') {
-    createHash = doubleSha3
+    createHash = hashSha3
   }
   const hash = createHash(buffer)
   return keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
