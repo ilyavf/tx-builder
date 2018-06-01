@@ -119,7 +119,7 @@ const txCopySubscript = function txCopySubscriptFn (keyPair, htlcParams, options
     // redeemerAddr, funderAddr, commitment, locktime
     const subscript = options.hashTimelockContract(addr, refundAddr, secretHash, timelock)
     // const subscript2 = Buffer.from('63a82088f1f9dcce43d0aea877b6be5d5ed4b90a470b151ccab39bc8d57584e6be03c78876a914d04a7422caea8c04f93b552c7c9b3caef2a91b306700696888ac', 'hex')
-    console.log(`subscript = ${subscript.toString('hex')}`)
+    // console.log(`subscript = ${subscript.toString('hex')}`)
     // console.log(`subscript2 = ${subscript2.toString('hex')}`)
 
     return subscript
