@@ -17,8 +17,8 @@
  */
 // createP2shP2wpkhAddress :: Object -> String -> String
 const createP2shP2wpkhAddress = options => publicKey => {
-  //typeforce(types.SegWitAddress, segwitAddress)
-  return
+  // typeforce(types.SegWitAddress, segwitAddress)
+
 }
 
 module.exports = {
