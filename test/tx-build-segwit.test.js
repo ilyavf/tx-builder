@@ -15,11 +15,25 @@
 const bitcoin = require('bitcoinjs-lib')
 const assert = require('assert')
 const fixturesSegwit = require('./fixtures/tx-sha3')
+const createP2shP2wpkhAddress = require('../src/segwit').createP2shP2wpkhAddress()
 const { buildTx } = require('../src/tx-builder')
 // const { getTxId } = require('../src/tx-decoder')
 
-describe('SegWit', function () {
-  describe('P2WPKH', function () {
+describe.only('SegWit', function () {
+  describe('Create P2SH-P2WPKH address', function () {
+    const expected = ''
+    before(function () {
+      // const ecPair = bitcoin.ECPair.fromWIF(fixturesSegwit[0].privKey, bitcoin.networks.testnet)
+      // fixturesSegwit[0].tx.vin.forEach(vin => { vin.keyPair = ecPair })
+      // buffer = buildTx(fixturesSegwit[0].tx, {sha: 'SHA256'})
+    })
+    it('should create P2SH-P2WSH address', function () {
+      const segwitAddress = 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx'
+      const p2sh = createP2shP2wpkhAddress(segwitAddress, bitcoin.networks.testnet)
+      assert.equal(p2sh, expected)
+    })
+  })
+  describe.skip('P2WPKH', function () {
     let buffer
     before(function () {
       const ecPair = bitcoin.ECPair.fromWIF(fixturesSegwit[0].privKey, bitcoin.networks.testnet)
