@@ -1,3 +1,17 @@
+/**
+ * Main article: https://bitcoincore.org/en/segwit_wallet_dev/
+ * Tool to check tx: http://n.bitcoin.ninja/checktx
+ *
+ * P2SH-P2WPKH
+ *   - A P2SH-P2WPKH address is comparable to Bitcoin’s original single-signature P2PKH address (address with prefix 1).
+ *   - Like any other P2SH address, P2SH-P2WPKH address has prefix 3.
+ *
+ * To create a P2SH-P2WPKH address:
+ *   1. Calculate the RIPEMD160 of the SHA256 of a public key (keyhash). Despite the keyhash formula is same as P2PKH, reuse of keyhash should be avoided for better privacy and prevention of accidental use of uncompressed key
+ *   2. The P2SH redeemScript is always 22 bytes. It starts with a OP_0, followed by a canonical push of the keyhash (i.e. 0x0014{20-byte keyhash})
+ *   3. Same as any other P2SH, the scriptPubKey is OP_HASH160 hash160(redeemScript) OP_EQUAL, and the address is the corresponding P2SH address with prefix 3.
+ */
+
 const bitcoin = require('bitcoinjs-lib')
 const assert = require('assert')
 const fixturesSegwit = require('./fixtures/tx-sha3')
