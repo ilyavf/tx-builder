@@ -34,6 +34,8 @@ const fixture = require('./fixtures/tx-hex-decoded')
 const fixtureNode = require('./fixtures/hdnode')
 const fixturesSha3 = require('./fixtures/tx-sha3')
 
+const network = bitcoin.networks.testnet
+
 describe('buffer-build utils', function () {
   describe('bufferInt32', function () {
     const buffer = bufferInt32(25)
@@ -126,8 +128,9 @@ describe('builder', function () {
       assert.equal(buffer.toString('hex'), fixture.hexItems.vin1emptyScript)
     })
     it('should return buffer of vin with subscript', function () {
+      // Requires publicKey to generate address (P2PKH).
       const keyPair = fixtureNode.keyPair
-      const subscript = txCopySubscript(keyPair)
+      const subscript = txCopySubscript(keyPair, null, { network })
       const vin = Object.assign({}, fixture.tx.vin[0], {script: subscript})
       const buffer = bufferInputEmptyScript(vin)
       assert.equal(buffer.toString('hex'), fixture.hexItems.vin1Subscript)
@@ -136,14 +139,14 @@ describe('builder', function () {
   describe('txCopySubscript', function () {
     it('should create a subscript for txCopy vin', function () {
       const keyPair = fixtureNode.keyPair
-      const subscript = txCopySubscript(keyPair)
+      const subscript = txCopySubscript(keyPair, null, { network })
       assert.equal(subscript.toString('hex'), fixture.hexItems.txCopySubscript)
     })
   })
   describe('buildTxCopy', function () {
     it('should return buffer of tx copy for scriptSig', function () {
       const keyPair = fixtureNode.keyPair
-      const subscript = txCopySubscript(keyPair)
+      const subscript = txCopySubscript(keyPair, null, { network })
       const txCopyWithScript = Object.assign({}, fixture.tx)
       txCopyWithScript.vin[0].script = subscript
       const buffer = buildTxCopy({})(txCopyWithScript)
@@ -153,14 +156,15 @@ describe('builder', function () {
   describe('txCopyForHash', function () {
     const keyPair = fixtureNode.keyPair
     it('should prepare txCopy for hashing', function () {
-      const txCopyBuffer = txCopyForHash(buildTxCopy({}))(keyPair, fixture.tx, 0)
+      const txCopyBuffer = txCopyForHash(buildTxCopy({}), { network })(keyPair, fixture.tx, 0)
       assert.equal(txCopyBuffer.toString('hex'), fixture.hexItems.txCopyForHash)
     })
   })
   describe('vinScript', function () {
     const keyPair = fixtureNode.keyPair
     it('should create vin script', function () {
-      const script = vinScript(buildTxCopy({}), {})(fixture.tx, 0)(keyPair)
+      // Requires both privateKey and publicKey.
+      const script = vinScript(buildTxCopy({}), { network })(fixture.tx, 0)(keyPair)
       assert.equal(script.toString('hex'), fixture.decoded.vin[0].scriptSig)
     })
   })
@@ -176,7 +180,7 @@ describe('builder', function () {
     const expectedScript = '47304402202fc3de1b21a557a25bf4b2e3dd99d3e17edf4548cdc0b23ffa3a2c636688191302204adbffa92dca8119c0dd566fe75f9763031c7f605003c443da7209c9f92a128a012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a31056c44dc6ac176bb534679a8e4b6979b151'
     it.skip('should create vin script with HTLC', function () {
       let hashTimelockContract
-      const script = vinScript(buildTxCopy({}), { hashTimelockContract })(fixture.tx, 0)(keyPair, htlc)
+      const script = vinScript(buildTxCopy({}), { hashTimelockContract, network })(fixture.tx, 0)(keyPair, htlc)
       // console.log(`script: ${script.toString('hex')}`)
       assert.equal(script.toString('hex'), expectedScript)
     })
@@ -187,14 +191,14 @@ describe('builder', function () {
     const secretHash = '7c4222070fe4f287b70f12561fe93e703153d34cbc35bc3210ddd4eed609b077'
     const htlc = {
       receiverAddr: 'n1nXTT79FU2bwHTLXQkydzfT7biCxW4ZqE',
-      refundAddr: keyPair.getAddress(),
+      refundAddr: fixtureNode.address,
       secretHash,
       timelock: 144
     }
     const expectedScript = '473044022032650eefcb5ced3a6b2257386659668483354070f7468a0fc8ab53a9ba33166f0220084cf01b7ebd1a9dcbc6cdd7818e598b8240e8b56347b9ae69c4f5cb13d645b5012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a300'
     it.skip('should create vin script with HTLC', function () {
       let hashTimelockContract
-      const script = vinScript(buildTxCopy({}), { hashTimelockContract })(fixture.tx, 0)(keyPair, htlc)
+      const script = vinScript(buildTxCopy({}), { hashTimelockContract, network })(fixture.tx, 0)(keyPair, htlc)
       // console.log(`script: ${script.toString('hex')}`)
       assert.equal(script.toString('hex'), expectedScript)
     })

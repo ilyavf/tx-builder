@@ -69,7 +69,7 @@ const buildTx = (tx, options) => {
 }
 
 // buildTxCopy :: Fn -> Tx -> Buffer
-const makeBuildTxCopy = bufferOutput => tx => {
+const makeBuildTxCopy = bufferOutput => function makeBuildTxCopyFn (tx) {
   typeforce(typeforce.tuple(
     types.FunctionType,
     types.TxConfig
@@ -102,6 +102,7 @@ const txCopyForHash = (buildTxCopy, options) => (keyPair, tx, index, htlcParams)
   return txCopyBufferWithType
 }
 
+// Requires publicKey to generate address (P2PKH).
 const txCopySubscript = function txCopySubscriptFn (keyPair, htlcParams, options) {
   typeforce('ECPair', keyPair)
   // console.log(`txCopySubscript: htlcParams: `, htlcParams)
@@ -124,7 +125,8 @@ const txCopySubscript = function txCopySubscriptFn (keyPair, htlcParams, options
 
     return subscript
   } else {
-    return bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
+    // return bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
+    return bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey, network: options.network }).output
   }
 }
 
@@ -135,7 +137,7 @@ const bufferInputs = (propName, bufferInput) => tx =>
 )
 
 // bufferInput :: (Fn -> Options) -> Tx -> (Object, Int) -> Buffer
-const makeBufferInput = (buildTxCopy, options) => tx => (vin, index) => {
+const makeBufferInput = (buildTxCopy, options) => tx => function makeBufferInputFn (vin, index) {
   typeforce(typeforce.tuple(
     types.FunctionType,
     types.TxConfig,
@@ -207,7 +209,7 @@ const vinScript = (buildTxCopy, options) => (tx, index) => (keyPair, htlc) => {
 
   let scriptBuffer
 
-  const kpPubKey = keyPair.getPublicKeyBuffer()
+  const kpPubKey = keyPair.publicKey
   const htlcSecretBuffer = htlc && htlc.secret && Buffer.from(htlc.secret, 'hex')
 
   // Note: for HTLC we use only SHA256 to hash a secret because Bitcoin node does not have SHA3.
@@ -215,7 +217,7 @@ const vinScript = (buildTxCopy, options) => (tx, index) => (keyPair, htlc) => {
     (htlc && htlc.secretHash)
 
   // For the REFUND transaction `receiverAddr` in the left branch of IF belongs to the other user and thus is passed with htlc params.
-  const addr = (htlc && htlc.receiverAddr) || keyPair.getAddress()
+  const addr = (htlc && htlc.receiverAddr) || getAddress(kpPubKey, options.network)
   const htlcParams = secretHash && {
     secretHash,
     addr,
@@ -328,14 +330,21 @@ const coinbaseScript = blockHeight => {
   return Buffer.concat([bVarInt, blockHeightBuffer, arbitraryData])
 }
 
-// signBuffer :: (KeyPair, String) -> MessageBuffer -> SignatureBuffer
-const signBuffer = (keyPair, sha) => function signBufferFn (buffer) {
+// signBuffer :: (KeyPair, Object) -> MessageBuffer -> SignatureBuffer
+const signBuffer = (keyPair, options) => function signBufferFn (buffer) {
   let createHash = bcrypto.hash256
-  if (sha && sha === 'SHA3_256') {
+  typeforce('ECPair', keyPair)
+  if (options && options.sha && options.sha === 'SHA3_256') {
     createHash = hashSha3
   }
   const hash = createHash(buffer)
-  return keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
+
+  // return keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
+  return bscript.signature.encode(keyPair.sign(hash), HASHTYPE.SIGHASH_ALL)
+}
+
+function getAddress (publicKey, network) {
+  return bitcoin.payments.p2pkh({ pubkey: publicKey, network }).address
 }
 
 module.exports = {
