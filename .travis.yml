@@ -1,3 +1,5 @@
 language: node_js
-node_js: 7.3
-cache: yarn
+node_js:
+  - "lts/*"
+  - "9"
+  - "10"
