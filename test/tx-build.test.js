@@ -25,7 +25,8 @@ const {
   voutScript,
   buildCoinbaseTx,
   coinbaseInput,
-  coinbaseScript
+  coinbaseScript,
+  signBuffer
 } = require('../src/tx-builder')
 const { prop } = require('../src/compose-build')
 const { getTxId } = require('../src/tx-decoder')
@@ -225,17 +226,37 @@ describe('builder', function () {
     })
   })
   describe('SHA3', function () {
-    let buffer
-    before(function () {
-      const ecPair = bitcoin.ECPair.fromWIF(fixturesSha3[0].privKey, bitcoin.networks.testnet)
-      fixturesSha3[0].tx.vin.forEach(vin => { vin.keyPair = ecPair })
-      buffer = buildTx(fixturesSha3[0].tx, {sha: 'SHA3_256'})
+    describe('SHA3 - signBuffer', function () {
+      let ecPair
+      const expectedSha256 = '30440220486203ea7e64d3ae6be581a0d12d34faad718221e4eb64df6550c6a82e19993002203df51050ce3ae2265f5b63812876f50d0b25e266f193f09705a14c5dc599b4ae01'
+      const expectedSha3 = '304402204b6de45521a16576e6d09e986256a7b11614ac50cb916240050433f674fabe7a0220528ef243fe6af99aab67945cb26a0e2a0aed0e43d42909cf2a5271c40f121b0001'
+      const bufferToSign = Buffer.from('123456')
+      before(function () {
+        ecPair = bitcoin.ECPair.fromWIF(fixturesSha3[0].privKey, bitcoin.networks.testnet)
+      })
+      it('should sign Buffer using SHA256', function () {
+        const buffer = signBuffer(ecPair, 'SHA256')(bufferToSign)
+        assert.equal(buffer.toString('hex'), expectedSha256)
+      })
+      it('should sign Buffer using SHA256', function () {
+        const buffer = signBuffer(ecPair, 'SHA3_256')(bufferToSign)
+        assert.equal(buffer.toString('hex'), expectedSha3)
+      })
     })
-    it('should build transaction using SHA3', function () {
-      assert.equal(buffer.toString('hex'), fixturesSha3[0].hex)
-    })
-    it('should create TXID using SHA3', function () {
-      assert.equal(getTxId({sha: 'SHA3_256'})(buffer), fixturesSha3[0].txid)
+
+    describe('SHA3 - buildTx', function () {
+      let buffer
+      before(function () {
+        const ecPair = bitcoin.ECPair.fromWIF(fixturesSha3[0].privKey, bitcoin.networks.testnet)
+        fixturesSha3[0].tx.vin.forEach(vin => { vin.keyPair = ecPair })
+        buffer = buildTx(fixturesSha3[0].tx, {sha: 'SHA3_256'})
+      })
+      it('should build transaction using SHA3', function () {
+        assert.equal(buffer.toString('hex'), fixturesSha3[0].hex)
+      })
+      it('should create TXID using SHA3', function () {
+        assert.equal(getTxId({sha: 'SHA3_256'})(buffer), fixturesSha3[0].txid)
+      })
     })
   })
 })
