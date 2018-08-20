@@ -337,6 +337,7 @@ console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 - [ ] parallelize `pow` with Web Workers
 
 ## Release Notes:
+- 0.16.0 Upgraded to `bitcoinjs-lib` v4.
 - 0.15.0 Allow to pass options to PoW.
 - 0.14.4 Bugfix for `tx-builder.types`.
 - 0.14.2 Use single hashing for SHA3 option.
