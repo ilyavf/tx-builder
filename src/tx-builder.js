@@ -234,7 +234,7 @@ const vinScript = (buildTxCopy, options) => (tx, index) => (keyPair, htlc) => {
   // console.log(`hash expected = d27fc0b87c10d49b59196742e2836b89e08df05f0b045aaeaa1bcd1d0278500b`)
   // const sig = keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
 
-  const sig = signBuffer(keyPair, options.sha)(txCopyBufferWithType)
+  const sig = signBuffer(keyPair, {sha: options.sha})(txCopyBufferWithType)
   // console.log(`sig          = ${sig.toString('hex')}`)
   // console.log(`sig expected = 30440220764bbe9ddff67409310c04ffb34fe937cc91c3d55303158f91a32bed8d9d7a7b02207fb30f6b9aaef93da8c88e2b818d993ad65aae54860c3de56c6304c57252cce101`)
 

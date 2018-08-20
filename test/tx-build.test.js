@@ -239,11 +239,11 @@ describe('builder', function () {
         ecPair = bitcoin.ECPair.fromWIF(fixturesSha3[0].privKey, bitcoin.networks.testnet)
       })
       it('should sign Buffer using SHA256', function () {
-        const buffer = signBuffer(ecPair, 'SHA256')(bufferToSign)
+        const buffer = signBuffer(ecPair, {sha: 'SHA256'})(bufferToSign)
         assert.equal(buffer.toString('hex'), expectedSha256)
       })
-      it('should sign Buffer using SHA256', function () {
-        const buffer = signBuffer(ecPair, 'SHA3_256')(bufferToSign)
+      it('should sign Buffer using SHA3', function () {
+        const buffer = signBuffer(ecPair, {sha: 'SHA3_256'})(bufferToSign)
         assert.equal(buffer.toString('hex'), expectedSha3)
       })
     })
