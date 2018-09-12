@@ -18,6 +18,12 @@ const HASHTYPE = {
   SIGHASH_ALL: 0x01
 }
 
+const CONSTANTS = {
+  SIGHASH_ALL: 0x01,
+  ADVANCED_TRANSACTION_MARKER: 0x00,
+  ADVANCED_TRANSACTION_FLAG: 0x01
+}
+
 const {
   bufferUInt8,
   bufferInt32,
@@ -53,9 +59,31 @@ const EMPTY_BUFFER = Buffer.allocUnsafe(0)
  *    sha: 'SHA3'                         // ('SHA256' | 'SHA3' | Fn)
  * }
  * ```
+ *
+ * Transaction serialization:
+ * - Pre-segwit:
+ *   `nVersion | txins | txouts | nLockTime`
+ * - SegWit:
+ *   `nVersion | marker | flag | txins | txouts | witness | nLockTime`
  */
 // buildTx :: (Tx, Options) -> Buffer
 const buildTx = (tx, options) => {
+  options = options || {}
+  typeforce(types.TxConfig, tx)
+  typeforce(types.TxBuilderOptions, options)
+
+  return compose([
+    prop('version', bufferInt32),                             // 4 bytes
+    iff(isSegwit(options), addSegwitMarker(options)),
+    bufferInputs('vin', bufferInput(options)),                // 1-9 bytes (VarInt), Input counter; Variable, Inputs
+    prop('vout', mapConcatBuffers(bufferOutput(options))),    // 1-9 bytes (VarInt), Output counter; Variable, Outputs
+    iff(isSegwit(options), prop('witnesses', addSegwitData(options))),
+    prop('locktime', bufferUInt32)                            // 4 bytes
+  ])(tx, EMPTY_BUFFER)
+}
+
+// buildTxOrig :: (Tx, Options) -> Buffer
+const buildTxOrig = (tx, options) => {
   options = options || {}
   typeforce(types.TxConfig, tx)
   typeforce(types.TxBuilderOptions, options)
@@ -152,7 +180,13 @@ const makeBufferInput = (buildTxCopy, options) => tx => function makeBufferInput
       'scriptSig',
       props(['keyPair', 'htlc'], vinScript(buildTxCopy, options)(tx, index))
     ),
-    prop('scriptSig', bufferVarSlice('hex')),  // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
+    iff(
+      isSegwit(options),
+      // Put signature into tx config for picking up later:
+      addProp('witness', prop('scriptSig', bufferVarSlice('hex'))),
+      // Else concat to the main buffer:
+      prop('scriptSig', bufferVarSlice('hex'))  // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
+    ),
     prop('sequence', bufferUInt32)             // 4 bytes, Sequence Number
   ])(vin, EMPTY_BUFFER)
 }
@@ -347,8 +381,34 @@ function getAddress (publicKey, network) {
   return bitcoin.payments.p2pkh({ pubkey: publicKey, network }).address
 }
 
+// If one of the VINs has type P2PKH then it requires SegWit serialization.
+// isSegwit :: Object -> Object -> Boolean
+const isSegwit = options => tx => {
+  if (tx.vin) {
+    return tx.vin.reduce((acc, { type }) => (acc || type === 'P2WPKH'), false)
+  } else {
+    // If an individual vin is passed:
+    return tx.type === 'P2WPKH'
+  }
+}
+
+const addSegwitMarker = options => tx => {
+  return compose([
+    () => bufferUInt8(CONSTANTS.ADVANCED_TRANSACTION_MARKER),
+    () => bufferUInt8(CONSTANTS.ADVANCED_TRANSACTION_FLAG)
+  ])(tx, EMPTY_BUFFER)
+}
+
+// Witnesses consist of a stack of byte arrays. It is encoded as a var_int item count followed by each item encoded
+// as a var_int length followed by a string of bytes.
+// addSegwitData :: Object -> Array -> Buffer
+const addSegwitData = options => witnesses => {
+  return EMPTY_BUFFER
+}
+
 module.exports = {
   buildTx,
+  buildTxOrig,
   buildTxCopy,
   txCopyForHash,
   txCopySubscript,
@@ -366,5 +426,7 @@ module.exports = {
   buildCoinbaseTx,
   coinbaseInput,
   coinbaseScript,
-  signBuffer
+  signBuffer,
+  isSegwit,
+  addSegwitMarker
 }

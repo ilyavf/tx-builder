@@ -26,7 +26,9 @@ const {
   buildCoinbaseTx,
   coinbaseInput,
   coinbaseScript,
-  signBuffer
+  signBuffer,
+  isSegwit,
+  addSegwitMarker
 } = require('../src/tx-builder')
 const { prop } = require('../src/compose-build')
 const { getTxId } = require('../src/tx-decoder')
@@ -261,6 +263,22 @@ describe('builder', function () {
       it('should create TXID using SHA3', function () {
         assert.equal(getTxId({sha: 'SHA3_256'})(buffer), fixturesSha3[0].txid)
       })
+    })
+  })
+
+  describe('isSegwit', function () {
+    it('should detect if segwit transaction serialization is required', function () {
+      assert.ok(isSegwit()({vin: [{}, {type: 'P2WPKH'}]}))
+    })
+    it('should detect if segwit transaction serialization is not required', function () {
+      assert.ok(!isSegwit()({vin: [{type: 'P2PKH'}]}))
+    })
+  })
+
+  describe('addSegwitMarker', function () {
+    it('should add marker and flag bytes', function () {
+      const expected = '0001'
+      assert.equal(addSegwitMarker()({}).toString('hex'), expected)
     })
   })
 })

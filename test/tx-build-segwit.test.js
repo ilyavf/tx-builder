@@ -12,15 +12,17 @@
  *   3. Same as any other P2SH, the scriptPubKey is OP_HASH160 hash160(redeemScript) OP_EQUAL, and the address is the corresponding P2SH address with prefix 3.
  */
 
+const Buffer = require('safe-buffer').Buffer
 const bitcoin = require('bitcoinjs-lib')
 const assert = require('assert')
 const fixturesSegwit = require('./fixtures/tx-sha3')
 const createP2shP2wpkhAddress = require('../src/segwit').createP2shP2wpkhAddress()
 const { buildTx } = require('../src/tx-builder')
-// const { getTxId } = require('../src/tx-decoder')
+const { decodeTx, getTxId } = require('../src/tx-decoder')
+const decodeFixtures = require('./fixtures/tx-segwit-decoded')
 
 describe.only('SegWit', function () {
-  describe('Create P2SH-P2WPKH address', function () {
+  describe.skip('Create P2SH-P2WPKH address', function () {
     const expected = ''
     before(function () {
       // const ecPair = bitcoin.ECPair.fromWIF(fixturesSegwit[0].privKey, bitcoin.networks.testnet)
@@ -33,15 +35,54 @@ describe.only('SegWit', function () {
       assert.equal(p2sh, expected)
     })
   })
-  describe.skip('P2WPKH', function () {
-    let buffer
-    before(function () {
-      const ecPair = bitcoin.ECPair.fromWIF(fixturesSegwit[0].privKey, bitcoin.networks.testnet)
-      fixturesSegwit[0].tx.vin.forEach(vin => { vin.keyPair = ecPair })
-      buffer = buildTx(fixturesSegwit[0].tx, {sha: 'SHA256'})
+  describe('P2WPKH', function () {
+    describe.only('- decode', function () {
+      let decoded
+      const hex = decodeFixtures.P2WPKH.hex
+      const buffer = Buffer.from(hex, 'hex')
+      const expected = {}
+      const expectedTxId = ''
+      before(function () {
+        decoded = decodeTx(buffer, {sha: 'SHA256'})
+      })
+      it('should build transaction with SegWit P2WPKH output', function () {
+        assert.equal(decoded, expected)
+      })
+      it('should calculate txid', function () {
+        assert.equal(getTxId(hex), expectedTxId)
+      })
     })
-    it('should build transaction with SegWit P2WPKH output', function () {
-      assert.equal(buffer.toString('hex'), fixturesSegwit[0].hex)
+    describe.skip('- build', function () {
+      let buffer
+      before(function () {
+        const ecPair = bitcoin.ECPair.fromWIF(fixturesSegwit[0].privKey, bitcoin.networks.testnet)
+        // fixturesSegwit[0].tx.vin.forEach(vin => { vin.keyPair = ecPair })
+        const txConfig = {
+          version: 2,
+          locktime: 101,
+          vin: [{
+            txid: '0252e23e5efbab816e2c7515246a470f7bdffdc373a9cf885180818697e7a119',
+            vout: 0,
+            keyPair: ecPair,
+            type: 'P2WPKH',
+            script: '',
+            sequence: 4294967294
+          }],
+          vout: [{
+            value: 1310255.22221466 * 100000000,
+            address: 'mxZs8wiVXSD6myyRhLuLauyh8X8GFmbaLK',
+            type: 'P2WPKH'
+          }, {
+            value: 2.5 * 100000000,
+            address: 'mgyFAKifcUPfmkY25LfLb8ckaNMP8JuvBL',
+            type: 'P2WPKH'
+          }]
+        }
+        buffer = buildTx(txConfig, {sha: 'SHA256'})
+      })
+      it('should build transaction with SegWit P2WPKH output', function () {
+        assert.equal(buffer.toString('hex'), fixturesSegwit[0].hex)
+      })
     })
   })
 })
