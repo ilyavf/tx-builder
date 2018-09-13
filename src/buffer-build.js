@@ -53,6 +53,16 @@ const bufferVarSliceBuffer = buffer => {
   return Buffer.concat([bVarInt, buffer])
 }
 
+// Creates a buffer from array of buffers: `<itemsCount><item1Length><item1><item2Length><item2>...`
+// bufferVarArray :: Array -> Buffer
+const bufferVarArray = arr => {
+  const bVarInt = bufferVarInt(arr.length)
+  return Buffer.concat([
+    bVarInt,
+    Buffer.concat(arr.map(bufferVarSliceBuffer))
+  ])
+}
+
 /**
  * Maps function to array elements and concats results into a buffer.
  */
@@ -72,5 +82,6 @@ module.exports = {
   bufferVarInt,
   bufferVarSlice,
   bufferVarSliceBuffer,
+  bufferVarArray,
   mapConcatBuffers
 }

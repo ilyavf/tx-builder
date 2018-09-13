@@ -8,6 +8,7 @@ const {
   bufferVarInt,
   bufferVarSlice,
   bufferVarSliceBuffer,
+  bufferVarArray,
   mapConcatBuffers
 } = require('../src/buffer-build')
 const {
@@ -90,6 +91,13 @@ describe('buffer-build utils', function () {
       const bufferValue = Buffer.from(hex, 'hex')
       const buffer = bufferVarSliceBuffer(bufferValue)
       assert.equal(buffer.toString('hex'), expectedBuffer.toString('hex'))
+    })
+  })
+  describe('bufferVarArray', function () {
+    it('should create a variable length buffer from array of buffers', function () {
+      const arr = [Buffer.from('0a', 'hex'), Buffer.from('0b', 'hex')]
+      const expectedHex = '02010a010b'
+      assert.equal(bufferVarArray(arr).toString('hex'), expectedHex)
     })
   })
   describe('mapConcatBuffers', function () {
