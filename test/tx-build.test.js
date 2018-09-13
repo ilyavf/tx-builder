@@ -29,7 +29,8 @@ const {
   coinbaseScript,
   signBuffer,
   isSegwit,
-  addSegwitMarker
+  addSegwitMarker,
+  addSegwitData
 } = require('../src/tx-builder')
 const { prop } = require('../src/compose-build')
 const { getTxId } = require('../src/tx-decoder')
@@ -274,19 +275,34 @@ describe('builder', function () {
     })
   })
 
-  describe('isSegwit', function () {
-    it('should detect if segwit transaction serialization is required', function () {
-      assert.ok(isSegwit()({vin: [{}, {type: 'P2WPKH'}]}))
+  describe('SegWit related utils', function () {
+    describe('isSegwit', function () {
+      it('should detect if segwit transaction serialization is required', function () {
+        assert.ok(isSegwit()({vin: [{}, {type: 'P2WPKH'}]}))
+      })
+      it('should detect if segwit transaction serialization is not required', function () {
+        assert.ok(!isSegwit()({vin: [{type: 'P2PKH'}]}))
+      })
     })
-    it('should detect if segwit transaction serialization is not required', function () {
-      assert.ok(!isSegwit()({vin: [{type: 'P2PKH'}]}))
-    })
-  })
 
-  describe('addSegwitMarker', function () {
-    it('should add marker and flag bytes', function () {
-      const expected = '0001'
-      assert.equal(addSegwitMarker()({}).toString('hex'), expected)
+    describe('addSegwitMarker', function () {
+      it('should add marker and flag bytes', function () {
+        const expected = '0001'
+        assert.equal(addSegwitMarker()({}).toString('hex'), expected)
+      })
+    })
+
+    describe.only('addSegwitData', function () {
+      it('should create witnesses buffer from tx config', function () {
+        const sig1 = Buffer.from('010203', 'hex')
+        const sig2 = Buffer.from('0a0b0c', 'hex')
+        const txConfig = {
+          vin: [{scriptSig: sig1}, {scriptSig: sig2}]
+        }
+        const buffer = addSegwitData({})(txConfig.vin)
+        const expected = '0203010203030a0b0c'
+        assert.equal(buffer.toString('hex'), expected)
+      })
     })
   })
 })

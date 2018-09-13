@@ -31,6 +31,7 @@ const {
   bufferUInt64,
   bufferVarInt,
   bufferVarSlice,
+  bufferVarArray,
   mapConcatBuffers
 } = require('./buffer-build')
 const {
@@ -39,6 +40,7 @@ const {
   props,
   addProp,
   iff,
+  iffNot,
   hasNo
 } = require('./compose-build')
 
@@ -77,7 +79,7 @@ const buildTx = (tx, options) => {
     iff(isSegwit(options), addSegwitMarker(options)),
     bufferInputs('vin', bufferInput(options)),                // 1-9 bytes (VarInt), Input counter; Variable, Inputs
     prop('vout', mapConcatBuffers(bufferOutput(options))),    // 1-9 bytes (VarInt), Output counter; Variable, Outputs
-    iff(isSegwit(options), prop('witnesses', addSegwitData(options))),
+    iff(isSegwit(options), prop('vin', addSegwitData(options))),
     prop('locktime', bufferUInt32)                            // 4 bytes
   ])(tx, EMPTY_BUFFER)
 }
@@ -180,11 +182,9 @@ const makeBufferInput = (buildTxCopy, options) => tx => function makeBufferInput
       'scriptSig',
       props(['keyPair', 'htlc'], vinScript(buildTxCopy, options)(tx, index))
     ),
-    iff(
+    // Do not add signature to buffer for SegWit, it will be picked up later for witness data.
+    iffNot(
       isSegwit(options),
-      // Put signature into tx config for picking up later:
-      addProp('witness', prop('scriptSig', bufferVarSlice('hex'))),
-      // Else concat to the main buffer:
       prop('scriptSig', bufferVarSlice('hex'))  // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     ),
     prop('sequence', bufferUInt32)             // 4 bytes, Sequence Number
@@ -402,8 +402,9 @@ const addSegwitMarker = options => tx => {
 // Witnesses consist of a stack of byte arrays. It is encoded as a var_int item count followed by each item encoded
 // as a var_int length followed by a string of bytes.
 // addSegwitData :: Object -> Array -> Buffer
-const addSegwitData = options => witnesses => {
-  return EMPTY_BUFFER
+const addSegwitData = options => vin => {
+  const witnesses = vin.map(({scriptSig}) => scriptSig)
+  return bufferVarArray(witnesses)
 }
 
 module.exports = {
@@ -428,5 +429,6 @@ module.exports = {
   coinbaseScript,
   signBuffer,
   isSegwit,
-  addSegwitMarker
+  addSegwitMarker,
+  addSegwitData
 }
