@@ -1,6 +1,6 @@
 const assert = require('assert')
 const Buffer = require('safe-buffer').Buffer
-const { compose, prop, props, iff, has, hasNo } = require('../src/compose-build')
+const { compose, prop, props, iff, iffNot, has, hasNo } = require('../src/compose-build')
 
 describe('compose-build', function () {
   describe('prop', function () {
@@ -46,6 +46,21 @@ describe('compose-build', function () {
       ])
       const res = app({doIt: false}, Buffer.allocUnsafe(0))
       assert.equal(res.toString('hex'), '70')
+    })
+  })
+  describe('iffNot', function () {
+    const myFn = () => Buffer.from([0x62])
+    const predicate = ({doIt}) => doIt
+    const app = compose([
+      iffNot(predicate, myFn)
+    ])
+    it('should run myFn if false', function () {
+      const res = app({doIt: false}, Buffer.allocUnsafe(0))
+      assert.equal(res.toString('hex'), '62')
+    })
+    it('should skip myFn if true', function () {
+      const res = app({doIt: true}, Buffer.allocUnsafe(0))
+      assert.equal(res.toString('hex'), '')
     })
   })
   describe('predicate has', function () {

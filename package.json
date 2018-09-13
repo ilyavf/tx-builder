@@ -18,7 +18,7 @@
     "lint": "standard",
     "lint:fix": "standard --fix",
     "mocha": "nyc mocha -u tdd --timeout 999999 --colors test/test.js",
-    "preversion": "npm run lint && npm test",
+    "preversion": "npm run lint:fix && npm test",
     "release:patch": "npm version patch && make publish",
     "release:minor": "npm version minor && make publish",
     "release:major": "npm version major && make publish",

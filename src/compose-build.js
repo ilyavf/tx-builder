@@ -27,6 +27,8 @@ const iff = (predicate, fn, elseFn) => obj => {
   return typeof elseFn === 'function' ? elseFn(obj) : EMPTY_BUFFER
 }
 
+const iffNot = (predicate, fn) => obj => (!predicate(obj) ? fn(obj) : EMPTY_BUFFER)
+
 const has = prop => obj => (typeof obj[prop] !== 'undefined')
 
 const hasNo = prop => obj => (typeof obj[prop] === 'undefined')
@@ -43,6 +45,7 @@ module.exports = {
   props,
   addProp,
   iff,
+  iffNot,
   has,
   hasNo
 }
