@@ -102,6 +102,7 @@ const { compose as composeDecoder, addProp } = decoder  // Composition helpers.
     - `bufferVarInt :: Int -> Buffer` Creates a buffer that contains a variable length integer.
     - `bufferVarSlice :: Encoding -> String -> Buffer` Creates a buffer that contains a variable length string of the given encoding.
     - `bufferVarSliceBuffer :: Buffer -> Buffer` Creates a variable length buffer with from the given buffer value.
+    - `bufferVarArray :: Array -> Buffer` Creates an buffer from array of buffers in format: `<itemsCount><item1Length><item1>...`
     - `mapConcatBuffers :: Fn -> Array -> Buffer` Maps function to array elements and concats results into a buffer.
   - **Composition helpers**.
     - `compose :: [Fn] -> Tx -> Buffer -> Buffer`

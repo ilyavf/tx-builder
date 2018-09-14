@@ -2,6 +2,7 @@ require('./buffer-read.test')
 require('./compose-build.test')
 require('./tx-decode.test')
 require('./tx-build.test')
+require('./tx-build-segwit.test.js')
 require('./pow.test')
 require('./types.test')
 
