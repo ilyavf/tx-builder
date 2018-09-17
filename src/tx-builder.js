@@ -40,7 +40,7 @@ const {
   props,
   addProp,
   iff,
-  iffNot,
+  // iffNot,
   hasNo
 } = require('./compose-build')
 
@@ -183,8 +183,9 @@ const makeBufferInput = (buildTxCopy, options) => tx => function makeBufferInput
       props(['keyPair', 'htlc'], vinScript(buildTxCopy, options)(tx, index))
     ),
     // Do not add signature to buffer for SegWit, it will be picked up later for witness data.
-    iffNot(
+    iff(
       isSegwit(options),
+      prop('scriptSig', () => bufferVarInt(0)),
       prop('scriptSig', bufferVarSlice('hex'))  // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     ),
     prop('sequence', bufferUInt32)             // 4 bytes, Sequence Number
