@@ -3,7 +3,7 @@ const typeforce = require('typeforce')
 const types = require('../src/types')
 
 describe('types', function () {
-  describe.only('Address', function () {
+  describe('Address', function () {
     it('should validate a good address', function () {
       const addr = 'mm2zdwmiVBR7ipNiN3tr4CCu6sS5tFwKna'
       assert.ok(typeforce(types.Address, addr))
@@ -21,7 +21,7 @@ describe('types', function () {
       const addr = 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx'
       assert.ok(typeforce(types.Address, addr))
     })
-    it('should invalidate address', function () {
+    it('should invalidate bad bech32 address', function () {
       const addr = 'tb1222qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx'
       try {
         typeforce(types.Address, addr)
