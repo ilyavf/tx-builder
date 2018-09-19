@@ -84,7 +84,7 @@ describe('SegWit', function () {
         assert.equal(buffer.toString('hex'), fixturesSegwit[0].hex)
       })
     })
-    describe('- build segwit', function () {
+    describe('- build segwit with P2WPKH input', function () {
       // Grabbed the value from manual-segwit.js decoding the built tx:
       const expectedSig = '473044022026dac9599e56b1038e5e77726dfed8dae0943708eb23bb0815ef28a08b35e644022025129a134cad83cf9eaf1ef9a1a8cb3a5f25be103dd9833e6fd06785a75c2b8d012103183de65f25cfbc5c371781dc212b46bca8db2de96d9076eef0a8c98ce0fd271e'
       const scriptLen = 106 * 2 // 0x6a=106 bytes (= 212 chars)
@@ -144,6 +144,43 @@ describe('SegWit', function () {
         }
         const buffer = buildTx(txConfig, {sha: 'SHA256'})
         assert.equal(buffer.toString('hex'), expectedHex)
+      })
+    })
+    describe('- build a tx with P2WPKH output', function () {
+      const privKey = 'cUtqnMnPdFJeg6fXknCH5XcHNqNz9amAYXDAD6S1XYehUiaVqJs3'
+      // const segwitAddress = 'bcrt1qr47dd36u96r0fjle36hdygdnp0v6pwfgzsrl3p'
+      const segwitAddress = 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx'
+      const scriptPubKey = '0014751e76e8199196d454941c45d1b3a323f1433bd6'
+      // "asm": "0 751e76e8199196d454941c45d1b3a323f1433bd6",
+      // "type": "witness_v0_keyhash",
+      const expectedTxHex = '010000000119a1e7978681805188cfa973c3fddf7b0f476a2415752c6e81abfb5e3ee25202000000006a473044022011a21c96c0b44c00d2c2db0bd3abc3cc7a66e2404bf69b4ccdbe04ce83612d63022034ec7ed76714175e64de95182a4e7cc0fcd37d3f8210244f75d6612de1683a69012103183de65f25cfbc5c371781dc212b46bca8db2de96d9076eef0a8c98ce0fd271efeffffff0180f0fa0200000000160014751e76e8199196d454941c45d1b3a323f1433bd600000000'
+      let txConfig, ecPair, buffer, hex
+      before(function () {
+        ecPair = bitcoin.ECPair.fromWIF(privKey, bitcoin.networks.testnet)
+        txConfig = {
+          version: 1,
+          locktime: 0,  // 4 bytes (8 hex chars)
+          vin: [{
+            txid: '0252e23e5efbab816e2c7515246a470f7bdffdc373a9cf885180818697e7a119',
+            vout: 0,
+            keyPair: ecPair,
+            script: '',
+            sequence: 4294967294
+          }],
+          vout: [{
+            value: 0.5 * 100000000,
+            address: segwitAddress,
+            type: 'P2WPKH'
+          }]
+        }
+        buffer = buildTx(txConfig, {sha: 'SHA256'})
+        hex = buffer.toString('hex')
+      })
+      it('should create segwit output script', function () {
+        assert.equal(hex.search(scriptPubKey), 324)
+      })
+      it('should build the right hex', function () {
+        assert.equal(hex, expectedTxHex)
       })
     })
   })
