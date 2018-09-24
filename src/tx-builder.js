@@ -406,6 +406,11 @@ const addSegwitMarker = options => tx => {
 const addSegwitData = options => vin => {
   const witnesses = vin.map(({scriptSig}) => scriptSig)
   return bufferVarArray(witnesses)
+  // console.log('addSegwitData:::')
+  // console.log('- bufferVarInt(2):', bufferVarInt(2))
+  // console.log('- vin.scriptSig:', vin[0].scriptSig)
+  // const witnesses = Buffer.concat([bufferVarInt(2), vin[0].scriptSig])
+  // return witnesses
 }
 
 module.exports = {
