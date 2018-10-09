@@ -26,6 +26,11 @@
 // - keyhash is RIPEMD160(SHA256) of a compressed public key.
 // - When spending a native P2WPKH, the scriptSig MUST be empty
 
+const Buffer = require('safe-buffer').Buffer
+const { createHash } = require('./tx-decoder')
+const { bufferTxid } = require('./tx-builder')
+const { bufferUInt32 } = require('./buffer-build')
+
 /**
  * @param {Object} options Options like sha algorithm.
  * @param {String} segwitAddress SegWit bitcoin address.
@@ -36,6 +41,19 @@ const createP2shP2wpkhAddress = options => publicKey => {
 
 }
 
+// hashPrevouts :: Object -> Array<Object> -> Buffer
+const hashPrevouts = options => vins => {
+  const buffer = Buffer.concat(vins.map(vin => {
+    return Buffer.concat([bufferTxid(vin.txid), bufferUInt32(vin.vout)])
+  }))
+  return createHash(options)(buffer)
+}
+const hashSequence = () => {}
+const hashOutputs = () => {}
+
 module.exports = {
-  createP2shP2wpkhAddress
+  createP2shP2wpkhAddress,
+  hashPrevouts,
+  hashSequence,
+  hashOutputs
 }

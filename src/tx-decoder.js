@@ -80,11 +80,11 @@ const hashSha3 = buffer => {
 
 // createHash :: Object -> Buffer -> Buffer
 const createHash = options => data => {
-  let createHash = bcrypto.hash256
+  let hashFn = bcrypto.hash256
   if (options && options.sha === 'SHA3_256') {
-    createHash = hashSha3
+    hashFn = hashSha3
   }
-  return createHash(data)
+  return hashFn(data)
 }
 
 // Since a hash is a 256-bit integer and is stored using Little Endian, we reverse it for showing to user (who reads BE).

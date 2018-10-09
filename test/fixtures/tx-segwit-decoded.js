@@ -1,4 +1,62 @@
 module.exports = {
+  // https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki#native-p2wpkh
+  'P2WPKH-OFFICIAL-EX': {
+    title: 'Example from bitcoin docs - Native P2WPKH',
+    desc: 'The first input comes from an ordinary P2PK. The second input comes from a P2WPKH witness program',
+    vin0: {
+      scriptPubKey: '2103c9f4836b9a4f77fc0d81f7bcb01b7f1b35916864b9476c241ce9fc198bd25432ac',
+      privKey: 'bbc27228ddcb9209d7fd6f36b02f7dfa6252af40bb2f1cbc7a557da8027ff866',
+      value: 6.25
+    },
+    vin1: {
+      scriptPubKey: '00141d0f172a0ecb48aee1be1f2687d2963ae33f71a1',
+      privKey: '619c335025c7f4012e556c2a58b2506e30b8511b53ade95ea316fd8c3286feb9',
+      publicKey: '025476c2e83188368da1ff3e292e7acafcdb3566bb0ad253f62fc70f07aeee6357',
+      value: 6
+    },
+    hex: '01000000000102fff7f7881a8099afa6940d42d1e7f6362bec38171ea3edf433541db4e4ad969f00000000494830450221008b9d1dc26ba6a9cb62127b02742fa9d754cd3bebf337f7a55d114c8e5cdd30be022040529b194ba3f9281a99f2b1c0a19c0489bc22ede944ccf4ecbab4cc618ef3ed01eeffffffef51e1b804cc89d182d279655c3aa89e815b1b309fe287d9b2b55d57b90ec68a0100000000ffffffff02202cb206000000001976a9148280b37df378db99f66f85c95a783a76ac7a6d5988ac9093510d000000001976a9143bde42dbee7e4dbe6a21b2d50ce2f0167faa815988ac000247304402203609e17b84f6a7d30c80bfa610b5b4542f32a8a0d5447a12fb1366d7f01cc44a0220573a954c4518331561406f90300e8f3358f51928d43c212a8caed02de67eebee0121025476c2e83188368da1ff3e292e7acafcdb3566bb0ad253f62fc70f07aeee635711000000',
+    decoded: {
+      nVersion:  '01000000',
+      marker:    '00',
+      flag:      '01',
+      txin:      '02 fff7f7881a8099afa6940d42d1e7f6362bec38171ea3edf433541db4e4ad969f 00000000 494830450221008b9d1dc26ba6a9cb62127b02742fa9d754cd3bebf337f7a55d114c8e5cdd30be022040529b194ba3f9281a99f2b1c0a19c0489bc22ede944ccf4ecbab4cc618ef3ed01 eeffffff ef51e1b804cc89d182d279655c3aa89e815b1b309fe287d9b2b55d57b90ec68a 01000000 00 ffffffff',
+      txout:     '02 202cb20600000000 1976a9148280b37df378db99f66f85c95a783a76ac7a6d5988ac 9093510d00000000 1976a9143bde42dbee7e4dbe6a21b2d50ce2f0167faa815988ac',
+      witness:    '00 02 47304402203609e17b84f6a7d30c80bfa610b5b4542f32a8a0d5447a12fb1366d7f01cc44a0220573a954c4518331561406f90300e8f3358f51928d43c212a8caed02de67eebee01 21025476c2e83188368da1ff3e292e7acafcdb3566bb0ad253f62fc70f07aeee6357',
+      nLockTime: '11000000'
+    },
+    items: {
+      hashPrevouts: '96b827c8483d4e9b96712b6713a7b68d6e8003a781feba36c31143470b4efd37',
+      hashSequence: '52b0a642eea2fb7ae638c36f6252b6750293dbe574a806984b8e4d8548339a3b',
+      hashOutputs: '863ef3e1a92afbfdb97f31ad0fc7683ee943e9abcf2501590ff8f6551f47e5e5'
+    },
+    tx: {
+      version: 1,
+      locktime: 17,
+      vin: [{
+        txid: '9f96ade4b41d5433f4eda31e1738ec2b36f6e7d1420d94a6af99801a88f7f7ff',
+        vout: 0,
+        script: '',
+        sequence: 4294967294,
+        value: 6.25,
+        privKey: 'bbc27228ddcb9209d7fd6f36b02f7dfa6252af40bb2f1cbc7a557da8027ff866'
+      }, {
+        txid: '8ac60eb9575db5b2d987e29f301b5b819ea83a5c6579d282d189cc04b8e151ef',
+        vout: 1,
+        script: '',
+        sequence: 4294967294,
+        value: 6,
+        privKey: '619c335025c7f4012e556c2a58b2506e30b8511b53ade95ea316fd8c3286feb9',
+        publicKey: '025476c2e83188368da1ff3e292e7acafcdb3566bb0ad253f62fc70f07aeee6357'
+      }],
+      vout: [{
+        value: 1.1234 * 100000000,
+        address: 'msQzKJatdWdw4rpy8sbv8puHoncseekYCf'
+      }, {
+        value: 2.2345 * 100000000,
+        address: 'mkyWRMBNtjzZxdCcEZDYNi5CSoYnRaKACc'
+      }]
+    }
+  },
   P2WPKH: {
     title: 'Decode SegWit - P2WPKH',
     txid: 'd869f854e1f8788bcff294cc83b280942a8c728de71eb709a2c29d10bfe21b7c',
