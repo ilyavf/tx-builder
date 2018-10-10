@@ -184,6 +184,9 @@ describe('SegWit', function () {
       })
     })
   })
+
+  // Official example:
+  // https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki#native-p2wpkh
 })
 
 /// / http://n.bitcoin.ninja/checktx?txid=d869f854e1f8788bcff294cc83b280942a8c728de71eb709a2c29d10bfe21b7c
