@@ -12,7 +12,7 @@ const xpub = hdNode.neutered().toBase58()
 
 // Address 0:
 const addrHdNode = hdNode.derive(0).derive(0)
-const keyPair = bitcoin.ECPair.fromPrivateKey(addrHdNode.privateKey)
+const keyPair = bitcoin.ECPair.fromPrivateKey(addrHdNode.privateKey, {network: bitcoin.networks.testnet})
 const addrPublicKeyHex = addrHdNode.publicKey.toString('hex')
 const address = getAddress(addrHdNode.publicKey, bitcoin.networks.testnet)
 const addressBech32 = getAddressBech32(addrHdNode.publicKey, bitcoin.networks.testnet)

@@ -176,7 +176,7 @@ const makeBufferInput = (buildTxCopy, options) => tx => function makeBufferInput
   ), [buildTxCopy, tx, vin, index])
 
   return compose([
-    prop('txid', bufferHash),                // 32 bytes, Transaction Hash
+    prop('txid', bufferTxid),                // 32 bytes, Transaction Hash
     prop('vout', bufferUInt32),              // 4 bytes, Output Index
     addProp(
       'scriptSig',
@@ -196,7 +196,7 @@ const makeBufferInput = (buildTxCopy, options) => tx => function makeBufferInput
 const bufferInputEmptyScript = vin =>
 (
   compose([
-    prop('txid', bufferHash),
+    prop('txid', bufferTxid),
     prop('vout', bufferUInt32),
     prop('script', script => (!script ? bufferVarInt(0) : bufferVarSlice('hex')(script))), // Empty script (1 byte 0x00)
     prop('sequence', bufferUInt32)
@@ -259,6 +259,8 @@ const vinScript = (buildTxCopy, options) => (tx, index) => (keyPair, htlc) => {
     refundAddr: htlc.refundAddr,
     timelock: htlc.timelock
   }
+
+  // SegWit: https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki#specification
   const txCopyBufferWithType = txCopyForHash(buildTxCopy, options)(keyPair, tx, index, htlcParams)
 
   // console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
@@ -312,8 +314,8 @@ const voutScript = ({network}) => addr => {
 /**
  * Transaction's hash is displayed in a reverse order.
  */
-// bufferHash :: HexString -> Buffer
-const bufferHash = hash => Buffer.from(hash, 'hex').reverse()
+// bufferTxid :: HexString -> Buffer
+const bufferTxid = txid => Buffer.from(txid, 'hex').reverse()
 
 /**
  * Implementation specific functions:
@@ -404,13 +406,13 @@ const addSegwitMarker = options => tx => {
 // as a var_int length followed by a string of bytes.
 // addSegwitData :: Object -> Array -> Buffer
 const addSegwitData = options => vin => {
-  const witnesses = vin.map(({scriptSig}) => scriptSig)
-  return bufferVarArray(witnesses)
+  // const witnesses = vin.map(({scriptSig}) => scriptSig)
+  // return bufferVarArray(witnesses)
   // console.log('addSegwitData:::')
   // console.log('- bufferVarInt(2):', bufferVarInt(2))
   // console.log('- vin.scriptSig:', vin[0].scriptSig)
-  // const witnesses = Buffer.concat([bufferVarInt(2), vin[0].scriptSig])
-  // return witnesses
+  const witnesses = Buffer.concat([bufferVarInt(2), vin[0].scriptSig])
+  return witnesses
 }
 
 module.exports = {
@@ -422,7 +424,7 @@ module.exports = {
   bufferInputs,
   bufferInput,
   bufferOutput,
-  bufferHash,
+  bufferTxid,
   vinScript,
   voutScript,
   bufferInputEmptyScript,

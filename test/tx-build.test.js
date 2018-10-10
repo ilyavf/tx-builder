@@ -19,7 +19,7 @@ const {
   bufferInput,
   bufferInputs,
   bufferOutput,
-  bufferHash,
+  bufferTxid,
   bufferInputEmptyScript,
   makeBufferOutput,
   vinScript,
@@ -112,10 +112,10 @@ describe('buffer-build utils', function () {
 })
 
 describe('builder', function () {
-  describe('bufferHash', function () {
+  describe('bufferTxid', function () {
     it('should create a buffer with txid', function () {
       const txid = '2d7a9f0534ddac231ef1978bda388791c32321f7e14e18e7df3bbed261615f54'
-      assert.equal(bufferHash(txid).reverse().toString('hex'), txid)
+      assert.equal(bufferTxid(txid).reverse().toString('hex'), txid)
     })
   })
   describe('makeBufferOutput', function () {
