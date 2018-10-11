@@ -48,12 +48,24 @@ const hashPrevouts = options => vins => {
   }))
   return createHash(options)(buffer)
 }
-const hashSequence = () => {}
+
+// hashSequenceRaw :: Array<Object> -> Buffer
+const hashSequenceRaw = vins => {
+  return Buffer.concat(vins.map(vin => bufferUInt32(vin.sequence)))
+}
+
+// hashSequence :: Object -> Array<Object> -> Buffer
+const hashSequence = options => vins => {
+  const buffer = hashSequenceRaw(vins)
+  return createHash(options)(buffer)
+}
+
 const hashOutputs = () => {}
 
 module.exports = {
   createP2shP2wpkhAddress,
   hashPrevouts,
+  hashSequenceRaw,
   hashSequence,
   hashOutputs
 }

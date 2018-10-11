@@ -25,8 +25,10 @@ module.exports = {
       nLockTime: '11000000'
     },
     items: {
+      hashPrevoutsRaw: 'fff7f7881a8099afa6940d42d1e7f6362bec38171ea3edf433541db4e4ad969f00000000ef51e1b804cc89d182d279655c3aa89e815b1b309fe287d9b2b55d57b90ec68a01000000',
       hashPrevouts: '96b827c8483d4e9b96712b6713a7b68d6e8003a781feba36c31143470b4efd37',
       hashSequence: '52b0a642eea2fb7ae638c36f6252b6750293dbe574a806984b8e4d8548339a3b',
+      hashSequenceRaw: 'eeffffffffffffff',
       hashOutputs: '863ef3e1a92afbfdb97f31ad0fc7683ee943e9abcf2501590ff8f6551f47e5e5'
     },
     tx: {
@@ -36,14 +38,14 @@ module.exports = {
         txid: '9f96ade4b41d5433f4eda31e1738ec2b36f6e7d1420d94a6af99801a88f7f7ff',
         vout: 0,
         script: '',
-        sequence: 4294967294,
+        sequence: 4294967278,
         value: 6.25,
         privKey: 'bbc27228ddcb9209d7fd6f36b02f7dfa6252af40bb2f1cbc7a557da8027ff866'
       }, {
         txid: '8ac60eb9575db5b2d987e29f301b5b819ea83a5c6579d282d189cc04b8e151ef',
         vout: 1,
         script: '',
-        sequence: 4294967294,
+        sequence: 4294967295,
         value: 6,
         privKey: '619c335025c7f4012e556c2a58b2506e30b8511b53ade95ea316fd8c3286feb9',
         publicKey: '025476c2e83188368da1ff3e292e7acafcdb3566bb0ad253f62fc70f07aeee6357'
