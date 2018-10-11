@@ -31,7 +31,7 @@ const {
   bufferUInt64,
   bufferVarInt,
   bufferVarSlice,
-  bufferVarArray,
+  // bufferVarArray,
   mapConcatBuffers
 } = require('./buffer-build')
 const {

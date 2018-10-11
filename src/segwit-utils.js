@@ -29,7 +29,8 @@
 const Buffer = require('safe-buffer').Buffer
 const { createHash } = require('./tx-decoder')
 const { bufferTxid } = require('./tx-builder')
-const { bufferUInt32 } = require('./buffer-build')
+const { bufferUInt32, bufferUInt64 } = require('./buffer-build')
+const { EMPTY_BUFFER, compose, prop } = require('./compose-build')
 
 /**
  * @param {Object} options Options like sha algorithm.
@@ -60,12 +61,50 @@ const hashSequence = options => vins => {
   return createHash(options)(buffer)
 }
 
-const hashOutputs = () => {}
+const outpoint = options => () => EMPTY_BUFFER
+const scriptCode = () => EMPTY_BUFFER
+const hashOutputs = options => () => EMPTY_BUFFER
+const sighash = () => EMPTY_BUFFER
+
+/*
+ [Transaction Signature Verification structure](segwit.md#Transaction-Signature-Verification-for-Version-0-Witness-Program)
+ Double hash of:
+ 1. `nVersion` of the transaction (4-byte little endian)
+ 2. `hashPrevouts` (32-byte hash)
+ 3. `hashSequence` (32-byte hash)
+ 4. `outpoint` (32-byte hash + 4-byte little endian)
+ 5. `scriptCode` of the input (serialized as scripts inside CTxOuts)
+ 6. `value` of the output spent by this input (8-byte little endian)
+ 7. `nSequence` of the input (4-byte little endian)
+ 8. `hashOutputs` (32-byte hash)
+ 9. `nLocktime` of the transaction (4-byte little endian)
+ 10. `sighash` type of the signature (4-byte little endian)
+ */
+const hashForWitnessV0 = options => input => tx => {
+  const buffer = serializeWitnessV0(options)(input)(tx, EMPTY_BUFFER)
+  return createHash(options)(buffer)
+}
+const serializeWitnessV0 = options => input => {
+  return compose([
+    prop('version', bufferUInt32),
+    prop('vin', hashPrevouts(options)),
+    prop('vin', hashSequence(options)),
+    prop('vout', outpoint(options)),
+    scriptCode,
+    () => bufferUInt64(input.value),
+    () => bufferUInt32(input.sequence),
+    prop('vout', hashOutputs(options)),
+    prop('locktime', bufferUInt32),
+    sighash
+  ])
+}
 
 module.exports = {
   createP2shP2wpkhAddress,
   hashPrevouts,
   hashSequenceRaw,
   hashSequence,
-  hashOutputs
+  hashOutputs,
+  serializeWitnessV0,
+  hashForWitnessV0
 }

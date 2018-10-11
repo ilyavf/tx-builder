@@ -16,7 +16,7 @@ const Buffer = require('safe-buffer').Buffer
 const bitcoin = require('bitcoinjs-lib')
 const assert = require('assert')
 const fixturesSegwit = require('./fixtures/tx-sha3')
-const createP2shP2wpkhAddress = require('../src/segwit').createP2shP2wpkhAddress()
+const createP2shP2wpkhAddress = require('../src/segwit-utils').createP2shP2wpkhAddress
 const { buildTx } = require('../src/tx-builder')
 const { decodeTx, getTxId } = require('../src/tx-decoder')
 const decodeFixtures = require('./fixtures/tx-segwit-decoded')
@@ -31,7 +31,7 @@ describe('SegWit', function () {
     })
     it('should create P2SH-P2WSH address', function () {
       const segwitAddress = 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx'
-      const p2sh = createP2shP2wpkhAddress(segwitAddress, bitcoin.networks.testnet)
+      const p2sh = createP2shP2wpkhAddress({})(segwitAddress, bitcoin.networks.testnet)
       assert.equal(p2sh, expected)
     })
   })

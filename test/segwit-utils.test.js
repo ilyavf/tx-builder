@@ -1,10 +1,10 @@
 const assert = require('assert')
-  const fixture = require('./fixtures/tx-segwit-decoded')['P2WPKH-OFFICIAL-EX']
+const fixture = require('./fixtures/tx-segwit-decoded')['P2WPKH-OFFICIAL-EX']
 const {
   hashPrevouts,
   hashSequenceRaw,
-  hashSequence,
-  hashOutputs
+  hashSequence
+  // hashOutputs
 } = require('../src/segwit-utils')
 
 describe('segwit-utils', function () {
