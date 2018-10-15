@@ -27,9 +27,11 @@
 // - When spending a native P2WPKH, the scriptSig MUST be empty
 
 const Buffer = require('safe-buffer').Buffer
+const OPS = require('bitcoin-ops')
 const { createHash } = require('./tx-decoder')
 const { bufferTxid } = require('./tx-builder')
-const { bufferUInt32, bufferUInt64 } = require('./buffer-build')
+const { getHexFromBech32Address } = require('./utils')
+const { bufferUInt8, bufferUInt32, bufferUInt64 } = require('./buffer-build')
 const { EMPTY_BUFFER, compose, prop } = require('./compose-build')
 
 /**
@@ -62,7 +64,14 @@ const hashSequence = options => vins => {
 }
 
 const outpoint = options => () => EMPTY_BUFFER
-const scriptCode = () => EMPTY_BUFFER
+
+// todo: should be defined  as a general payment utility (outside of this utility set).
+const scriptCode = input => {
+  if (input.type === 'P2WPKH') {
+    return Buffer.concat([bufferUInt8(OPS.OP_0), getHexFromBech32Address(input.address)])
+  }
+  return EMPTY_BUFFER
+}
 const hashOutputs = options => () => EMPTY_BUFFER
 const sighash = () => EMPTY_BUFFER
 
@@ -89,8 +98,9 @@ const serializeWitnessV0 = options => input => {
     prop('version', bufferUInt32),
     prop('vin', hashPrevouts(options)),
     prop('vin', hashSequence(options)),
-    prop('vout', outpoint(options)),
-    scriptCode,
+    () => bufferTxid(input.txid),       // outpoint
+    () => bufferUInt32(input.index),    // outpoint
+    () => scriptCode(input),
     () => bufferUInt64(input.value),
     () => bufferUInt32(input.sequence),
     prop('vout', hashOutputs(options)),
@@ -105,6 +115,8 @@ module.exports = {
   hashSequenceRaw,
   hashSequence,
   hashOutputs,
+  outpoint,
+  scriptCode,
   serializeWitnessV0,
   hashForWitnessV0
 }
