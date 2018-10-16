@@ -1,6 +1,6 @@
 const assert = require('assert')
 const bitcoin = require('bitcoinjs-lib')
-const { getAddress, getAddressBech32, getHexFromAddress, outputScript } = require('../src/utils')
+const { getAddress, getAddressBech32, getHexFromAddress, outputScript, outputScriptWitness } = require('../src/utils')
 
 describe('Utils', function () {
   const publicKeyHex = '03a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a3'
@@ -30,8 +30,17 @@ describe('Utils', function () {
   describe('outputScript', function () {
     it('should create P2PKH output script off address', function () {
       const address = 'msQzKJatdWdw4rpy8sbv8puHoncseekYCf'
-      const expected = '76a9148280b37df378db99f66f85c95a783a76ac7a6d5988ac'
       const script = outputScript({ address })
+      const expected = '76a9148280b37df378db99f66f85c95a783a76ac7a6d5988ac'
+      assert.equal(script.toString('hex'), expected)
+    })
+  })
+  describe('outputScriptWitness', function () {
+    it('should create P2WPKH output script off address', function () {
+      const publicKey = Buffer.from('025476c2e83188368da1ff3e292e7acafcdb3566bb0ad253f62fc70f07aeee6357', 'hex')
+      const address = getAddressBech32(publicKey)
+      const script = outputScriptWitness({ address })
+      const expected = '00141d0f172a0ecb48aee1be1f2687d2963ae33f71a1'
       assert.equal(script.toString('hex'), expected)
     })
   })
