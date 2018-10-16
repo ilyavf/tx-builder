@@ -34,7 +34,7 @@ describe('segwit-utils', function () {
 
   describe('serializeWitnessV0', function () {
     it('should calc hash of sequence of all inputs', function () {
-      const res = serializeWitnessV0({})(txConfig.vin)(txConfig)
+      const res = serializeWitnessV0({})(txConfig.vin[1])(txConfig)
       assert.ok(res.toString('hex'))
       assert.equal(res.toString('hex'), fixture.items.witnessV0)
     })

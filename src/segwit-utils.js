@@ -67,7 +67,10 @@ const outpoint = options => () => EMPTY_BUFFER
 
 // todo: should be defined  as a general payment utility (outside of this utility set).
 const scriptCode = input => {
-  if (input.type === 'P2WPKH') {
+  if (input.scriptPubKey) {
+    return Buffer.from(input.scriptPubKey, 'hex')
+  }
+  if (input.address && input.type === 'P2WPKH') {
     return Buffer.concat([bufferUInt8(OPS.OP_0), getHexFromBech32Address(input.address)])
   }
   return EMPTY_BUFFER
