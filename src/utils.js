@@ -22,7 +22,7 @@ function getAddressBech32 (publicKey, network) {
 function getHexFromBech32Address (address) {
   typeforce(types.Address, address)
   const result = bech32.decode(address)
-  const version = result.words.shift()
+  result.words.shift() // version
   const data = bech32.fromWords(result.words)
   return Buffer.from(data)
 }

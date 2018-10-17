@@ -27,7 +27,7 @@
 // - When spending a native P2WPKH, the scriptSig MUST be empty
 
 const Buffer = require('safe-buffer').Buffer
-const bitcoin = require('bitcoinjs-lib')
+// const bitcoin = require('bitcoinjs-lib')
 const OPS = require('bitcoin-ops')
 const typeforce = require('typeforce')
 const types = require('./types')
