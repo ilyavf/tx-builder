@@ -27,11 +27,14 @@
 // - When spending a native P2WPKH, the scriptSig MUST be empty
 
 const Buffer = require('safe-buffer').Buffer
+const bitcoin = require('bitcoinjs-lib')
 const OPS = require('bitcoin-ops')
+const typeforce = require('typeforce')
+const types = require('./types')
 const { createHash } = require('./tx-decoder')
 const { bufferTxid } = require('./tx-builder')
-const { getHexFromBech32Address } = require('./utils')
-const { bufferUInt8, bufferUInt32, bufferUInt64 } = require('./buffer-build')
+const { getHexFromBech32Address, outputScript, outputScriptWitness } = require('./utils')
+const { bufferUInt8, bufferUInt32, bufferUInt64, bufferVarSliceBuffer } = require('./buffer-build')
 const { EMPTY_BUFFER, compose, prop } = require('./compose-build')
 
 /**
@@ -63,8 +66,6 @@ const hashSequence = options => vins => {
   return createHash(options)(buffer)
 }
 
-const outpoint = options => () => EMPTY_BUFFER
-
 // todo: should be defined  as a general payment utility (outside of this utility set).
 const scriptCode = input => {
   if (input.scriptPubKey) {
@@ -75,7 +76,30 @@ const scriptCode = input => {
   }
   return EMPTY_BUFFER
 }
-const hashOutputs = options => () => EMPTY_BUFFER
+
+// serializeOutputs :: Array -> Buffer
+const serializeOutputs = vouts => {
+  return Buffer.concat(vouts.map(vout => {
+    if (!vout.script) {
+      typeforce(types.Address, vout.address)
+      typeforce.oneOf(
+        typeforce.value('P2PKH'), typeforce.value('P2WPKH'),
+        vout.type
+      )
+      vout.script = vout.type === 'P2WPKH'
+        ? outputScriptWitness({address: vout.address})
+        : outputScript({address: vout.address})
+    }
+    return Buffer.concat([bufferUInt64(vout.value), bufferVarSliceBuffer(vout.script)])
+  }))
+}
+
+// hashOutputs :: Object -> Array -> Buffer
+const hashOutputs = options => vouts => {
+  const buffer = serializeOutputs(vouts)
+  return createHash(options)(buffer)
+}
+
 const sighash = () => EMPTY_BUFFER
 
 /*
@@ -117,8 +141,8 @@ module.exports = {
   hashPrevouts,
   hashSequenceRaw,
   hashSequence,
+  serializeOutputs,
   hashOutputs,
-  outpoint,
   scriptCode,
   serializeWitnessV0,
   hashForWitnessV0

@@ -90,6 +90,7 @@ module.exports = {
       hashPrevouts: '96b827c8483d4e9b96712b6713a7b68d6e8003a781feba36c31143470b4efd37',
       hashSequence: '52b0a642eea2fb7ae638c36f6252b6750293dbe574a806984b8e4d8548339a3b',
       hashSequenceRaw: 'eeffffffffffffff',
+      serializedOutputs: '202cb206000000001976a9148280b37df378db99f66f85c95a783a76ac7a6d5988ac9093510d000000001976a9143bde42dbee7e4dbe6a21b2d50ce2f0167faa815988ac',
       hashOutputs: '863ef3e1a92afbfdb97f31ad0fc7683ee943e9abcf2501590ff8f6551f47e5e5',
       witnessV0: 'todo...'
     },
@@ -118,10 +119,12 @@ module.exports = {
       }],
       vout: [{
         value: 1.1234 * 100000000,
-        address: 'msQzKJatdWdw4rpy8sbv8puHoncseekYCf'
+        address: 'msQzKJatdWdw4rpy8sbv8puHoncseekYCf',
+        type: 'P2PKH'
       }, {
         value: 2.2345 * 100000000,
-        address: 'mkyWRMBNtjzZxdCcEZDYNi5CSoYnRaKACc'
+        address: 'mkyWRMBNtjzZxdCcEZDYNi5CSoYnRaKACc',
+        type: 'P2PKH'
       }]
     }
   },

@@ -4,6 +4,8 @@ const {
   hashPrevouts,
   hashSequenceRaw,
   hashSequence,
+  serializeOutputs,
+  hashOutputs,
   serializeWitnessV0
 } = require('../src/segwit-utils')
 
@@ -32,7 +34,20 @@ describe('segwit-utils', function () {
     })
   })
 
-  describe('serializeWitnessV0', function () {
+  describe('serializeOutputs', function () {
+    it('should serialize outputs (amounts and scriptPubKey)', function () {
+      const res = serializeOutputs(txConfig.vout)
+      assert.equal(res.toString('hex'), fixture.items.serializedOutputs)
+    })
+  })
+
+  describe('hashOutputs', function () {
+    it('should hash outputs (sha256 of serialized vouts)', function () {
+      const res = hashOutputs({})(txConfig.vout)
+      assert.equal(res.toString('hex'), fixture.items.hashOutputs)
+    })
+  })
+  describe.skip('serializeWitnessV0', function () {
     it('should calc hash of sequence of all inputs', function () {
       const res = serializeWitnessV0({})(txConfig.vin[1])(txConfig)
       assert.ok(res.toString('hex'))
