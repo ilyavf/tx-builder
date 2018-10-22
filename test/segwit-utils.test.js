@@ -75,7 +75,7 @@ describe('segwit-utils', function () {
 
   describe('hashForWitnessV0', function () {
     it('should hash WitnessV0', function () {
-        const res = hashForWitnessV0({})(txConfig.vin[1])(txConfig, EMPTY_BUFFER)
+      const res = hashForWitnessV0({})(txConfig.vin[1])(txConfig, EMPTY_BUFFER)
       assert.equal(res.toString('hex'), fixture.items.sigHash)
     })
   })
