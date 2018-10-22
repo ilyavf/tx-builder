@@ -51,3 +51,6 @@ Double SHA256 of the serialization of:
 - If the sighash type is neither SINGLE nor NONE, hashOutputs is the double SHA256 of the serialization of all output amount (8-byte little endian) with scriptPubKey (serialized as scripts inside CTxOuts);
 - If sighash type is SINGLE and the input index is smaller than the number of outputs, hashOutputs is the double SHA256 of the output amount with scriptPubKey of the same index as the input;
 - Otherwise, hashOutputs is a uint256 of 0x0000......0000.
+
+### scriptCode
+For P2WPKH witness program, the scriptCode is 0x1976a914{20-byte-pubkey-hash}88ac

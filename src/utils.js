@@ -61,7 +61,8 @@ function outputScriptWitness ({ address, hash }) {
 }
 
 // todo: add SHA3 option.
-const pubKeyHash = options => pubKey => {
+// createPubKeyHash :: Object -> Buffer -> Buffer
+const createPubKeyHash = options => pubKey => {
   typeforce('Buffer', pubKey)
   return bitcoin.crypto.hash160(pubKey)
 }
@@ -73,5 +74,5 @@ module.exports = {
   getHexFromAddress,
   outputScript,
   outputScriptWitness,
-  pubKeyHash
+  createPubKeyHash
 }

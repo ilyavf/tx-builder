@@ -33,9 +33,10 @@ const typeforce = require('typeforce')
 const types = require('./types')
 const { createHash } = require('./tx-decoder')
 const { bufferTxid } = require('./tx-builder')
-const { getHexFromBech32Address, outputScript, outputScriptWitness } = require('./utils')
+const { getHexFromBech32Address, outputScript, outputScriptWitness, createPubKeyHash } = require('./utils')
 const { bufferUInt8, bufferUInt32, bufferUInt64, bufferVarSliceBuffer } = require('./buffer-build')
 const { EMPTY_BUFFER, compose, prop } = require('./compose-build')
+const CONSTANTS = require('./constants')
 
 /**
  * @param {Object} options Options like sha algorithm.
@@ -66,15 +67,33 @@ const hashSequence = options => vins => {
   return createHash(options)(buffer)
 }
 
+// inputValue :: Object -> Buffer
+const inputValue = input => bufferUInt64(input.value)
+
 // todo: should be defined  as a general payment utility (outside of this utility set).
-const scriptCode = input => {
-  if (input.scriptPubKey) {
-    return Buffer.from(input.scriptPubKey, 'hex')
+const scriptCode = options => input => {
+  // let script
+  // if (input.scriptPubKey) {
+  //   script = Buffer.from(input.scriptPubKey, 'hex')
+  //   return bufferVarSliceBuffer(script)
+  // }
+  typeforce({
+    address: typeforce.maybe(types.Address),
+    publicKey: typeforce.maybe('String'),
+    type: typeforce.value('P2WPKH')
+  }, input)
+  if (input.type === 'P2WPKH') {
+    // For P2WPKH witness program, the scriptCode is:
+    // `0x1976a914{20-byte-pubkey-hash}88ac` (bip-0143)
+    let pubKeyHash
+    if (input.address) {
+      pubKeyHash = getHexFromBech32Address(input.address).toString('hex')
+    } else if (input.publicKey) {
+      const pubKeyBuffer = Buffer.from(input.publicKey, 'hex')
+      pubKeyHash = createPubKeyHash(options)(pubKeyBuffer).toString('hex')
+    }
+    return Buffer.from(`1976a914${pubKeyHash}88ac`, 'hex')
   }
-  if (input.address && input.type === 'P2WPKH') {
-    return Buffer.concat([bufferUInt8(OPS.OP_0), getHexFromBech32Address(input.address)])
-  }
-  return EMPTY_BUFFER
 }
 
 // serializeOutputs :: Array -> Buffer
@@ -100,7 +119,12 @@ const hashOutputs = options => vouts => {
   return createHash(options)(buffer)
 }
 
-const sighash = () => EMPTY_BUFFER
+const hashType = input => {
+  if (['P2PKH', 'P2WPKH'].indexOf(input.type) !== -1) {
+    return CONSTANTS.SIGHASH_ALL
+  }
+  return CONSTANTS.SIGHASH_ALL
+}
 
 /*
  [Transaction Signature Verification structure](segwit.md#Transaction-Signature-Verification-for-Version-0-Witness-Program)
@@ -120,19 +144,22 @@ const hashForWitnessV0 = options => input => tx => {
   const buffer = serializeWitnessV0(options)(input)(tx, EMPTY_BUFFER)
   return createHash(options)(buffer)
 }
+
 const serializeWitnessV0 = options => input => {
+  typeforce(types.TxVin, input)
+
   return compose([
     prop('version', bufferUInt32),
     prop('vin', hashPrevouts(options)),
     prop('vin', hashSequence(options)),
     () => bufferTxid(input.txid),       // outpoint
-    () => bufferUInt32(input.index),    // outpoint
-    () => scriptCode(input),
-    () => bufferUInt64(input.value),
+    () => bufferUInt32(input.vout),     // outpoint
+    () => scriptCode(options)(input),
+    () => inputValue(input),            // amount
     () => bufferUInt32(input.sequence),
     prop('vout', hashOutputs(options)),
     prop('locktime', bufferUInt32),
-    sighash
+    () => bufferUInt32(hashType(input))
   ])
 }
 
@@ -143,6 +170,7 @@ module.exports = {
   hashSequence,
   serializeOutputs,
   hashOutputs,
+  inputValue,
   scriptCode,
   serializeWitnessV0,
   hashForWitnessV0

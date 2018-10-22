@@ -13,15 +13,10 @@ const bitcoin = require('bitcoinjs-lib')
 const bcrypto = bitcoin.crypto
 const bscript = bitcoin.script
 const baddress = bitcoin.address
+const CONSTANTS = require('./constants')
 
 const HASHTYPE = {
   SIGHASH_ALL: 0x01
-}
-
-const CONSTANTS = {
-  SIGHASH_ALL: 0x01,
-  ADVANCED_TRANSACTION_MARKER: 0x00,
-  ADVANCED_TRANSACTION_FLAG: 0x01
 }
 
 const {
