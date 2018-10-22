@@ -28,13 +28,13 @@
 
 const Buffer = require('safe-buffer').Buffer
 // const bitcoin = require('bitcoinjs-lib')
-const OPS = require('bitcoin-ops')
+// const OPS = require('bitcoin-ops')
 const typeforce = require('typeforce')
 const types = require('./types')
 const { createHash } = require('./tx-decoder')
 const { bufferTxid } = require('./tx-builder')
 const { getHexFromBech32Address, outputScript, outputScriptWitness, createPubKeyHash } = require('./utils')
-const { bufferUInt8, bufferUInt32, bufferUInt64, bufferVarSliceBuffer } = require('./buffer-build')
+const { bufferUInt32, bufferUInt64, bufferVarSliceBuffer } = require('./buffer-build')
 const { EMPTY_BUFFER, compose, prop } = require('./compose-build')
 const CONSTANTS = require('./constants')
 
