@@ -292,7 +292,7 @@ describe('builder', function () {
       })
     })
 
-    describe('addSegwitData', function () {
+    describe.skip('addSegwitData', function () {
       it('should create witnesses buffer from tx config', function () {
         const sig1 = Buffer.from('010203', 'hex')
         const sig2 = Buffer.from('0a0b0c', 'hex')
