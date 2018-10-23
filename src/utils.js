@@ -6,6 +6,7 @@ const OPS = require('bitcoin-ops')
 const typeforce = require('typeforce')
 const types = require('./types')
 const { bufferUInt8, bufferVarInt } = require('./buffer-build')
+const { createHash } = require('./tx-decoder')
 
 function getAddress (publicKey, network) {
   network = network || bitcoin.networks.testnet
@@ -60,10 +61,12 @@ function outputScriptWitness ({ address, hash }) {
   return Buffer.concat([bufferUInt8(OPS.OP_0), bufferVarInt(hash.length), hash])
 }
 
-// todo: add SHA3 option.
 // createPubKeyHash :: Object -> Buffer -> Buffer
 const createPubKeyHash = options => pubKey => {
   typeforce('Buffer', pubKey)
+  if (options && options.sha === 'SHA3_256') {
+    return bitcoin.crypto.ripemd160(createHash(options)(pubKey))
+  }
   return bitcoin.crypto.hash160(pubKey)
 }
 
