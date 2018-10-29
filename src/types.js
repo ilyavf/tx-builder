@@ -3,15 +3,11 @@ const types = require('bitcoinjs-lib/src/types')
 const typeforce = require('typeforce')
 
 function Address (value, strict) {
-  let payload
   try {
-    payload = bs58check.decode(value)
+    return bs58check.decode(value).length === 21
   } catch (err) {
     return false
   }
-  if (payload.length < 21) return false
-  if (payload.length > 21) return false
-  return true
 }
 
 function FunctionType (value, strict) {
