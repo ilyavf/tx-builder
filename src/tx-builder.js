@@ -126,6 +126,12 @@ const txCopySubscript = function txCopySubscriptFn (keyPair, htlcParams, options
     return subscript
   } else {
     // return bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
+    if (options && options.sha === 'SHA3_256') {
+      return bitcoin.payments.p2pkh({
+        hash: bcrypto.ripemd160(hashSha3(Buffer.from(keyPair.publicKey, 'hex'))),
+        network: options.network
+      }).output
+    }
     return bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey, network: options.network }).output
   }
 }
@@ -217,7 +223,7 @@ const vinScript = (buildTxCopy, options) => (tx, index) => (keyPair, htlc) => {
     (htlc && htlc.secretHash)
 
   // For the REFUND transaction `receiverAddr` in the left branch of IF belongs to the other user and thus is passed with htlc params.
-  const addr = (htlc && htlc.receiverAddr) || getAddress(kpPubKey, options.network)
+  const addr = (htlc && htlc.receiverAddr) || getAddress(kpPubKey, options.network, options.sha)
   const htlcParams = secretHash && {
     secretHash,
     addr,
@@ -343,7 +349,13 @@ const signBuffer = (keyPair, options) => function signBufferFn (buffer) {
   return bscript.signature.encode(keyPair.sign(hash), HASHTYPE.SIGHASH_ALL)
 }
 
-function getAddress (publicKey, network) {
+function getAddress (publicKey, network, sha) {
+  if (sha === 'SHA3_256') {
+    return bitcoin.payments.p2pkh({
+      hash: bcrypto.ripemd160(hashSha3(Buffer.from(publicKey, 'hex'))),
+      network: network
+    }).address
+  }
   return bitcoin.payments.p2pkh({ pubkey: publicKey, network }).address
 }
 
@@ -366,5 +378,6 @@ module.exports = {
   buildCoinbaseTx,
   coinbaseInput,
   coinbaseScript,
-  signBuffer
+  signBuffer,
+  getAddress
 }
