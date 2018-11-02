@@ -151,10 +151,8 @@ const txCopySubscript = function txCopySubscriptFn (keyPair, htlcParams, options
     return subscript
   } else {
     // return bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
-    const useSha3 = options && options.sha === 'SHA3_256'
     return bitcoin.payments.p2pkh({
-      pubkey: useSha3 ? undefined : keyPair.publicKey,
-      hash: useSha3 ? createPubKeyHash(options)(keyPair.publicKey) : undefined,
+      hash: createPubKeyHash(options)(keyPair.publicKey),
       network: options.network
     }).output
   }
@@ -381,10 +379,8 @@ const signBuffer = (keyPair, options) => function signBufferFn (buffer) {
 }
 
 function getAddress (publicKey, options) {
-  const useSha3 = options && options.sha === 'SHA3_256'
   return bitcoin.payments.p2pkh({
-    pubkey: useSha3 ? undefined : publicKey,
-    hash: useSha3 ? createPubKeyHash(options)(publicKey) : undefined,
+    hash: createPubKeyHash(options)(publicKey),
     network: options.network
   }).address
 }
