@@ -11,10 +11,7 @@ function Address (value, strict) {
 
 function AddressBase58Check (value) {
   try {
-    const payload = bs58check.decode(value)
-    if (payload.length < 21) return false
-    if (payload.length > 21) return false
-    return true
+    return bs58check.decode(value).length === 21
   } catch (err) {
     return false
   }
@@ -24,9 +21,6 @@ function AddressBech32 (value) {
   try {
     const payload = bech32.decode(value)
     return !!payload
-  } catch (err) {
-    return false
-  }
 }
 
 function FunctionType (value, strict) {

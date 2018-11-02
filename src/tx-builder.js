@@ -350,7 +350,7 @@ const coinbaseInput = (vin) =>
     () => Buffer.from('0000000000000000000000000000000000000000000000000000000000000000', 'hex'),  // 32 bytes, txid
     () => Buffer.from('ffffffff', 'hex'),   // 4 bytes, vout
     prop('blockHeight', coinbaseScript),    // 4+ bytes (VarInt), coinbase script contains block height and arbitrary data
-    () => bufferUInt32(4294967295)          // 4 bytes, sequence number
+    () => bufferUInt32(0xffffffff)          // 4 bytes, sequence number 4294967295
   ])(vin, EMPTY_BUFFER)
 )
 
@@ -366,7 +366,7 @@ const coinbaseScript = blockHeight => {
 const signBuffer = (keyPair, options) => function signBufferFn (buffer) {
   let createHash = bcrypto.hash256
   typeforce('ECPair', keyPair)
-  if (options && options.sha && options.sha === 'SHA3_256') {
+  if (options && options.sha === 'SHA3_256') {
     createHash = hashSha3
   }
   const hash = createHash(buffer)
