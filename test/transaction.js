@@ -1,3 +1,4 @@
+const bip32 = require('bip32')
 const bip39 = require('bip39')
 const bitcoin = require('bitcoinjs-lib')
 const { decodeTx } = require('../src/tx-decoder')
@@ -5,7 +6,7 @@ const fixture = require('./fixtures/tx-hex-decoded')
 
 const mnemonic = 'talent destroy radar dinosaur punch muscle swear diary mango unit gallery bus'
 const seed = bip39.mnemonicToSeed(mnemonic, '')
-const root = bitcoin.HDNode.fromSeedBuffer(seed, bitcoin.networks.testnet)
+const root = bip32.fromSeed(seed, bitcoin.networks.testnet)
 const hdNode = root.derivePath("m/44'/0'/0'")
 
 const addrHdNode = hdNode.derive(0).derive(0)

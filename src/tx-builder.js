@@ -13,6 +13,7 @@ const bitcoin = require('bitcoinjs-lib')
 const bcrypto = bitcoin.crypto
 const bscript = bitcoin.script
 const baddress = bitcoin.address
+const CONSTANTS = require('./constants')
 
 const HASHTYPE = {
   SIGHASH_ALL: 0x01
@@ -25,6 +26,7 @@ const {
   bufferUInt64,
   bufferVarInt,
   bufferVarSlice,
+  // bufferVarArray,
   mapConcatBuffers
 } = require('./buffer-build')
 const {
@@ -33,6 +35,7 @@ const {
   props,
   addProp,
   iff,
+  // iffNot,
   hasNo
 } = require('./compose-build')
 
@@ -53,9 +56,31 @@ const EMPTY_BUFFER = Buffer.allocUnsafe(0)
  *    sha: 'SHA3'                         // ('SHA256' | 'SHA3' | Fn)
  * }
  * ```
+ *
+ * Transaction serialization:
+ * - Pre-segwit:
+ *   `nVersion | txins | txouts | nLockTime`
+ * - SegWit:
+ *   `nVersion | marker | flag | txins | txouts | witness | nLockTime`
  */
 // buildTx :: (Tx, Options) -> Buffer
 const buildTx = (tx, options) => {
+  options = options || {}
+  typeforce(types.TxConfig, tx)
+  typeforce(types.TxBuilderOptions, options)
+
+  return compose([
+    prop('version', bufferInt32),                             // 4 bytes
+    iff(isSegwit(options), addSegwitMarker(options)),
+    bufferInputs('vin', bufferInput(options)),                // 1-9 bytes (VarInt), Input counter; Variable, Inputs
+    prop('vout', mapConcatBuffers(bufferOutput(options))),    // 1-9 bytes (VarInt), Output counter; Variable, Outputs
+    iff(isSegwit(options), prop('vin', addSegwitData(options))),
+    prop('locktime', bufferUInt32)                            // 4 bytes
+  ])(tx, EMPTY_BUFFER)
+}
+
+// buildTxOrig :: (Tx, Options) -> Buffer
+const buildTxOrig = (tx, options) => {
   options = options || {}
   typeforce(types.TxConfig, tx)
   typeforce(types.TxBuilderOptions, options)
@@ -146,13 +171,18 @@ const makeBufferInput = (buildTxCopy, options) => tx => function makeBufferInput
   ), [buildTxCopy, tx, vin, index])
 
   return compose([
-    prop('txid', bufferHash),                // 32 bytes, Transaction Hash
+    prop('txid', bufferTxid),                // 32 bytes, Transaction Hash
     prop('vout', bufferUInt32),              // 4 bytes, Output Index
     addProp(
       'scriptSig',
       props(['keyPair', 'htlc'], vinScript(buildTxCopy, options)(tx, index))
     ),
-    prop('scriptSig', bufferVarSlice('hex')),  // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
+    // Do not add signature to buffer for SegWit, it will be picked up later for witness data.
+    iff(
+      isSegwit(options),
+      prop('scriptSig', () => bufferVarInt(0)),
+      prop('scriptSig', bufferVarSlice('hex'))  // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
+    ),
     prop('sequence', bufferUInt32)             // 4 bytes, Sequence Number
   ])(vin, EMPTY_BUFFER)
 }
@@ -161,7 +191,7 @@ const makeBufferInput = (buildTxCopy, options) => tx => function makeBufferInput
 const bufferInputEmptyScript = vin =>
 (
   compose([
-    prop('txid', bufferHash),
+    prop('txid', bufferTxid),
     prop('vout', bufferUInt32),
     prop('script', script => (!script ? bufferVarInt(0) : bufferVarSlice('hex')(script))), // Empty script (1 byte 0x00)
     prop('sequence', bufferUInt32)
@@ -224,6 +254,8 @@ const vinScript = (buildTxCopy, options) => (tx, index) => (keyPair, htlc) => {
     refundAddr: htlc.refundAddr,
     timelock: htlc.timelock
   }
+
+  // SegWit: https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki#specification
   const txCopyBufferWithType = txCopyForHash(buildTxCopy, options)(keyPair, tx, index, htlcParams)
 
   // console.log('*** 1: ' + txCopyBufferWithType.toString('hex'))
@@ -277,8 +309,8 @@ const voutScript = ({network}) => addr => {
 /**
  * Transaction's hash is displayed in a reverse order.
  */
-// bufferHash :: HexString -> Buffer
-const bufferHash = hash => Buffer.from(hash, 'hex').reverse()
+// bufferTxid :: HexString -> Buffer
+const bufferTxid = txid => Buffer.from(txid, 'hex').reverse()
 
 /**
  * Implementation specific functions:
@@ -347,15 +379,47 @@ function getAddress (publicKey, network) {
   return bitcoin.payments.p2pkh({ pubkey: publicKey, network }).address
 }
 
+// If one of the VINs has type P2PKH then it requires SegWit serialization.
+// isSegwit :: Object -> Object -> Boolean
+const isSegwit = options => tx => {
+  if (tx.vin) {
+    return tx.vin.reduce((acc, { type }) => (acc || type === 'P2WPKH'), false)
+  } else {
+    // If an individual vin is passed:
+    return tx.type === 'P2WPKH'
+  }
+}
+
+const addSegwitMarker = options => tx => {
+  return compose([
+    () => bufferUInt8(CONSTANTS.ADVANCED_TRANSACTION_MARKER),
+    () => bufferUInt8(CONSTANTS.ADVANCED_TRANSACTION_FLAG)
+  ])(tx, EMPTY_BUFFER)
+}
+
+// Witnesses consist of a stack of byte arrays. It is encoded as a var_int item count followed by each item encoded
+// as a var_int length followed by a string of bytes.
+// addSegwitData :: Object -> Array -> Buffer
+const addSegwitData = options => vin => {
+  // const witnesses = vin.map(({scriptSig}) => scriptSig)
+  // return bufferVarArray(witnesses)
+  // console.log('addSegwitData:::')
+  // console.log('- bufferVarInt(2):', bufferVarInt(2))
+  // console.log('- vin.scriptSig:', vin[0].scriptSig)
+  const witnesses = Buffer.concat([bufferVarInt(2), vin[0].scriptSig])
+  return witnesses
+}
+
 module.exports = {
   buildTx,
+  buildTxOrig,
   buildTxCopy,
   txCopyForHash,
   txCopySubscript,
   bufferInputs,
   bufferInput,
   bufferOutput,
-  bufferHash,
+  bufferTxid,
   vinScript,
   voutScript,
   bufferInputEmptyScript,
@@ -366,5 +430,8 @@ module.exports = {
   buildCoinbaseTx,
   coinbaseInput,
   coinbaseScript,
-  signBuffer
+  signBuffer,
+  isSegwit,
+  addSegwitMarker,
+  addSegwitData
 }

@@ -18,7 +18,7 @@
     "lint": "standard",
     "lint:fix": "standard --fix",
     "mocha": "nyc mocha -u tdd --timeout 999999 --colors test/test.js",
-    "preversion": "npm run lint && npm test",
+    "preversion": "npm run lint:fix && npm test",
     "release:patch": "npm version patch && make publish",
     "release:minor": "npm version minor && make publish",
     "release:major": "npm version major && make publish",
@@ -34,10 +34,12 @@
     ]
   },
   "dependencies": {
+    "bech32": "^1.1.3",
     "bip32": "^1.0.2",
     "bip39": "^2.3.1",
+    "bitcoin-ops": "^1.4.1",
     "bitcoinjs-lib": "^4.0.1",
-    "bs58check": "^2.1.0",
+    "bs58check": "^2.1.2",
     "js-sha3": "^0.7.0",
     "ramda": "^0.24.1",
     "safe-buffer": "^5.1.1",

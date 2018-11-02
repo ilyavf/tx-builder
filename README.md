@@ -102,6 +102,7 @@ const { compose as composeDecoder, addProp } = decoder  // Composition helpers.
     - `bufferVarInt :: Int -> Buffer` Creates a buffer that contains a variable length integer.
     - `bufferVarSlice :: Encoding -> String -> Buffer` Creates a buffer that contains a variable length string of the given encoding.
     - `bufferVarSliceBuffer :: Buffer -> Buffer` Creates a variable length buffer with from the given buffer value.
+    - `bufferVarArray :: Array -> Buffer` Creates an buffer from array of buffers in format: `<itemsCount><item1Length><item1>...`
     - `mapConcatBuffers :: Fn -> Array -> Buffer` Maps function to array elements and concats results into a buffer.
   - **Composition helpers**.
     - `compose :: [Fn] -> Tx -> Buffer -> Buffer`
@@ -222,7 +223,7 @@ const tx = {
   version: 1,
   locktime: 0,
   vin: [{
-      hash: '2d7a9f0534ddac231ef1978bda388791c32321f7e14e18e7df3bbed261615f54',
+      txid: '2d7a9f0534ddac231ef1978bda388791c32321f7e14e18e7df3bbed261615f54',
       index: 1,
       script: '4830450221008c33d...',
       sequence: '4294967295'
@@ -261,8 +262,8 @@ const txConfig = {
 }
 
 const options = {
-  network: "TESTNET",     // which is decault, or "MAINNET"
-  sha: "SHA3_256",        // default: "SHA256"
+  network: "TESTNET",     // which is default; enum("TESTNET", "MAINNET")
+  sha: "SHA3_256",        // default: "SHA256"; enum("SHA256", "SHA3_256")
 }
 
 const txBuffer = buildTx(txConfig, options)
