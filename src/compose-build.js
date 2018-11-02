@@ -1,8 +1,9 @@
+const Buffer = require('safe-buffer').Buffer
 const typeforce = require('typeforce')
 
 const EMPTY_BUFFER = Buffer.allocUnsafe(0)
 
-// compose :: [Fn] -> Tx -> Buffer -> Buffer
+// compose :: [Fn] -> (Tx, Buffer) -> Buffer
 const compose = args => (tx, buffer) => {
   typeforce(typeforce.Array, args)
   typeforce(typeforce.Object, tx)
@@ -19,6 +20,10 @@ const props = (propNames, fn) => obj => {
   return fn.apply(this, props)
 }
 
+// Allows to pass a static value to the function and still be composable.
+// value :: a => Fn b => (() => b)
+const value = (val, fn) => () => fn(val)
+
 const iff = (predicate, fn, elseFn) => obj => {
   const res = predicate(obj)
   if (res) {
@@ -26,6 +31,8 @@ const iff = (predicate, fn, elseFn) => obj => {
   }
   return typeof elseFn === 'function' ? elseFn(obj) : EMPTY_BUFFER
 }
+
+const iffNot = (predicate, fn) => obj => (!predicate(obj) ? fn(obj) : EMPTY_BUFFER)
 
 const has = prop => obj => (typeof obj[prop] !== 'undefined')
 
@@ -38,11 +45,14 @@ const addProp = (propName, fn) => obj => {
 }
 
 module.exports = {
+  EMPTY_BUFFER,
   compose,
   prop,
   props,
   addProp,
   iff,
+  iffNot,
   has,
-  hasNo
+  hasNo,
+  value
 }

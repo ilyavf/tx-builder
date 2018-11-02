@@ -17,6 +17,19 @@ describe('types', function () {
         assert.equal(err.message, 'Expected Address, got String "123"')
       }
     })
+    it('should validate bech32 address', function () {
+      const addr = 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx'
+      assert.ok(typeforce(types.Address, addr))
+    })
+    it('should invalidate bad bech32 address', function () {
+      const addr = 'tb1222qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx'
+      try {
+        typeforce(types.Address, addr)
+        assert.ok(false, 'should reject instead')
+      } catch (err) {
+        assert.equal(err.message, 'Expected Address, got String "tb1222qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"')
+      }
+    })
   })
   describe('FunctionType', function () {
     it('should validate a function', function () {

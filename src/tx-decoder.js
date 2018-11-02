@@ -78,14 +78,19 @@ const hashSha3 = buffer => {
   return Buffer.from(hashString, 'hex')
 }
 
+// createHash :: Object -> Buffer -> Buffer
+const createHash = options => data => {
+  let hashFn = bcrypto.hash256
+  if (options && options.sha === 'SHA3_256') {
+    hashFn = hashSha3
+  }
+  return hashFn(data)
+}
+
 // Since a hash is a 256-bit integer and is stored using Little Endian, we reverse it for showing to user (who reads BE).
 // getTxId :: Buffer -> String
 const getTxId = options => buffer => {
-  let createHash = bcrypto.hash256
-  if (options && options.sha === 'SHA3_256') {
-    createHash = hashSha3
-  }
-  return createHash(buffer).reverse().toString('hex')
+  return createHash(options)(buffer).reverse().toString('hex')
 }
 
 module.exports = {
@@ -94,6 +99,7 @@ module.exports = {
   readInputs,
   readInput,
   readOutput,
+  createHash,
   getTxId,
   hashSha3
 }

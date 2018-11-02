@@ -8,6 +8,7 @@ const {
   bufferVarInt,
   bufferVarSlice,
   bufferVarSliceBuffer,
+  bufferVarArray,
   mapConcatBuffers
 } = require('../src/buffer-build')
 const {
@@ -18,7 +19,7 @@ const {
   bufferInput,
   bufferInputs,
   bufferOutput,
-  bufferHash,
+  bufferTxid,
   bufferInputEmptyScript,
   makeBufferOutput,
   vinScript,
@@ -26,7 +27,10 @@ const {
   buildCoinbaseTx,
   coinbaseInput,
   coinbaseScript,
-  signBuffer
+  signBuffer,
+  isSegwit,
+  addSegwitMarker,
+  addSegwitData
 } = require('../src/tx-builder')
 const { prop } = require('../src/compose-build')
 const { getTxId } = require('../src/tx-decoder')
@@ -90,6 +94,13 @@ describe('buffer-build utils', function () {
       assert.equal(buffer.toString('hex'), expectedBuffer.toString('hex'))
     })
   })
+  describe('bufferVarArray', function () {
+    it('should create a variable length buffer from array of buffers', function () {
+      const arr = [Buffer.from('0a', 'hex'), Buffer.from('0b', 'hex')]
+      const expectedHex = '02010a010b'
+      assert.equal(bufferVarArray(arr).toString('hex'), expectedHex)
+    })
+  })
   describe('mapConcatBuffers', function () {
     it('should concat buffers', function () {
       const fn = a => Buffer.from((a * 5) + '')
@@ -101,10 +112,10 @@ describe('buffer-build utils', function () {
 })
 
 describe('builder', function () {
-  describe('bufferHash', function () {
+  describe('bufferTxid', function () {
     it('should create a buffer with txid', function () {
       const txid = '2d7a9f0534ddac231ef1978bda388791c32321f7e14e18e7df3bbed261615f54'
-      assert.equal(bufferHash(txid).reverse().toString('hex'), txid)
+      assert.equal(bufferTxid(txid).reverse().toString('hex'), txid)
     })
   })
   describe('makeBufferOutput', function () {
@@ -260,6 +271,37 @@ describe('builder', function () {
       })
       it('should create TXID using SHA3', function () {
         assert.equal(getTxId({sha: 'SHA3_256'})(buffer), fixturesSha3[0].txid)
+      })
+    })
+  })
+
+  describe('SegWit related utils', function () {
+    describe('isSegwit', function () {
+      it('should detect if segwit transaction serialization is required', function () {
+        assert.ok(isSegwit()({vin: [{}, {type: 'P2WPKH'}]}))
+      })
+      it('should detect if segwit transaction serialization is not required', function () {
+        assert.ok(!isSegwit()({vin: [{type: 'P2PKH'}]}))
+      })
+    })
+
+    describe('addSegwitMarker', function () {
+      it('should add marker and flag bytes', function () {
+        const expected = '0001'
+        assert.equal(addSegwitMarker()({}).toString('hex'), expected)
+      })
+    })
+
+    describe.skip('addSegwitData', function () {
+      it('should create witnesses buffer from tx config', function () {
+        const sig1 = Buffer.from('010203', 'hex')
+        const sig2 = Buffer.from('0a0b0c', 'hex')
+        const txConfig = {
+          vin: [{scriptSig: sig1}, {scriptSig: sig2}]
+        }
+        const buffer = addSegwitData({})(txConfig.vin)
+        const expected = '0203010203030a0b0c'
+        assert.equal(buffer.toString('hex'), expected)
       })
     })
   })
