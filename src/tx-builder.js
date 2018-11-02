@@ -30,6 +30,7 @@ const {
   mapConcatBuffers
 } = require('./buffer-build')
 const {
+  EMPTY_BUFFER,
   compose,
   prop,
   props,
@@ -40,8 +41,7 @@ const {
 } = require('./compose-build')
 
 const { hashSha3 } = require('./tx-decoder')
-
-const EMPTY_BUFFER = Buffer.allocUnsafe(0)
+const { createPubKeyHash } = require('./utils')
 
 /**
  * Main function to build a bitcoin transaction. Creates an instance of Buffer.
@@ -151,7 +151,10 @@ const txCopySubscript = function txCopySubscriptFn (keyPair, htlcParams, options
     return subscript
   } else {
     // return bscript.pubKeyHash.output.encode(bcrypto.hash160(keyPair.getPublicKeyBuffer()))
-    return bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey, network: options.network }).output
+    return bitcoin.payments.p2pkh({
+      hash: createPubKeyHash(options)(keyPair.publicKey),
+      network: options.network
+    }).output
   }
 }
 
@@ -247,7 +250,7 @@ const vinScript = (buildTxCopy, options) => (tx, index) => (keyPair, htlc) => {
     (htlc && htlc.secretHash)
 
   // For the REFUND transaction `receiverAddr` in the left branch of IF belongs to the other user and thus is passed with htlc params.
-  const addr = (htlc && htlc.receiverAddr) || getAddress(kpPubKey, options.network)
+  const addr = (htlc && htlc.receiverAddr) || getAddress(kpPubKey, options)
   const htlcParams = secretHash && {
     secretHash,
     addr,
@@ -375,8 +378,11 @@ const signBuffer = (keyPair, options) => function signBufferFn (buffer) {
   return bscript.signature.encode(keyPair.sign(hash), HASHTYPE.SIGHASH_ALL)
 }
 
-function getAddress (publicKey, network) {
-  return bitcoin.payments.p2pkh({ pubkey: publicKey, network }).address
+function getAddress (publicKey, options) {
+  return bitcoin.payments.p2pkh({
+    hash: createPubKeyHash(options)(publicKey),
+    network: options.network
+  }).address
 }
 
 // If one of the VINs has type P2PKH then it requires SegWit serialization.
