@@ -8,9 +8,11 @@ const types = require('./types')
 const { bufferUInt8, bufferVarInt } = require('./buffer-build')
 const { createHash } = require('./tx-decoder')
 
-function getAddress (publicKey, network) {
-  network = network || bitcoin.networks.testnet
-  return bitcoin.payments.p2pkh({ pubkey: publicKey, network }).address
+function getAddress (publicKey, options) {
+  return bitcoin.payments.p2pkh({
+    hash: createPubKeyHash(options)(publicKey),
+    network: options.network
+  }).address
 }
 
 function getAddressBech32 (publicKey, network) {
