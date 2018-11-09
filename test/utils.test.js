@@ -8,14 +8,14 @@ describe('Utils', function () {
   describe('getAddress', function () {
     it('should return Base58Check address', function () {
       const expected = 'mm2zdwmiVBR7ipNiN3tr4CCu6sS5tFwKna'
-      const addr = getAddress(publicKey, bitcoin.networks.testnet)
+      const addr = getAddress(publicKey, { network: bitcoin.networks.testnet })
       assert.equal(addr, expected)
     })
   })
   describe('getAddressBech32', function () {
     it('should return Bech32 (SegWit) address', function () {
       const expected = 'tb1q8jr3q3s0cc7j0en5rhgeylcweeq7nd246575ce'
-      const addr = getAddressBech32(publicKey, bitcoin.networks.testnet)
+      const addr = getAddressBech32(publicKey, { network: bitcoin.networks.testnet })
       assert.equal(addr, expected)
     })
   })
@@ -38,7 +38,7 @@ describe('Utils', function () {
   describe('outputScriptWitness', function () {
     it('should create P2WPKH output script off address', function () {
       const publicKey = Buffer.from('025476c2e83188368da1ff3e292e7acafcdb3566bb0ad253f62fc70f07aeee6357', 'hex')
-      const address = getAddressBech32(publicKey)
+      const address = getAddressBech32(publicKey, { network: bitcoin.networks.testnet })
       const script = outputScriptWitness({ address })
       const expected = '00141d0f172a0ecb48aee1be1f2687d2963ae33f71a1'
       assert.equal(script.toString('hex'), expected)
