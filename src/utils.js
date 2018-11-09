@@ -11,14 +11,14 @@ const { createHash } = require('./tx-decoder')
 function getAddress (publicKey, options) {
   return bitcoin.payments.p2pkh({
     hash: createPubKeyHash(options)(publicKey),
-    network: options.network || bitcoin.networks.testnet
+    network: (options && options.network) || bitcoin.networks.testnet
   }).address
 }
 
 function getAddressBech32 (publicKey, options) {
   return bitcoin.payments.p2wpkh({
     hash: createPubKeyHash(options)(publicKey),
-    network: options.network || bitcoin.networks.testnet
+    network: (options && options.network) || bitcoin.networks.testnet
   }).address
 }
 
