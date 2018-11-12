@@ -8,14 +8,18 @@ const types = require('./types')
 const { bufferUInt8, bufferVarInt } = require('./buffer-build')
 const { createHash } = require('./tx-decoder')
 
-function getAddress (publicKey, network) {
-  network = network || bitcoin.networks.testnet
-  return bitcoin.payments.p2pkh({ pubkey: publicKey, network }).address
+function getAddress (publicKey, options) {
+  return bitcoin.payments.p2pkh({
+    hash: createPubKeyHash(options)(publicKey),
+    network: (options && options.network) || bitcoin.networks.testnet
+  }).address
 }
 
-function getAddressBech32 (publicKey, network) {
-  network = network || bitcoin.networks.testnet
-  return bitcoin.payments.p2wpkh({ pubkey: publicKey, network }).address
+function getAddressBech32 (publicKey, options) {
+  return bitcoin.payments.p2wpkh({
+    hash: createPubKeyHash(options)(publicKey),
+    network: (options && options.network) || bitcoin.networks.testnet
+  }).address
 }
 
 // Returns hex value of a SegWit address:

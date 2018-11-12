@@ -41,7 +41,7 @@ const {
 } = require('./compose-build')
 
 const { hashSha3 } = require('./tx-decoder')
-const { createPubKeyHash } = require('./utils')
+const { createPubKeyHash, getAddress } = require('./utils')
 
 /**
  * Main function to build a bitcoin transaction. Creates an instance of Buffer.
@@ -376,13 +376,6 @@ const signBuffer = (keyPair, options) => function signBufferFn (buffer) {
 
   // return keyPair.sign(hash).toScriptSignature(HASHTYPE.SIGHASH_ALL)
   return bscript.signature.encode(keyPair.sign(hash), HASHTYPE.SIGHASH_ALL)
-}
-
-function getAddress (publicKey, options) {
-  return bitcoin.payments.p2pkh({
-    hash: createPubKeyHash(options)(publicKey),
-    network: options.network
-  }).address
 }
 
 // If one of the VINs has type P2PKH then it requires SegWit serialization.
