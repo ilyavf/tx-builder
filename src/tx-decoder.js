@@ -27,7 +27,7 @@ const readHash = buffer => {
   return [hash, bufferLeft]
 }
 
-// readSig :: Buffer -> [{Asm, Hex}, Buffer]
+// readSig :: Buffer -> [ScriptSig, Buffer]
 const readSig = buffer => {
   const [ res, bufferLeft ] = readVarSlice(buffer)
 
@@ -55,6 +55,7 @@ const readInputs = readFn => buffer => {
   return [vins, bufferLeft]
 }
 
+// readScript :: Buffer -> [ScriptPubKey, Buffer]
 const readScript = buffer => {
   const [ scriptBuffer, bufferLeft ] = readVarSlice(buffer)
 
