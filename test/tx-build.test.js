@@ -176,7 +176,7 @@ describe('builder', function () {
     it('should create vin script', function () {
       // Requires both privateKey and publicKey.
       const script = vinScript(buildTxCopy({}), { network })(fixture.tx, 0)(keyPair)
-      assert.equal(script.toString('hex'), fixture.decoded.vin[0].scriptSig)
+      assert.equal(script.toString('hex'), fixture.decoded.vin[0].scriptSig.hex)
     })
   })
 

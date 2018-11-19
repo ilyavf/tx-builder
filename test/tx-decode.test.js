@@ -27,7 +27,7 @@ describe('decoder', function () {
       assert.equal(input.vout, fixture.decoded.vin[0].vout)
     })
     it('should read scriptSig', function () {
-      assert.equal(input.scriptSig.toString('hex'), fixture.decoded.vin[0].scriptSig)
+      assert.equal(input.scriptSig.hex, fixture.decoded.vin[0].scriptSig.hex)
     })
     it('should read sequence', function () {
       assert.equal(input.sequence, fixture.decoded.vin[0].sequence)
@@ -45,7 +45,7 @@ describe('decoder', function () {
       assert.equal(output.value, fixture.decoded.vout[0].value)
     })
     it('should read scriptPubKey', function () {
-      assert.equal(output.scriptPubKey.toString('hex'), fixture.decoded.vout[0].scriptPubKey)
+      assert.equal(output.scriptPubKey.hex, fixture.decoded.vout[0].scriptPubKey.hex)
     })
     it('should leave some buffer', function () {
       assert.ok(bufferLeft)
@@ -77,13 +77,13 @@ describe('decoder', function () {
       assert.equal(outputs[0].value, fixture.decoded.vout[0].value)
     })
     it('should read vout-1 script', function () {
-      assert.equal(outputs[0].scriptPubKey.toString('hex'), fixture.decoded.vout[0].scriptPubKey)
+      assert.equal(outputs[0].scriptPubKey.hex, fixture.decoded.vout[0].scriptPubKey.hex)
     })
     it('should read vout-2 value', function () {
       assert.equal(outputs[1].value, fixture.decoded.vout[1].value)
     })
     it('should read vout-2 script', function () {
-      assert.equal(outputs[1].scriptPubKey.toString('hex'), fixture.decoded.vout[1].scriptPubKey)
+      assert.equal(outputs[1].scriptPubKey.hex, fixture.decoded.vout[1].scriptPubKey.hex)
     })
     it('should leave some buffer', function () {
       assert.ok(bufferLeft)
