@@ -27,6 +27,20 @@ const readHash = buffer => {
   return [hash, bufferLeft]
 }
 
+// readSig :: Buffer -> [ScriptSig, Buffer]
+const readSig = buffer => {
+  const [ res, bufferLeft ] = readVarSlice(buffer)
+
+  const [ asmPart, asmBufferLeft ] = readVarSlice(res)
+  const asm = [ asmPart.toString('hex') ]
+  const hashType = asmPart.readUInt8(asmPart.length - 1) & ~0x80
+  if (hashType <= 0 || hashType >= 4) throw new Error('Invalid hashType ' + hashType)
+  const [ asmPart2 ] = readVarSlice(asmBufferLeft)
+  asm.push(asmPart2.toString('hex'))
+
+  return [{ asm: asm.join(' '), hex: res.toString('hex') }, bufferLeft]
+}
+
 // readInputs :: Fn -> Buffer -> (Res, Buffer)
 const readInputs = readFn => buffer => {
   const vins = []
@@ -37,6 +51,18 @@ const readInputs = readFn => buffer => {
     vins.push(vin)
   }
   return [vins, bufferLeft]
+}
+
+// readScript :: Buffer -> [ScriptPubKey, Buffer]
+const readScript = buffer => {
+  const [ scriptBuffer, bufferLeft ] = readVarSlice(buffer)
+
+  return [ {
+    hex: scriptBuffer.toString('hex'),
+    type: scriptBuffer[0] === bitcoin.opcodes.OP_DUP && scriptBuffer[1] === bitcoin.opcodes.OP_HASH160 ? 'pubkeyhash' : 'nonstandard',
+    asm: bitcoin.script.toASM(scriptBuffer),
+    addresses: [ bitcoin.address.fromOutputScript(scriptBuffer) ]
+  }, bufferLeft ]
 }
 
 // decodeTx :: Buffer -> [Object, Buffer]
@@ -56,7 +82,7 @@ const readInput = buffer =>
   compose([
     addProp('txid', readHash),                // 32 bytes, Transaction Hash
     addProp('vout', readUInt32),             // 4 bytes, Output Index
-    addProp('scriptSig', readVarSlice),       // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
+    addProp('scriptSig', readSig),       // 1-9 bytes (VarInt), Unlocking-Script Size; Variable, Unlocking-Script
     addProp('sequence', readUInt32)           // 4 bytes, Sequence Number
   ])({}, buffer)
 )
@@ -66,7 +92,7 @@ const readOutput = buffer =>
 (
   compose([
     addProp('value', readUInt64),             // 8 bytes, Amount in satoshis
-    addProp('scriptPubKey', readVarSlice)     // 1-9 bytes (VarInt), Locking-Script Size; Variable, Locking-Script
+    addProp('scriptPubKey', readScript)     // 1-9 bytes (VarInt), Locking-Script Size; Variable, Locking-Script
   ])({}, buffer)
 )
 

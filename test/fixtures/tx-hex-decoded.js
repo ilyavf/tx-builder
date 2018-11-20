@@ -20,15 +20,30 @@ module.exports = {
     vin: [{
       txid: 'a3661cde89a5690f8aaffce8fb4371f78dda08b1f44b886798bb928d9e348aa5',
       vout: 1,
-      scriptSig: '4730440220764bbe9ddff67409310c04ffb34fe937cc91c3d55303158f91a32bed8d9d7a7b02207fb30f6b9aaef93da8c88e2b818d993ad65aae54860c3de56c6304c57252cce1012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a3',
+      scriptSig: {
+        asm: '30440220764bbe9ddff67409310c04ffb34fe937cc91c3d55303158f91a32bed8d9d7a7b02207fb30f6b9aaef93da8c88e2b818d993ad65aae54860c3de56c6304c57252cce1[ALL] 03a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a3',
+        hex: '4730440220764bbe9ddff67409310c04ffb34fe937cc91c3d55303158f91a32bed8d9d7a7b02207fb30f6b9aaef93da8c88e2b818d993ad65aae54860c3de56c6304c57252cce1012103a6afa2211fc96a4130e767da4a9e802f5e922a151c5cd6d4bffa80358dd1f9a3'
+      },
       sequence: '4294967295'
     }],
     vout: [{
       value: 200000000,
-      scriptPubKey: '76a9147adddcbdf9f0ebcb814e2efb95debda73bfefd9888ac'
+      scriptPubKey: {
+        hex: '76a9147adddcbdf9f0ebcb814e2efb95debda73bfefd9888ac',
+        type: 'pukeyhash',
+        asm: 'OP_DUP OP_HASH160 7adddcbdf9f0ebcb814e2efb95debda73bfefd98 OP_EQUALVERIFY OP_CHECKSIG',
+        addresses: [
+          '1CCfDfXrK93pqwczpwQnzKEPzBvuGZ9bbW'
+        ]
+      }
     }, {
       value: 1999980000,  // (21.9999 - 2 - 0.0001)
-      scriptPubKey: '76a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac'
+      scriptPubKey: {
+        hex: '76a9145e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f788ac',
+        type: 'pubkeyhash',
+        asm: 'OP_DUP OP_HASH160 5e9f5c8cc17ecaaea1b4e5a3d091ca0aed1342f7 OP_EQUALVERIFY OP_CHECKSIG',
+        addresses: [ '19dKRfZK3JyfZnaaRDFmmgjdWmw8dz7j4g' ]
+      }
     }]
   },
   offsetVout1: 153,
