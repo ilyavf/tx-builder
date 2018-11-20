@@ -32,11 +32,9 @@ const readSig = buffer => {
   const [ res, bufferLeft ] = readVarSlice(buffer)
 
   const [ asmPart, asmBufferLeft ] = readVarSlice(res)
-  const asm = [ asmPart.toString('hex') ] // [ asmPart.slice(0, -1).toString('hex') ]
+  const asm = [ asmPart.toString('hex') ]
   const hashType = asmPart.readUInt8(asmPart.length - 1) & ~0x80
   if (hashType <= 0 || hashType >= 4) throw new Error('Invalid hashType ' + hashType)
-  // uncomment this to follow the format of fixture data in most tests (replaces hashType with '[ALL]')
-  // else if (hashType === 1) asm.push('[ALL] ')
   const [ asmPart2 ] = readVarSlice(asmBufferLeft)
   asm.push(asmPart2.toString('hex'))
 
