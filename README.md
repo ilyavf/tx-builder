@@ -338,6 +338,7 @@ console.log(`coinbaseTx hex = ${conbaseTx.toString("hex")}`)
 - [ ] parallelize `pow` with Web Workers
 
 ## Release Notes:
+- 0.18.0 Decode scriptPubKey and scriptSig (#21).
 - 0.17.0 Added createPubKeyHash utility. Now different sha function can be used for hashing pub keys.
 - 0.16.0 Upgraded to `bitcoinjs-lib` v4.
 - 0.15.0 Allow to pass options to PoW.
